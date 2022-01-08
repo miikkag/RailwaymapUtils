@@ -1,0 +1,22 @@
+Finland:
+(58.813741715708,18.10546875,70.641768735846,33.22265625);
+
+
+[out:xml][timeout:500];
+// gather results
+(
+  // query part for: “railway=*”
+  rel["natural"="water"]["water"="lake"]({{bbox}});
+  way["natural"="water"]({{bbox}});
+  way["railway"="rail"]({{bbox}});
+  way["railway"="light_rail"]({{bbox}});
+  way["construction"="rail"]({{bbox}});
+  way["construction"="light_rail"]({{bbox}});
+  node["railway"="station"]["station"!="subway"]({{bbox}});
+  way["admin_level"="2"][!"maritime"]({{bbox}});
+  way["natural"="coastline"]({{bbox}});
+);
+// print results
+out body;
+>;
+out skel qt;

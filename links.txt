@@ -1,0 +1,11 @@
+https://gis.stackexchange.com/questions/261975/is-it-possible-to-download-all-the-contents-of-openrailwaymap-com-as-a-shapefile/261979
+
+http://download.geofabrik.de/europe/finland.html#
+
+
+
+https://docs.python.org/3/library/xml.sax.handler.html#xml.sax.handler.ContentHandler
+https://docs.python.org/3/library/xml.sax.reader.html
+https://wiki.openstreetmap.org/wiki/Way
+https://wiki.openstreetmap.org/wiki/Relation
+

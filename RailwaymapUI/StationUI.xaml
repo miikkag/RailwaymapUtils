@@ -1,0 +1,237 @@
+﻿<UserControl x:Class="RailwaymapUI.StationUI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RailwaymapUI"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <Brush x:Key="AlignButtonIdle">#E0E0E0</Brush>
+        <Brush x:Key="AlignbuttonSelected">#B6DBC1</Brush>
+        <Brush x:Key="BoldbuttonSelected">#8BD698</Brush>
+        <Brush x:Key="ENbuttonSelected">#FF975B</Brush>
+
+        <Style x:Key="StyleMainBackground" TargetType="Border">
+            <Setter Property="Background" Value="#F0F0E0"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Highlighted}" Value="True">
+                    <Setter Property="Background" Value="#B6DB8E"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="StyleValign_Bottom" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Valign_Bottom}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AlignbuttonSelected}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="StyleValign_Center" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Valign_Center}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AlignbuttonSelected}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="StyleValign_Top" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Valign_Top}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AlignbuttonSelected}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="StyleHalign_Left" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Halign_Left}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AlignbuttonSelected}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="StyleHalign_Center" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Halign_Center}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AlignbuttonSelected}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style x:Key="StyleHalign_Right" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Halign_Right}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AlignbuttonSelected}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style x:Key="StyleButtonBold" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding bold}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BoldbuttonSelected}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style x:Key="StyleButtonEN" TargetType="Button">
+            <Setter Property="Foreground" Value="#404040"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding english}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource ENbuttonSelected}"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding has_english}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DotButtonStyle1" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding dotsize}" Value="1">
+                    <Setter Property="Background" Value="{StaticResource BoldbuttonSelected}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="DotButtonStyle2" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding dotsize}" Value="2">
+                    <Setter Property="Background" Value="{StaticResource BoldbuttonSelected}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="DotButtonStyle3" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding dotsize}" Value="3">
+                    <Setter Property="Background" Value="{StaticResource BoldbuttonSelected}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="DotButtonStyle4" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding dotsize}" Value="4">
+                    <Setter Property="Background" Value="{StaticResource BoldbuttonSelected}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+
+    </UserControl.Resources>
+    <Border HorizontalAlignment="Left" Padding="2" Margin="2,2,2,2" BorderThickness="1" BorderBrush="White"
+            x:Name="LayoutRoot" DataContext="{Binding}" SnapsToDevicePixels="True" UseLayoutRounding="True"
+            Style="{StaticResource StyleMainBackground}" >
+        <StackPanel Orientation="Vertical">
+            <Grid>
+                <CheckBox Content="{Binding use_name}" VerticalContentAlignment="Center" FontWeight="SemiBold"
+                              IsChecked="{Binding visible}"
+                              Click="Station_Check_click"/>
+                <StackPanel Orientation="Horizontal" TextElement.FontSize="11" HorizontalAlignment="Right">
+                    <TextBlock Text="{Binding xy}"/>
+                    <Border Width="3"/>
+                    <Button Padding="-3" Tag="{Binding id}" Width="16" Height="14" Click="Station_EN_Click"
+                        FontSize="9" FontWeight="Normal" TextOptions.TextFormattingMode="Display"
+                        Style="{StaticResource StyleButtonEN}">EN</Button>
+
+                </StackPanel>
+            </Grid>
+            <Border Height="2"/>
+            <StackPanel Orientation="Horizontal">
+                <Button Padding="2" Tag="{Binding id}" Width="18" Height="18" Click="Station_valign_top"
+                        FontFamily="Segoe MDL2 Assets" FontSize="9" TextOptions.TextFormattingMode="Display"
+                        Style="{StaticResource StyleValign_Top}">&#xF0AD;</Button>
+                <Border Width="2"/>
+                <Button Padding="2" Tag="{Binding id}" Width="18" Height="18" Click="Station_valign_center"
+                        FontFamily="Segoe MDL2 Assets" FontSize="10" TextOptions.TextFormattingMode="Display"
+                        Style="{StaticResource StyleValign_Center}">&#xF141;</Button>
+                <Border Width="2"/>
+                <Button Padding="2" Tag="{Binding id}" Width="18" Height="18" Click="Station_valign_bottom"
+                        FontFamily="Segoe MDL2 Assets" FontSize="9" TextOptions.TextFormattingMode="Display"
+                        Style="{StaticResource StyleValign_Bottom}">&#xF0AE;</Button>
+
+                <Border Width="6"/>
+
+                <Button Padding="2" Tag="{Binding id}" Width="18" Height="18" Click="Station_halign_left"
+                        FontFamily="Segoe MDL2 Assets" FontSize="9" TextOptions.TextFormattingMode="Display"
+                        Style="{StaticResource StyleHalign_Left}">&#xF0B0;</Button>
+                <Border Width="2"/>
+                <Button Padding="2" Tag="{Binding id}" Width="18" Height="18" Click="Station_halign_center"
+                        FontSize="10" TextOptions.TextFormattingMode="Display"
+                        Style="{StaticResource StyleHalign_Center}">|</Button>
+                <Border Width="2"/>
+                <Button Padding="2" Tag="{Binding id}" Width="18" Height="18" Click="Station_halign_right"
+                        FontFamily="Segoe MDL2 Assets" FontSize="9" TextOptions.TextFormattingMode="Display"
+                        Style="{StaticResource StyleHalign_Right}">&#xF0AF;</Button>
+
+                <Border Width="5"/>
+                <TextBox Text="{Binding display_name}" Width="82"
+                         GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
+            </StackPanel>
+            <Border Height="2"/>
+            <StackPanel Orientation="Horizontal">
+                <Button Padding="-3" Tag="{Binding id}" Width="18" Height="14" Click="Station_offsety_minus"
+                        FontFamily="Segoe MDL2 Assets" FontSize="8" TextOptions.TextFormattingMode="Display">&#xE70E;</Button>
+                <Border Width="2"/>
+                <Button Padding="-3" Tag="{Binding id}" Width="18" Height="14" Click="Station_offsety_plus"
+                        FontFamily="Segoe MDL2 Assets" FontSize="8" TextOptions.TextFormattingMode="Display">&#xE70D;</Button>
+                <Border Width="2"/>
+                <Border Width="18" Height="13">
+                    <TextBlock FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Center"
+                               Text="{Binding offsety}" Foreground="Gray"/>
+                </Border>
+
+                <Border Width="6"/>
+
+                <Button Padding="-3" Tag="{Binding id}" Width="18" Height="14" Click="Station_offsetx_minus"
+                        FontFamily="Segoe MDL2 Assets" FontSize="8" TextOptions.TextFormattingMode="Display">&#xE76B;</Button>
+                <Border Width="2"/>
+                <Button Padding="-3" Tag="{Binding id}" Width="18" Height="14" Click="Station_offsetx_plus"
+                        FontFamily="Segoe MDL2 Assets" FontSize="8" TextOptions.TextFormattingMode="Display">&#xE76C;</Button>
+                <Border Width="2"/>
+                <Border Width="18" Height="14">
+                    <TextBlock FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Center"
+                               Text="{Binding offsetx}" Foreground="Gray"/>
+                </Border>
+
+                <Border Width="5"/>
+                <Button Padding="-3" Tag="{Binding id}" Width="18" Height="14" Click="Station_Bold_Click"
+                        FontSize="10" FontWeight="Bold" TextOptions.TextFormattingMode="Display"
+                        Style="{StaticResource StyleButtonBold}">B</Button>
+                <Border Width="4"/>
+                
+                <Button Padding="-3" Tag="{Binding id}" Width="14" Height="14" Click="Station_Dot1"
+                        FontSize="10" TextOptions.TextFormattingMode="Display"
+                        Style="{StaticResource DotButtonStyle1}">
+                    <Rectangle Width="2" Height="2" Fill="Black"/>
+                </Button>
+                <Border Width="1"/>
+                <Button Padding="-3" Tag="{Binding id}" Width="14" Height="14" Click="Station_Dot2"
+                        FontSize="12" TextOptions.TextFormattingMode="Display"
+                        Style="{StaticResource DotButtonStyle2}">
+                    <Rectangle Width="3" Height="3" Fill="Black"/>
+                </Button>
+                <Border Width="1"/>
+                <Button Padding="-3" Tag="{Binding id}" Width="14" Height="14" Click="Station_Dot3"
+                        FontSize="6" TextOptions.TextFormattingMode="Display"
+                        Style="{StaticResource DotButtonStyle3}">
+                    <Rectangle Width="4" Height="4" Fill="Black"/>
+                </Button>
+                <Border Width="1"/>
+                <Button Padding="-3" Tag="{Binding id}" Width="14" Height="14" Click="Station_Dot4"
+                        FontSize="7" TextOptions.TextFormattingMode="Display"
+                        Style="{StaticResource DotButtonStyle4}">
+                    <Rectangle Width="6" Height="6" Fill="Black"/>
+                </Button>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>

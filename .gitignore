@@ -1,0 +1,7 @@
+__obsolete
+__pycache__
+bin/
+obj/
+.vs/
+*.xml
+*.db
