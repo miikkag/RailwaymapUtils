@@ -100,11 +100,11 @@ namespace RailwaymapUI
             {
                 if (ws.WayCoordSets[w].Coords.Length > 1)
                 {
-                    double y1 = bounds.Y_Pad + (bounds.Scale * (bounds.Y_max - Commons.Merc_Y(ws.WayCoordSets[w].Coords[0].Latitude)));
-                    double x1 = bounds.X_Pad + (bounds.Scale * (Commons.Merc_X(ws.WayCoordSets[w].Coords[0].Longitude) - bounds.X_min));
+                    double y1 = bounds.Scale * (bounds.Y_max - Commons.Merc_Y(ws.WayCoordSets[w].Coords[0].Latitude));
+                    double x1 = bounds.Scale * (Commons.Merc_X(ws.WayCoordSets[w].Coords[0].Longitude) - bounds.X_min);
 
-                    double y2 = bounds.Y_Pad + (bounds.Scale * (bounds.Y_max - Commons.Merc_Y(ws.WayCoordSets[w].Coords.Last().Latitude)));
-                    double x2 = bounds.X_Pad + (bounds.Scale * (Commons.Merc_X(ws.WayCoordSets[w].Coords.Last().Longitude) - bounds.X_min));
+                    double y2 = bounds.Scale * (bounds.Y_max - Commons.Merc_Y(ws.WayCoordSets[w].Coords.Last().Latitude));
+                    double x2 = bounds.Scale * (Commons.Merc_X(ws.WayCoordSets[w].Coords.Last().Longitude) - bounds.X_min);
 
                     DrawLine.Draw_Line_1px(new System.Drawing.Point((int)x1, (int)y1), new System.Drawing.Point((int)x2, (int)y2), bmp, color);
                 }
@@ -144,8 +144,8 @@ namespace RailwaymapUI
 
                 for (int c = 0; c < lenc; c++)
                 {
-                    double y = bounds.Y_Pad + (bounds.Scale * (bounds.Y_max - Commons.Merc_Y(ws.WayCoordSets[w].Coords[c].Latitude)));
-                    double x = bounds.X_Pad + (bounds.Scale * (Commons.Merc_X(ws.WayCoordSets[w].Coords[c].Longitude) - bounds.X_min));
+                    double y = bounds.Scale * (bounds.Y_max - Commons.Merc_Y(ws.WayCoordSets[w].Coords[c].Latitude));
+                    double x = bounds.Scale * (Commons.Merc_X(ws.WayCoordSets[w].Coords[c].Longitude) - bounds.X_min);
 
                     // Filter lines too close to each other
                     double dist = Math.Abs(x - prev_x) + Math.Abs(y - prev_y);
@@ -228,8 +228,8 @@ namespace RailwaymapUI
 
                 for (int c = 0; c < lenc; c++)
                 {
-                    double y = bounds.Y_Pad + (bounds.Scale * (bounds.Y_max - Commons.Merc_Y(ws.WayCoordSets[w].Coords[c].Latitude)));
-                    double x = bounds.X_Pad + (bounds.Scale * (Commons.Merc_X(ws.WayCoordSets[w].Coords[c].Longitude) - bounds.X_min));
+                    double y = bounds.Scale * (bounds.Y_max - Commons.Merc_Y(ws.WayCoordSets[w].Coords[c].Latitude));
+                    double x = bounds.Scale * (Commons.Merc_X(ws.WayCoordSets[w].Coords[c].Longitude) - bounds.X_min);
 
                     // Filter lines too close to each other
                     double dist = Math.Abs(x - prev_x) + Math.Abs(y - prev_y);

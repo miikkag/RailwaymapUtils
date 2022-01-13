@@ -54,8 +54,8 @@ namespace RailwaymapUI
                         usefont = font_normal;
                     }
 
-                    double yf = bounds.Y_Pad + (bounds.Scale * (bounds.Y_max - Commons.Merc_Y(stations[i].Coord.Latitude)));
-                    double xf = bounds.X_Pad + (bounds.Scale * (Commons.Merc_X(stations[i].Coord.Longitude) - bounds.X_min));
+                    double yf = bounds.Scale * (bounds.Y_max - Commons.Merc_Y(stations[i].Coord.Latitude));
+                    double xf = bounds.Scale * (Commons.Merc_X(stations[i].Coord.Longitude) - bounds.X_min);
 
                     int x = (int)xf;
                     int y = (int)yf;

@@ -34,6 +34,8 @@ namespace RailwaymapUI
 
         private const string DB_FILENAME_RAILWAYS = "railway.db";
         private const string DB_FILENAME_BORDER = "border.db";
+        private const string DB_FILENAME_COASTLINE = "coastline.db";
+        private const string DB_FILENAME_COASTLINE_CACHE = "coastline_cache.db";
 
         public string Area { get; private set; }
         private string AreaPath;
@@ -45,10 +47,6 @@ namespace RailwaymapUI
         public int OutputSizeWidth { get; set; }
         public int OutputSizeHeight { get; set; }
 
-        public int OutputPaddingLeft { get; set; }
-        public int OutputPaddingRight { get; set; }
-        public int OutputPaddingTop { get; set; }
-        public int OutputPaddingBottom { get; set; }
 
         public MapImage_Background Image_Background { get; private set; }
         public MapImage_Landarea Image_Landarea { get; private set; }
@@ -83,6 +81,7 @@ namespace RailwaymapUI
             public bool railways;
             public bool cities;
             public bool scale;
+            public bool margins;
         }
 
         private DrawItems draw_items;
@@ -121,6 +120,7 @@ namespace RailwaymapUI
         public void Reset_Size()
         {
             Image_Background.Set_Size(OutputSizeWidth, OutputSizeHeight);
+            Image_Landarea.Set_Size(OutputSizeWidth, OutputSizeHeight);
             Image_Water.Set_Size(OutputSizeWidth, OutputSizeHeight);
             Image_Borders.Set_Size(OutputSizeWidth, OutputSizeHeight);
             Image_Railways.Set_Size(OutputSizeWidth, OutputSizeHeight);
@@ -138,6 +138,7 @@ namespace RailwaymapUI
             draw_items.railways = true;
             draw_items.cities = true;
             draw_items.scale = true;
+            draw_items.margins = true;
 
             Thread thr = new Thread(DrawAllThread);
 
@@ -152,6 +153,7 @@ namespace RailwaymapUI
             draw_items.railways = (item == MapItems.Railways);
             draw_items.cities = (item == MapItems.Cities);
             draw_items.scale = (item == MapItems.Scale);
+            draw_items.margins = (item == MapItems.Margins);
 
             Thread thr = new Thread(DrawAllThread);
 
@@ -419,6 +421,11 @@ namespace RailwaymapUI
 
             gr.Clear(Set.Color_Land);
 
+            if (Image_Landarea.Enabled)
+            {
+                gr.DrawImage(Image_Landarea.GetBitmap(), 0, 0);
+            }
+
             if (Image_Water.Enabled)
             {
                 gr.DrawImage(Image_Water.GetBitmap(), 0, 0);
@@ -441,7 +448,10 @@ namespace RailwaymapUI
 
             gr.DrawImage(Image_Scale.GetBitmap(), 0, 0);
 
-            bmp.Save(OutputFileName, ImageFormat.Png);
+            string parent = Directory.GetParent(AreaPath).FullName;
+            string output_pathname = Path.Combine(parent, OutputFileName);
+
+            bmp.Save(output_pathname, ImageFormat.Png);
         }
 
 
@@ -460,10 +470,6 @@ namespace RailwaymapUI
 
                 all.Add(DB_CONFIG_PREFIX + "OutputWidth=" + OutputSizeWidth.ToString());
                 all.Add(DB_CONFIG_PREFIX + "OutputHeight=" + OutputSizeHeight.ToString());
-                all.Add(DB_CONFIG_PREFIX + "OutputPaddingLeft=" + OutputPaddingLeft.ToString());
-                all.Add(DB_CONFIG_PREFIX + "OutputPaddingRight=" + OutputPaddingRight.ToString());
-                all.Add(DB_CONFIG_PREFIX + "OutputPaddingTop=" + OutputPaddingTop.ToString());
-                all.Add(DB_CONFIG_PREFIX + "OutputPaddingBottom=" + OutputPaddingBottom.ToString());
 
                 all.Add(DB_CONFIG_PREFIX + "Separate_NonVisibleStations=" + Separate_NonVisibleStations.ToString());
 
@@ -557,22 +563,6 @@ namespace RailwaymapUI
 
                             case "OutputHeight":
                                 OutputSizeHeight = val;
-                                break;
-
-                            case "OutputPaddingLeft":
-                                OutputPaddingLeft = val;
-                                break;
-
-                            case "OutputPaddingRight":
-                                OutputPaddingRight = val;
-                                break;
-
-                            case "OutputPaddingTop":
-                                OutputPaddingTop = val;
-                                break;
-
-                            case "OutputPaddingBottom":
-                                OutputPaddingBottom = val;
                                 break;
 
                             case "Separate_NonVisibleStations":
@@ -695,57 +685,73 @@ namespace RailwaymapUI
             double delta_x = x_max - x_min;
             double delta_y = y_max - y_min;
 
-            double scalex = (double)(OutputSizeWidth - (OutputPaddingLeft + OutputPaddingRight)) / delta_x;
-            double scaley = (double)(OutputSizeHeight - (OutputPaddingTop + OutputPaddingBottom)) / delta_y;
+            double scalex = (double)OutputSizeWidth / delta_x;
+            double scaley = (double)OutputSizeHeight / delta_y;
 
             double scale = Math.Min(scalex, scaley);
 
-            //Console.WriteLine(string.Format("y_max={0} y_min={1} x_max={2} x_min={3} delta_x={4} delta_y={5} scalex={6} scaley={7}",
-            //    y_max, y_min, x_max, x_min, delta_x, delta_y, scalex, scaley));
 
-            BoundsXY bxy = new BoundsXY(x_max, x_min, y_max, y_min, scale, OutputPaddingLeft, OutputPaddingTop);
+            BoundsXY bxy = new BoundsXY(x_max, x_min, y_max, y_min, scale);
 
-            if (draw_items.borders)
+            string db_file = "Init";
+
+            //try
             {
-                Progress.Set_Info(true, "Drawing borders", 0);
 
-                string db_file = Path.Combine(AreaPath, DB_FILENAME_BORDER);
-
-                try
+                if (draw_items.landarea)
                 {
+                    db_file = Path.Combine(AreaPath, DB_FILENAME_COASTLINE);
+                    
+                    string db_cache = Path.Combine(AreaPath, DB_FILENAME_COASTLINE_CACHE);
+
+                    if (!LandareaCache.Check_Cache_DB(db_file, db_cache))
+                    {
+                        LandareaCache.Convert_Coastline(db_file, db_cache, Progress);
+                    }
+
+                    using (SQLiteConnection sqlite_landarea_cache = new SQLiteConnection("Data Source=" + db_cache))
+                    {
+                        sqlite_landarea_cache.Open();
+
+                        Image_Landarea.Draw(sqlite_landarea_cache, bxy, Progress, Set);
+
+                        sqlite_landarea_cache.Close();
+                    }
+
+                    OnPropertyChanged("Image_Landarea");
+                }
+
+                if (draw_items.borders)
+                {
+                    db_file = Path.Combine(AreaPath, DB_FILENAME_BORDER);
+
                     using (SQLiteConnection sqlite_border = new SQLiteConnection("Data Source=" + db_file))
                     {
                         sqlite_border.Open();
 
                         Image_Borders.Draw(sqlite_border, bxy, Progress, Set);
+
+                        sqlite_border.Close();
                     }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error opening " + db_file + Environment.NewLine + Environment.NewLine + ex.Message,
-                        "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                    OnPropertyChanged("Image_Borders");
                 }
 
-                OnPropertyChanged("Image_Borders");
-            }
-
-            if (draw_items.water)
-            {
-                Progress.Set_Info(true, "Drawing water", 0);
-
-                //Image_Water.Draw(sqlite_conn, bxy, Progress, Set);
-
-                OnPropertyChanged("Image_Water");
-            }
-
-            if (draw_items.railways)
-            {
-                Progress.Set_Info(true, "Processing railways", 0);
-
-                string db_file = Path.Combine(AreaPath, DB_FILENAME_RAILWAYS);
-
-                try
+                if (draw_items.water)
                 {
+                    Progress.Set_Info(true, "Drawing water", 0);
+
+                    //Image_Water.Draw(sqlite_conn, bxy, Progress, Set);
+
+                    OnPropertyChanged("Image_Water");
+                }
+
+                if (draw_items.railways)
+                {
+                    Progress.Set_Info(true, "Processing railways", 0);
+
+                    db_file = Path.Combine(AreaPath, DB_FILENAME_RAILWAYS);
+
                     using (SQLiteConnection sqlite_railways = new SQLiteConnection("Data Source=" + db_file))
                     {
                         sqlite_railways.Open();
@@ -754,36 +760,40 @@ namespace RailwaymapUI
 
                         sqlite_railways.Close();
                     }
+
+                    OnPropertyChanged("Image_Railways");
                 }
-                catch (Exception ex)
+
+                if (draw_items.cities)
                 {
-                    MessageBox.Show("Error opening " + db_file + Environment.NewLine + Environment.NewLine + ex.Message,
-                        "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    db_file = "Cities";
+
+                    Progress.Set_Info(true, "Drawing cities", 0);
+
+                    Image_Cities.Draw(Stations, bxy, Progress, Set);
+
+                    OnPropertyChanged("Image_Cities");
                 }
 
-                OnPropertyChanged("Image_Railways");
-            }
+                if (draw_items.scale)
+                {
+                    db_file = "Scale";
 
-            if (draw_items.cities)
+                    Image_Scale.Draw(bxy, bounds, Set);
+
+                    OnPropertyChanged("Image_Scale");
+                }
+            }
+            /*catch (Exception ex)
             {
-                Progress.Set_Info(true, "Drawing cities", 0);
+                MessageBox.Show("Error processing " + db_file + Environment.NewLine + Environment.NewLine + ex.Message,
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
-                Image_Cities.Draw(Stations, bxy, Progress, Set);
-
-                OnPropertyChanged("Image_Cities");
-            }
-
-            if (draw_items.scale)
-            {
-                Image_Scale.Draw(bxy, bounds, Set);
-
-                OnPropertyChanged("Image_Scale");
-            }
-
+                return;
+            }*/
 
             Progress.Set_Info(false, "", 0);
         }
-
 
         private void Load_Stations(SQLiteConnection conn)
         {

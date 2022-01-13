@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace RailwaymapUI
 {
@@ -48,17 +49,20 @@ namespace RailwaymapUI
         public Color Color_Selection_Area = Color.FromArgb(242, 255, 0);
         public Color Color_Selection_Border = Color.FromArgb(93, 124, 0);
 
+        public Color Color_DebugPink = Color.FromArgb(255, 0, 255);
+        public Color Color_DebugOrange = Color.FromArgb(255, 128, 0);
+
         public const int Dotsize_Station_Default = 2;
 
         public int Scale_km = 100;
         public int Scale_FontSize = 8;
         public string Scale_FontName = "Microsoft Sans Serif";
 
-        public bool Draw_Border_Land { get; set; }
-        public bool Draw_Border_Coastline { get; set; }
-        public bool Draw_Border_Territorial { get; set; }
-
         public bool Draw_Railway_Spur { get; set; }
+        public bool Draw_Border { get; set; }
+
+        public bool Draw_Landarea_Islands { get; set; }
+        public bool Draw_Landarea_Islets { get; set; }
 
         public int Filter_Water_Line { get; set; }
         public int Filter_Water_Area { get; set; }
@@ -83,6 +87,10 @@ namespace RailwaymapUI
         public int FontSizeBold_Cities { get; set; }
 
         public bool AutoRedraw_Cities { get; set; }
+
+        private bool _overdraw_margins;
+        public bool Overdraw_Margins { get { return _overdraw_margins; } set { if (_overdraw_margins != value) { _overdraw_margins = value; OnPropertyChanged("Overdraw_Margins"); OnPropertyChanged("Overdraw_MarginsVisible"); } } }
+        public Visibility Overdraw_MarginsVisible { get { if (Overdraw_Margins) return Visibility.Visible; else return Visibility.Hidden; } }
 
         private ScalePosition scale_pos;
         public ScalePosition Scale_Position { get { return scale_pos; } set { scale_pos = value; OnPropertyChanged("Scale_Position"); } }
@@ -112,11 +120,11 @@ namespace RailwaymapUI
 
             AutoRedraw_Cities = true;
 
-            Draw_Border_Land = true;
-            Draw_Border_Coastline = true;
-            Draw_Border_Territorial = true;
-
             Draw_Railway_Spur = false;
+            Draw_Border = true;
+
+            Draw_Landarea_Islands = true;
+            Draw_Landarea_Islets = false;
 
             Debug_Water_ID = false;
             Debug_Water_BorderOnly = false;
@@ -211,20 +219,20 @@ namespace RailwaymapUI
                             AutoRedraw_Cities = val_bool;
                             break;
 
-                        case "Draw_Border_Land":
-                            Draw_Border_Land = val_bool;
-                            break;
-
-                        case "Draw_Border_Coastline":
-                            Draw_Border_Coastline = val_bool;
-                            break;
-
-                        case "Draw_Border_Territorial":
-                            Draw_Border_Territorial = val_bool;
-                            break;
-
                         case "Draw_Railway_Spur":
                             Draw_Railway_Spur = val_bool;
+                            break;
+
+                        case "Draw_Border":
+                            Draw_Railway_Spur = val_bool;
+                            break;
+
+                        case "Draw_Landarea_Islands":
+                            Draw_Landarea_Islands = val_bool;
+                            break;
+
+                        case "Draw_Landarea_Islets":
+                            Draw_Landarea_Islets = val_bool;
                             break;
 
                         case "Scale_Position":
@@ -237,6 +245,10 @@ namespace RailwaymapUI
 
                         case "Scale_MarginY":
                             Scale_MarginY = val_int;
+                            break;
+
+                        case "Overdraw_Margins":
+                            Overdraw_Margins = val_bool;
                             break;
 
                         default:
@@ -293,16 +305,16 @@ namespace RailwaymapUI
             str = CONFIG_PREFIX + "AutoRedraw_Cities=" + AutoRedraw_Cities.ToString();
             result.Add(str);
 
-            str = CONFIG_PREFIX + "Draw_Border_Land=" + Draw_Border_Land.ToString();
-            result.Add(str);
-
-            str = CONFIG_PREFIX + "Draw_Border_Coastline=" + Draw_Border_Coastline.ToString();
-            result.Add(str);
-
-            str = CONFIG_PREFIX + "Draw_Border_Territorial=" + Draw_Border_Territorial.ToString();
-            result.Add(str);
-
             str = CONFIG_PREFIX + "Draw_Railway_Spur=" + Draw_Railway_Spur.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Draw_Border=" + Draw_Railway_Spur.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Draw_Landarea_Islands=" + Draw_Landarea_Islands.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Draw_Landarea_Islets=" + Draw_Landarea_Islets.ToString();
             result.Add(str);
 
             str = CONFIG_PREFIX + "Scale_Position=" + Scale_Position.ToString();
@@ -314,6 +326,8 @@ namespace RailwaymapUI
             str = CONFIG_PREFIX + "Scale_MarginY=" + Scale_MarginY.ToString();
             result.Add(str);
 
+            str = CONFIG_PREFIX + "Overdraw_Margins=" + Overdraw_Margins.ToString();
+            result.Add(str);
 
             return result;
         }

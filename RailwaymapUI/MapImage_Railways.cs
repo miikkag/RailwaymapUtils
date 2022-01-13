@@ -119,6 +119,8 @@ namespace RailwaymapUI
                     if ((DateTime.Now - last_progress).TotalMilliseconds >= 200)
                     {
                         progress.Set_Info((i * 100 / rs.ways.Length));
+
+                        last_progress = DateTime.Now;
                     }
 
                     WayRail wr = rs.ways[i];
@@ -205,7 +207,7 @@ namespace RailwaymapUI
                 }
             }
 
-            progress.Set_Info(false, "", 0);
+            progress.Clear();
         }
     }
 }

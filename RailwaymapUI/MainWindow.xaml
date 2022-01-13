@@ -8,6 +8,7 @@
         mc:Ignorable="d"
         Drop="MainWindow_Drop"
         AllowDrop="True"
+        WindowStartupLocation="CenterScreen"
         Title="Railway Map UI" Width="1200" Height="850" Icon="icons/icon.ico">
     <Window.Resources>
         <Brush x:Key="ButtonSelected">#8BD698</Brush>
@@ -132,38 +133,17 @@
                                 <TextBox Width="40" Height="20" VerticalContentAlignment="Center" Text="{Binding DB.OutputSizeHeight}"
                                          GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
                                 <Border Width="5"/>
-                                <TextBlock VerticalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="16" FontWeight="Normal" ToolTip="Refresh Image">
-                                    <Hyperlink TextDecorations="None" Foreground="Black" Click="Refresh_ImageSize">&#xEDAB;</Hyperlink>
-                                </TextBlock>
                             </StackPanel>
+                            <TextBlock HorizontalAlignment="Right" FontFamily="Segoe MDL2 Assets" FontSize="24" ToolTip="Refresh Image" Margin="0,0,3,0">
+                                <TextBlock.Effect>
+                                    <DropShadowEffect Color="Black" BlurRadius="5" ShadowDepth="2" Opacity="0.5"></DropShadowEffect>
+                                </TextBlock.Effect>
+                                    <Hyperlink TextDecorations="None" Foreground="RoyalBlue" Click="Refresh_ImageSize">&#xEDAB;</Hyperlink>
+                            </TextBlock>
                         </Grid>
-
-                        <Border Height="5"/>
-
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock FontWeight="SemiBold" VerticalAlignment="Center" Width="60">Margins:</TextBlock>
-                            <TextBox Width="30" Height="16" FontSize="10" VerticalAlignment="Center" VerticalContentAlignment="Center"
-                                        Text="{Binding DB.OutputPaddingLeft}"
-                                        GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
-                            <Border Width="2"/>
-                            <StackPanel Orientation="Vertical">
-                                <TextBox Width="30" Height="16" FontSize="10" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                                            Text="{Binding DB.OutputPaddingTop}"
-                                        GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
-                                <Border Height="2"/>
-                                <TextBox Width="30" Height="16" FontSize="10" VerticalAlignment="Center" VerticalContentAlignment="Center"  HorizontalContentAlignment="Center"
-                                            Text="{Binding DB.OutputPaddingBottom}"
-                                        GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
-                            </StackPanel>
-                            <Border Width="2"/>
-                            <TextBox Width="30" Height="16" FontSize="10" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Right"
-                                        Text="{Binding DB.OutputPaddingRight}"
-                                        GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
-                        </StackPanel>
 
                         <Separator Background="Silver" Margin="0,8,0,8"/>
 
-                        <Border Height="5"/>
                         <Grid>
                             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,3,0" FontFamily="Segoe MDL2 Assets" FontSize="16" FontWeight="Normal" ToolTip="Refresh Scale">
                                     <Hyperlink TextDecorations="None" Foreground="Black" Click="Refresh_Scale">&#xEDAB;</Hyperlink>
@@ -238,29 +218,20 @@
                                 <Grid HorizontalAlignment="{Binding HorizontalAlignment, RelativeSource={RelativeSource AncestorType=ContentPresenter}, Mode=OneWayToSource}">
                                     <TextBlock>Land Area</TextBlock>
                                     <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" FontFamily="Segoe MDL2 Assets" FontSize="16" FontWeight="Normal" ToolTip="Refresh Image">
-                                        <Hyperlink TextDecorations="None" Foreground="Black" Click="Refresh_ImageBorder">&#xEDAB;</Hyperlink>
+                                        <Hyperlink TextDecorations="None" Foreground="Black" Click="Refresh_ImageLandarea">&#xEDAB;</Hyperlink>
                                     </TextBlock>
                                 </Grid>
                             </Expander.Header>
 
                             <StackPanel Orientation="Vertical" Margin="4">
                                 <CheckBox IsChecked="{Binding DB.Image_Landarea.Enabled}">Visible</CheckBox>
-                                <Separator Background="LightGray" Margin="0,3,0,5"/>
+                                
+                                <Separator Background="LightGray" Margin="0,5,0,5"/>
 
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock VerticalAlignment="Center" Width="80">Line filter:</TextBlock>
-                                    <TextBox Text="{Binding DB.Set.Filter_Border_Line}" Width="30"
-                                             GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
-                                    <Border Width="3"/>
-                                    <TextBlock>px</TextBlock>
-                                </StackPanel>
+                                <CheckBox IsChecked="{Binding DB.Set.Draw_Landarea_Islands}">Draw Islands</CheckBox>
+                                <CheckBox IsChecked="{Binding DB.Set.Draw_Landarea_Islets}">Draw Islets</CheckBox>
 
                                 <Border Height="5"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <CheckBox IsChecked="{Binding DB.Set.Filter_Border_DrawLine}">Filter 1px Waysets</CheckBox>
-                                </StackPanel>
-
-                                <Border Height="8"/>
                             </StackPanel>
                         </Expander>
 
@@ -356,9 +327,7 @@
                                 <CheckBox IsChecked="{Binding DB.Image_Borders.Enabled}">Visible</CheckBox>
                                 <Separator Background="LightGray" Margin="0,3,0,5"/>
 
-                                <CheckBox IsChecked="{Binding DB.Set.Draw_Border_Land}" VerticalContentAlignment="Center" Margin="0,0,0,1">Land</CheckBox>
-                                <CheckBox IsChecked="{Binding DB.Set.Draw_Border_Coastline}" VerticalContentAlignment="Center" Margin="0,0,0,1">Coastline</CheckBox>
-                                <CheckBox IsChecked="{Binding DB.Set.Draw_Border_Territorial}" VerticalContentAlignment="Center" Margin="0,0,0,1">Territorial</CheckBox>
+                                <CheckBox IsChecked="{Binding DB.Set.Draw_Border}" VerticalContentAlignment="Center" Margin="0,0,0,1">Draw Border</CheckBox>
 
                                 <Separator Background="LightGray" Margin="0,3,0,3"/>
 
@@ -567,6 +536,9 @@
                         <local:ImageNN Source="{Binding DB.Image_Background.ImageSrc}"
                                        Width="{Binding DB.Image_Background.Image_Width}" Height="{Binding DB.Image_Background.Image_Height}"
                                        Visibility="{Binding DB.Image_Background.Visible}"/>
+                        <local:ImageNN Source="{Binding DB.Image_Landarea.ImageSrc}"
+                                       Width="{Binding DB.Image_Landarea.Image_Width}" Height="{Binding DB.Image_Landarea.Image_Height}"
+                                       Visibility="{Binding DB.Image_Landarea.Visible}"/>
                         <local:ImageNN Source="{Binding DB.Image_Water.ImageSrc}"
                                        Width="{Binding DB.Image_Water.Image_Width}" Height="{Binding DB.Image_Water.Image_Height}"
                                        Visibility="{Binding DB.Image_Water.Visible}"/>

@@ -84,6 +84,11 @@ namespace RailwaymapUI
             DB.Reset_Single(MapItems.Borders);
         }
 
+        private void Refresh_ImageLandarea(object sender, RoutedEventArgs e)
+        {
+            DB.Reset_Single(MapItems.Landarea);
+        }
+
         private void Refresh_ImageRailways(object sender, RoutedEventArgs e)
         {
             DB.Reset_Single(MapItems.Railways);

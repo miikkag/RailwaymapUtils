@@ -95,7 +95,10 @@
     <Compile Include="Coordinate.cs" />
     <Compile Include="ExpandList.cs" />
     <Compile Include="ImageNN.cs" />
-    <Compile Include="LandareaPoint.cs" />
+    <Compile Include="LandareaCache.cs" />
+    <Compile Include="LandareaDrawSegment.cs" />
+    <Compile Include="LandAreaSegment.cs" />
+    <Compile Include="LandareaNode.cs" />
     <Compile Include="MapImage.cs" />
     <Compile Include="MapImage_Background.cs" />
     <Compile Include="MapImage_Borders.cs" />

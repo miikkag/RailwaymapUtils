@@ -13,17 +13,13 @@ namespace RailwaymapUI
         public double Y_max;
         public double Y_min;
         public double Scale;
-        public double X_Pad;
-        public double Y_Pad;
 
-        public BoundsXY(double xmax, double xmin, double ymax, double ymin, double scale, double xpad, double ypad)
+        public BoundsXY(double xmax, double xmin, double ymax, double ymin, double scale)
         {
             X_max = xmax;
             X_min = xmin;
             Y_max = ymax;
             Y_min = ymin;
-            X_Pad = xpad;
-            Y_Pad = ypad;
 
             Scale = scale;
         }
@@ -34,8 +30,6 @@ namespace RailwaymapUI
             Y_max = double.MinValue;
             X_min = double.MaxValue;
             Y_min = double.MaxValue;
-            Y_Pad = 0;
-            X_Pad = 0;
         }
 
         public void TryXY(double x_try, double y_try)

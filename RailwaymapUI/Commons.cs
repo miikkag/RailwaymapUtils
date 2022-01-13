@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RailwaymapUI
 {
-    public enum MapItems { Landarea, Water, Borders, Railways, Cities, Scale };
+    public enum MapItems { Landarea, Water, Borders, Railways, Cities, Scale, Margins };
 
     public static class Commons
     {

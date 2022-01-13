@@ -18,13 +18,10 @@ namespace RailwaymapUI
 
                 gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
 
-                if (set.Draw_Border_Land)
-                {
-                    WaySet ws = Commons.Generate_Wayset(conn_border);
+                WaySet ws = Commons.Generate_Wayset(conn_border);
 
-                    Draw_Way_Coordinates(ws, progress, set.Filter_Border_Line, false, set.Color_Border_Land, bounds,
-                        set.Filter_Border_DrawLine);
-                }
+                Draw_Way_Coordinates(ws, progress, set.Filter_Border_Line, false, set.Color_Border_Land, bounds,
+                    set.Filter_Border_DrawLine);
             }
         }
     }
