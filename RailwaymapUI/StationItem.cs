@@ -8,8 +8,17 @@ using System.Threading.Tasks;
 
 namespace RailwaymapUI
 {
+    public enum StationItemType { None, Station, Site, Yard }
+
     public class StationItem : INotifyPropertyChanged
     {
+        private StationItemType _type;
+        public StationItemType Type { get { return _type; } set { if (_type != value) { _type = value; OnPropertyChanged("Type"); OnPropertyChanged("IsSite"); OnPropertyChanged("IsYard"); OnPropertyChanged("IsStation"); } } }
+
+        public bool IsStation { get { return (Type == StationItemType.Station); } }
+        public bool IsSite { get { return (Type==StationItemType.Site); } }
+        public bool IsYard { get { return (Type==StationItemType.Yard); } }
+
         public enum Valign { Top, Center, Bottom };
         public enum Halign { Left, Center, Right };
 
@@ -23,8 +32,8 @@ namespace RailwaymapUI
         public Valign valign;
         public Halign halign;
 
-        private bool _hightlighted;
-        public bool Highlighted { get { return _hightlighted; } set { if (_hightlighted != value) { _hightlighted = value; OnPropertyChanged("Highlighted"); } } }
+        private bool _highlighted;
+        public bool Highlighted { get { return _highlighted; } set { if (_highlighted != value) { _highlighted = value; OnPropertyChanged("Highlighted"); } } }
 
         public bool Valign_Top { get { return (valign == Valign.Top); } }
         public bool Valign_Center { get { return (valign == Valign.Center); } }
@@ -125,8 +134,10 @@ namespace RailwaymapUI
             OnPropertyChanged(string.Empty);
         }
 
-        public StationItem()
+        public StationItem(StationItemType item_type)
         {
+            Type = item_type;
+
             Set_Valign(Valign.Top);
             Set_Halign(Halign.Right);
 

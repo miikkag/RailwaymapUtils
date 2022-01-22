@@ -74,7 +74,7 @@ namespace RailwaymapUI
             return bmp;
         }
 
-        private ImageSource BitmapToImageSource(Bitmap bmp)
+        public static ImageSource BitmapToImageSource(Bitmap bmp)
         {
             if (bmp != null)
             {
@@ -188,85 +188,6 @@ namespace RailwaymapUI
                             {
                                 DrawLine.Draw_Line_1px(set_lines[l - 1], set_lines[l], bmp, color);
                             }
-                        }
-                    }
-                }
-            }
-        }
-
-        protected void Draw_Way_Polygons(WaySet ws, ProgressInfo progress, double areafilter_px, double linefilter_px, System.Drawing.Color fillcolor, BoundsXY bounds, bool border_only, bool draw_id, int single_itemnumber)
-        {
-            DateTime prev_update = DateTime.Now;
-
-
-            for (int w = 0; w < ws.WayCoordSets.Length; w++)
-            {
-                // Debug feature to draw only single item
-                if ((single_itemnumber >= 0) && (single_itemnumber != w))
-                {
-                    continue;
-                }
-
-                DateTime now = DateTime.Now;
-
-                if ((now - prev_update).TotalMilliseconds >= Commons.PROGRESS_INTERVAL)
-                {
-                    int percent = ((w * 100) / ws.WayCoordSets.Length);
-                    progress.Set_Info(percent);
-
-                    prev_update = now;
-                }
-
-                List<System.Drawing.Point> set_lines = new List<System.Drawing.Point>();
-
-                double prev_x = double.MinValue;
-                double prev_y = double.MinValue;
-
-                int lenc = ws.WayCoordSets[w].Coords.Length;
-
-                BoundsXY bxy = new BoundsXY();
-
-                for (int c = 0; c < lenc; c++)
-                {
-                    double y = bounds.Scale * (bounds.Y_max - Commons.Merc_Y(ws.WayCoordSets[w].Coords[c].Latitude));
-                    double x = bounds.Scale * (Commons.Merc_X(ws.WayCoordSets[w].Coords[c].Longitude) - bounds.X_min);
-
-                    // Filter lines too close to each other
-                    double dist = Math.Abs(x - prev_x) + Math.Abs(y - prev_y);
-
-                    if ((dist > linefilter_px) || (c == (lenc - 1)))
-                    {
-                        set_lines.Add(new System.Drawing.Point((int)x, (int)y));
-                        prev_x = x;
-                        prev_y = y;
-
-                        bxy.TryXY(x, y);
-                    }
-                }
-
-                if (set_lines.Count > 2)
-                {
-                    double areasize = Math.Max(bxy.X_max - bxy.X_min, bxy.Y_max - bxy.Y_min);
-
-                    if (areasize > areafilter_px)
-                    {
-                        if (border_only)
-                        {
-                            gr.DrawPolygon(new System.Drawing.Pen(fillcolor, 1), set_lines.ToArray());
-                        }
-                        else
-                        {
-                            gr.FillPolygon(new SolidBrush(fillcolor), set_lines.ToArray());
-                        }
-
-                        if (draw_id)
-                        {
-                            double centerx = bxy.X_min + ((bxy.X_max - bxy.X_min) / 2);
-                            double centery = bxy.Y_min + ((bxy.Y_max - bxy.Y_min) / 2);
-
-                            Font usefont = new Font("Arial", 8);
-
-                            gr.DrawString(w.ToString(), usefont, System.Drawing.Brushes.SteelBlue, (float)centerx, (float)centery);
                         }
                     }
                 }

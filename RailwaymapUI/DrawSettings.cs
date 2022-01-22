@@ -27,7 +27,6 @@ namespace RailwaymapUI
         public Color Color_Border_Coastline = Color.Black;
         public Color Color_Border_Territorial = Color.Black;
 
-        //public Color Color_Water = Color.FromArgb(160, 190, 255);
         public Color Color_Water = Color.FromArgb(190, 224, 255);
         public Color Color_Land = Color.FromArgb(255, 255, 255);
 
@@ -54,7 +53,6 @@ namespace RailwaymapUI
 
         public const int Dotsize_Station_Default = 2;
 
-        public int Scale_km = 100;
         public int Scale_FontSize = 8;
         public string Scale_FontName = "Microsoft Sans Serif";
 
@@ -64,10 +62,8 @@ namespace RailwaymapUI
         public bool Draw_Landarea_Islands { get; set; }
         public bool Draw_Landarea_Islets { get; set; }
 
-        public int Filter_Water_Line { get; set; }
         public int Filter_Water_Area { get; set; }
         public bool Draw_WaterLand { get; set; }
-        public int Filter_WaterLand_Line { get; set; }
         public int Filter_WaterLand_Area { get; set; }
         public int Filter_Border_Line { get; set; }
         public bool Filter_Border_DrawLine { get; set; }
@@ -86,24 +82,27 @@ namespace RailwaymapUI
         public int FontSize_Cities { get; set; }
         public int FontSizeBold_Cities { get; set; }
 
-        public bool AutoRedraw_Cities { get; set; }
+        public string FontName_Sites { get; set; }
+        public string FontNameBold_Sites { get; set; }
+        public int FontSize_Sites { get; set; }
+        public int FontSizeBold_Sites { get; set; }
 
-        private bool _overdraw_margins;
-        public bool Overdraw_Margins { get { return _overdraw_margins; } set { if (_overdraw_margins != value) { _overdraw_margins = value; OnPropertyChanged("Overdraw_Margins"); OnPropertyChanged("Overdraw_MarginsVisible"); } } }
-        public Visibility Overdraw_MarginsVisible { get { if (Overdraw_Margins) return Visibility.Visible; else return Visibility.Hidden; } }
+
+        public bool AutoRedraw_Cities { get; set; }
+        public bool AutoRedraw_Sites { get; set; }
+
 
         private ScalePosition scale_pos;
         public ScalePosition Scale_Position { get { return scale_pos; } set { scale_pos = value; OnPropertyChanged("Scale_Position"); } }
 
         public int Scale_MarginX { get; set; }
         public int Scale_MarginY { get; set; }
+        public int Scale_Km { get; set; }
 
 
         public DrawSettings()
         {
-            Filter_Water_Line = 3;
             Filter_Water_Area = 3;
-            Filter_WaterLand_Line = 3;
             Filter_WaterLand_Area = 3;
 
             Draw_WaterLand = true;
@@ -117,6 +116,11 @@ namespace RailwaymapUI
             FontNameBold_Cities = "Arial";
             FontSize_Cities = 8;
             FontSizeBold_Cities = 8;
+
+            FontName_Sites = FontName_Cities;
+            FontNameBold_Sites = FontNameBold_Cities;
+            FontSize_Sites = FontSize_Cities;
+            FontSizeBold_Sites = FontSizeBold_Cities;
 
             AutoRedraw_Cities = true;
 
@@ -134,6 +138,7 @@ namespace RailwaymapUI
             Scale_Position = ScalePosition.LeftBottom;
             Scale_MarginX = 15;
             Scale_MarginY = 15;
+            Scale_Km = 100;
         }
 
         public void Set_ScalePos(ScalePosition new_pos)
@@ -167,16 +172,8 @@ namespace RailwaymapUI
 
                     switch (items[0])
                     {
-                        case "Filter_Water_Line":
-                            Filter_Water_Line = val_int;
-                            break;
-
                         case "Filter_WaterLand_Area":
                             Filter_WaterLand_Area = val_int;
-                            break;
-
-                        case "Filter_WaterLand_Line":
-                            Filter_WaterLand_Line = val_int;
                             break;
 
                         case "Draw_WaterLand":
@@ -215,8 +212,28 @@ namespace RailwaymapUI
                             FontSizeBold_Cities = val_int;
                             break;
 
+                        case "FontName_Sites":
+                            FontName_Sites = items[1];
+                            break;
+
+                        case "FontSize_Sites":
+                            FontSize_Sites = val_int;
+                            break;
+
+                        case "FontNameBold_Sites":
+                            FontNameBold_Sites = items[1];
+                            break;
+
+                        case "FontSizeBold_Sites":
+                            FontSizeBold_Sites = val_int;
+                            break;
+
                         case "AutoRedraw_Cities":
                             AutoRedraw_Cities = val_bool;
+                            break;
+
+                        case "AutoRedraw_Sites":
+                            AutoRedraw_Sites = val_bool;
                             break;
 
                         case "Draw_Railway_Spur":
@@ -247,8 +264,8 @@ namespace RailwaymapUI
                             Scale_MarginY = val_int;
                             break;
 
-                        case "Overdraw_Margins":
-                            Overdraw_Margins = val_bool;
+                        case "Scale_Km":
+                            Scale_Km = val_int;
                             break;
 
                         default:
@@ -266,13 +283,7 @@ namespace RailwaymapUI
 
             string str;
 
-            str = CONFIG_PREFIX + "Filter_Water_Line=" + Filter_Water_Line.ToString();
-            result.Add(str);
-
             str = CONFIG_PREFIX + "Filter_Water_Area=" + Filter_Water_Area.ToString();
-            result.Add(str);
-
-            str = CONFIG_PREFIX + "Filter_WaterLand_Line=" + Filter_WaterLand_Line.ToString();
             result.Add(str);
 
             str = CONFIG_PREFIX + "Filter_WaterLand_Area=" + Filter_WaterLand_Area.ToString();
@@ -302,7 +313,22 @@ namespace RailwaymapUI
             str = CONFIG_PREFIX + "FontSizeBold_Cities=" + FontSize_Cities.ToString();
             result.Add(str);
 
+            str = CONFIG_PREFIX + "FontName_Sites=" + FontName_Sites;
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "FontSize_Sites=" + FontSize_Sites.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "FontNameBold_Sites=" + FontName_Sites;
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "FontSizeBold_Sites=" + FontSize_Sites.ToString();
+            result.Add(str);
+
             str = CONFIG_PREFIX + "AutoRedraw_Cities=" + AutoRedraw_Cities.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "AutoRedraw_Sites=" + AutoRedraw_Sites.ToString();
             result.Add(str);
 
             str = CONFIG_PREFIX + "Draw_Railway_Spur=" + Draw_Railway_Spur.ToString();
@@ -326,7 +352,7 @@ namespace RailwaymapUI
             str = CONFIG_PREFIX + "Scale_MarginY=" + Scale_MarginY.ToString();
             result.Add(str);
 
-            str = CONFIG_PREFIX + "Overdraw_Margins=" + Overdraw_Margins.ToString();
+            str = CONFIG_PREFIX + "Scale_Km=" + Scale_Km.ToString();
             result.Add(str);
 
             return result;

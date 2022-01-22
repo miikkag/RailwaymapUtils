@@ -26,7 +26,7 @@ namespace RailwaymapUI
             double lon_use = lon_middle + 1.0;
             double dist_1_degree = Commons.Haversine_km(new Coordinate(lat_middle, lon_middle), new Coordinate(lat_middle, lon_use));
 
-            double target_degree = set.Scale_km / dist_1_degree;
+            double target_degree = set.Scale_Km / dist_1_degree;
             lon_use = lon_middle + target_degree;
 
             double pixelwidth = Math.Abs(bounds.Scale * (Commons.Merc_X(lon_middle) - Commons.Merc_X(lon_use)));
@@ -35,7 +35,7 @@ namespace RailwaymapUI
             int starty = -1;
 
             string start_str = "0";
-            string end_str = set.Scale_km.ToString();
+            string end_str = set.Scale_Km.ToString();
             string mid_str = "km";
 
             Font usefont = new Font(set.Scale_FontName, (float)set.Scale_FontSize, FontStyle.Regular);

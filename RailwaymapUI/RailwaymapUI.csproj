@@ -89,16 +89,19 @@
     <Compile Include="Bounds.cs" />
     <Compile Include="BoundsPoint.cs" />
     <Compile Include="BoundsXY.cs" />
+    <Compile Include="CoordinateMinMax.cs" />
     <Compile Include="DrawLine.cs" />
     <Compile Include="DrawSettings.cs" />
     <Compile Include="Commons.cs" />
     <Compile Include="Coordinate.cs" />
     <Compile Include="ExpandList.cs" />
     <Compile Include="ImageNN.cs" />
+    <Compile Include="LakeCache.cs" />
+    <Compile Include="LakeSegment.cs" />
     <Compile Include="LandareaCache.cs" />
     <Compile Include="LandareaDrawSegment.cs" />
     <Compile Include="LandAreaSegment.cs" />
-    <Compile Include="LandareaNode.cs" />
+    <Compile Include="PolygonNode.cs" />
     <Compile Include="MapImage.cs" />
     <Compile Include="MapImage_Background.cs" />
     <Compile Include="MapImage_Borders.cs" />
@@ -107,13 +110,15 @@
     <Compile Include="MapImage_Railways.cs" />
     <Compile Include="MapImage_Scale.cs" />
     <Compile Include="MapImage_Selection.cs" />
-    <Compile Include="MapImage_Water.cs" />
+    <Compile Include="MapImage_Lakes.cs" />
     <Compile Include="ProgressInfo.cs" />
     <Compile Include="RailwaySet.cs" />
     <Compile Include="StationItem.cs" />
     <Compile Include="StationUI.xaml.cs">
       <DependentUpon>StationUI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Lake.cs" />
+    <Compile Include="Way.cs" />
     <Compile Include="WayCoordset.cs" />
     <Compile Include="WaySet.cs" />
     <Compile Include="WayRail.cs" />

@@ -10,26 +10,35 @@ CLEAR = "\033[1K\033[1G"
 
 targets = {}
 
-targets['--border'] = ( "border", \
+targets['--border'] = ( "border",
 	[ 'way["admin_level"="2"][!"maritime"]' ] )
 
-targets['--coastline'] = ( "coastline", \
+targets['--coastline'] = ( "coastline",
 	{ 'way["natural"="coastline"]' } )
 
-targets['--railway'] = ( "railway", \
-	[ 'way["railway"="rail"]', 'way["construction"="rail"]',
-	  'way["railway"="narrow_gauge"]', 'way["construction"="narrow_gauge"]'
-	  'node["railway"="station"]["station"!="subway"]["station"!="light_rail"]' ]  )
+targets['--railway'] = ( "railway",
+	{ 'way["railway"="rail"]',
+	  'way["construction"="rail"]',
+	  'way["railway"="narrow_gauge"]',
+	  'way["construction"="narrow_gauge"]',
+	  'node["railway"="station"]["station"!="subway"]["station"!="light_rail"]',
+	  'node["railway"="site"]',
+	  'node["railway"="yard"]'
+      } )
 
-targets['--lightrail'] = ( "lightrail", \
-	[ 'way["railway"="light_rail"]', 'way["construction"="light_rail"]',
-	  'node["railway"="station"]["station"="light_rail"]' ] )
+#targets['--railwaysites'] = ( "railway-sites",
+#	  { 'node["railway"="yard"]',
+#	    'node["railway"="site"]' } )
 
-targets['--lakes'] = ( "lakes", \
+targets['--lightrail'] = ( "lightrail",
+	{ 'way["railway"="light_rail"]', 'way["construction"="light_rail"]',
+	  'node["railway"="station"]["station"="light_rail"]' } )
+
+targets['--lakes'] = ( "lakes",
 	{ 'rel["natural"="water"]["water"="lake"]' } )
 
 
-targets['--water'] = ( "water", \
+targets['--water'] = ( "water",
 	{ 'way["natural"="water"]' } )
 
 
@@ -42,11 +51,11 @@ if len(sys.argv) <= 1:
 	exit(f"Arguments: country [ {' | '.join(targets)} ]")
 elif len(sys.argv) == 2:
 	for k in targets:
-		use_targets.append(k)
+		use_targets.append(targets[k])
 else:
 	for a in range (2, len(sys.argv)):
 		if sys.argv[a] in targets:
-			use_targets.append(targets[sys.argv[2]])
+			use_targets.append(targets[sys.argv[a]])
 		else:
 			exit (f"Argument {sys.argv[a]} unknown")
 
@@ -74,6 +83,10 @@ for t in use_targets:
 	query = query + "out;\n>;\nout skel qt;\n"
 
 	print(f"Request: {t[0]}")
+
+	print("Query:")
+	print(query)
+
 	# Make request
 	with requests.post(endpoint, data=query, stream=True) as r:
 		r.raise_for_status()

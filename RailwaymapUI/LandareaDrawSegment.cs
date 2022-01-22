@@ -10,8 +10,8 @@ namespace RailwaymapUI
 
     public class LandareaDrawSegment
     {
-        public readonly LandareaNode Start;
-        public readonly LandareaNode End;
+        public readonly PolygonNode Start;
+        public readonly PolygonNode End;
 
         public double LatMax;
         public double LatMin;
@@ -24,14 +24,10 @@ namespace RailwaymapUI
 
         public CrossDirection CrossDir;
 
-        private BoundsXY bxy;
-
-        public LandareaDrawSegment(double lat1, double lon1, double lat2, double lon2, BoundsXY bounds)
+        public LandareaDrawSegment(double lat1, double lon1, double lat2, double lon2)
         {
-            bxy = bounds;
-
-            Start = new LandareaNode(lat1, lon1, bxy);
-            End = new LandareaNode(lat2, lon2, bxy);
+            Start = new PolygonNode(lat1, lon1);
+            End = new PolygonNode(lat2, lon2);
 
             LatMax = Math.Max(lat1, lat2);
             LatMin = Math.Min(lat1, lat2);

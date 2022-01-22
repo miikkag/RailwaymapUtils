@@ -1,7 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Drawing;
+using System.Windows;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,11 +13,16 @@ namespace RailwaymapUI
     {
         private enum LandOrWater { Unknown = 0,Land=1, Water=2 };
 
-        public void Draw(SQLiteConnection conn, BoundsXY bxy, ProgressInfo progress, DrawSettings set)
+        public void Draw(string filename_cache, BoundsXY bxy, ProgressInfo progress, DrawSettings set)
         {
-            if ((gr == null) || (conn == null))
+            if (gr == null)
             {
                 return;
+            }
+
+            if (!File.Exists(filename_cache))
+            {
+                throw new Exception("Coastline cache file does not exist.");
             }
 
             gr.Clear(Color.Transparent);
@@ -25,76 +31,70 @@ namespace RailwaymapUI
 
             System.Diagnostics.Debug.WriteLine(bxy.ToString());
 
-            progress.Set_Info(true, "Processing land area cache", 0);
+            progress.Set_Info(true, "Reading coastline cache", 0);
 
             DateTime last_progress = DateTime.Now;
 
             List<LandareaDrawSegment> segments = new List<LandareaDrawSegment>();
 
-            int rowcount = 0;
+            FileInfo info = new FileInfo(filename_cache);
 
-            using (SQLiteCommand cmd_count = new SQLiteCommand("SELECT COUNT() FROM segments;", conn))
-            using (SQLiteDataReader rdr_count = cmd_count.ExecuteReader())
+            using (FileStream fs = File.OpenRead(filename_cache))
+            using (BinaryReader reader = new BinaryReader(fs, Encoding.UTF8, false))
             {
-                if (rdr_count.Read())
-                {
-                    rowcount = rdr_count.GetInt32(0);
-                }
+                _ = reader.ReadString();    // DB Timestamp
 
-                rdr_count.Close();
-                cmd_count.Dispose();
-            }
+                int itemsize = 4 * 8 + 2;   // 4x double, 2x bool
+                int itemcount = (int) (info.Length / itemsize);
 
-            using (SQLiteCommand cmd_segments = new SQLiteCommand("SELECT lat1,lon1,lat2,lon2,island,islet FROM segments;", conn))
-            using (SQLiteDataReader rdr_segments = cmd_segments.ExecuteReader())
-            {
-                int i = 0;
-
-                while (rdr_segments.Read())
+                for (int i = 0; i < itemcount; i++)
                 {
                     if ((i % 1000) == 0)
                     {
                         if ((DateTime.Now - last_progress).TotalMilliseconds > 200)
                         {
-                            progress.Set_Info((i * 100) / rowcount);
+                            progress.Set_Info((i * 100) / itemcount);
 
                             last_progress = DateTime.Now;
                         }
                     }
 
-                    bool island = rdr_segments.GetBoolean(4);
-                    bool islet = rdr_segments.GetBoolean(5);
-
-                    bool draw_this = true;
-
-                    if (island && !set.Draw_Landarea_Islands)
+                    try
                     {
-                        draw_this = false;
-                    }
+                        double lat1 = reader.ReadDouble();
+                        double lon1 = reader.ReadDouble();
+                        double lat2 = reader.ReadDouble();
+                        double lon2 = reader.ReadDouble();
+                        bool island = reader.ReadBoolean();
+                        bool islet = reader.ReadBoolean();
 
-                    if (islet && !set.Draw_Landarea_Islets)
+                        bool draw_this = true;
+
+                        if (!set.Draw_Landarea_Islands && island)
+                        {
+                            draw_this = false;
+                        }
+
+                        if (!set.Draw_Landarea_Islets && islet)
+                        {
+                            draw_this = false;
+                        }
+
+                        if (draw_this)
+                        {
+                            segments.Add(new LandareaDrawSegment(lat1, lon1, lat2, lon2));
+                        }
+                    }
+                    catch (Exception ex)
                     {
-                        draw_this = false;
+                        throw new Exception("Coastline cache unexpected EOF, item " + i.ToString() + " of " + itemcount.ToString() + ": " + ex.Message );
                     }
-
-                    if (draw_this)
-                    {
-                        double lat1 = rdr_segments.GetDouble(0);
-                        double lon1 = rdr_segments.GetDouble(1);
-                        double lat2 = rdr_segments.GetDouble(2);
-                        double lon2 = rdr_segments.GetDouble(3);
-
-                        segments.Add(new LandareaDrawSegment(lat1, lon1, lat2, lon2, bxy));
-                    }
-
-                    i++;
                 }
-
-                rdr_segments.Close();
-                cmd_segments.Dispose();
             }
 
-            System.Diagnostics.Debug.WriteLine("segments count: " + segments.Count.ToString());
+            progress.Set_Info(true, "Sorting coastline segments", 0);
+
+            //System.Diagnostics.Debug.WriteLine("segments count: " + segments.Count.ToString());
 
             // Sort segments based on latitude
             segments.Sort(new LandareaDrawSegmentComparerLat());
@@ -268,6 +268,8 @@ namespace RailwaymapUI
 
                         backfill_until = -1;
                     }
+
+                    crosslist.Clear();
                 }
                 else
                 {
@@ -286,7 +288,10 @@ namespace RailwaymapUI
                 }
             }
 
+            segments.Clear();
             progress.Clear();
+
+            GC.Collect();
         }
     }
 }

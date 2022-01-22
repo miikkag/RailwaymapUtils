@@ -13,10 +13,29 @@
 
         <Style x:Key="StyleMainBackground" TargetType="Border">
             <Setter Property="Background" Value="#F0F0E0"/>
+            <Setter Property="BorderBrush" Value="#FFFFFF"/>
             <Style.Triggers>
-                <DataTrigger Binding="{Binding Highlighted}" Value="True">
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding Highlighted}" Value="True"/>
+                        <Condition Binding="{Binding IsStation}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
                     <Setter Property="Background" Value="#B6DB8E"/>
-                </DataTrigger>
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding Highlighted}" Value="True"/>
+                        <Condition Binding="{Binding IsSite}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="#ADE2F7"/>
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding Highlighted}" Value="True"/>
+                        <Condition Binding="{Binding IsYard}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="#F7CB96"/>
+                </MultiDataTrigger>
             </Style.Triggers>
         </Style>
         <Style x:Key="StyleValign_Bottom" TargetType="Button">
@@ -127,7 +146,7 @@
 
 
     </UserControl.Resources>
-    <Border HorizontalAlignment="Left" Padding="2" Margin="2,2,2,2" BorderThickness="1" BorderBrush="White"
+    <Border HorizontalAlignment="Left" Padding="2" Margin="2,2,2,2" BorderThickness="1"
             x:Name="LayoutRoot" DataContext="{Binding}" SnapsToDevicePixels="True" UseLayoutRounding="True"
             Style="{StaticResource StyleMainBackground}" >
         <StackPanel Orientation="Vertical">

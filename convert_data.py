@@ -31,7 +31,7 @@ class node:
 		self.attr_id = set_id
 		self.attr_lat = set_lat
 		self.attr_lon = set_lon
-		self.railwaystation = False
+		self.railwaystation = 0
 		self.tags = []
 
 class way:
@@ -102,15 +102,20 @@ class OSMNodesHandler ( xml.sax.ContentHandler ):
 				## other element -- ignore
 				self.unknown_level += 1
 				self.state = osmst.OTHER
-				print("Found other: " + tag)
+				print(f"Found other: {tag}")
 
 		elif self.state == osmst.NODE:
 			if tag=="tag":
 				attr_k = attributes.getValue("k")
 				attr_v = attributes.getValue("v")
 				self.node.tags.append( ( attr_k, attr_v ) )
-				if (attr_k == "railway") and (attr_v=="station"):
-					self.node.railwaystation = True
+				if (attr_k== "railway"):
+					if(attr_v=="station"):
+						self.node.railwaystation = 1
+					elif (attr_v=="site"):
+						self.node.railwaystation = 2
+					elif (attr_v=="yard"):
+						self.node.railwaystation = 3
 				self.state = osmst.NODE_TAG
 			else:
 				print ("Unknown element inside NODE: " + tag)
@@ -160,15 +165,16 @@ class OSMNodesHandler ( xml.sax.ContentHandler ):
 
 		self.elementcount += 1
 
-		if (self.elementcount % 20000)==0:
-			self.PrintStatus()
+		#if (self.elementcount % 20000)==0:
+		#	self.PrintStatus()
 
 	def endElement(self, tag):
 		global c
 
 		if self.unknown_level > 0:
-			self.unknown_level=0
-		else:
+			self.unknown_level -= 1
+
+		if self.unknown_level == 0:
 			if self.state == osmst.NODE:
 				# Save node and tags
 				c.execute ( "INSERT OR IGNORE INTO nodes ( id, lat, lon, station ) VALUES ( ?, ?, ?, ? );", ( self.node.attr_id, self.node.attr_lat, self.node.attr_lon, self.node.railwaystation ) )
@@ -232,7 +238,7 @@ elif len(sys.argv) == 2:
 else:
 	for a in range (2, len(sys.argv)):
 		if sys.argv[a] in targets:
-			use_targets.append(targets[sys.argv[2]])
+			use_targets.append(targets[sys.argv[a]])
 		else:
 			exit (f"Argument {sys.argv[a]} unknown")
 
@@ -263,7 +269,7 @@ for t in use_targets:
 	
 	c = conn.cursor()
 	
-	c.execute ( "CREATE TABLE nodes ( id INTEGER PRIMARY KEY, lat REAL, lon REAL, station BOOLEAN  );" )
+	c.execute ( "CREATE TABLE nodes ( id INTEGER PRIMARY KEY, lat REAL, lon REAL, station INTEGER );" )
 	c.execute ( "CREATE TABLE node_tags ( id INTEGER PRIMARY KEY, node_id INT, k TEXT, v TEXT );" )
 	
 	c.execute ( "CREATE TABLE ways ( id INTEGER PRIMARY KEY, railway BOOLEAN );" )
@@ -298,6 +304,9 @@ for t in use_targets:
 	c.execute ( "CREATE INDEX way_tags_index ON way_tags ( way_id );" )
 	print (f"{CLEAR}Creating index 4...", end='')
 	c.execute ( "CREATE INDEX relation_members_index ON relation_members ( relation_id );" )
+
+	print (f"{CLEAR}Creating index 4...", end='')
+	c.execute ( "CREATE INDEX node_idx ON nodes ( id );" )
 	
 	print("")
 	

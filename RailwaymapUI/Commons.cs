@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace RailwaymapUI
 {
-    public enum MapItems { Landarea, Water, Borders, Railways, Cities, Scale, Margins };
+    public enum MapItems { Landarea, Water, Borders, Railways, Cities, Sites, Scale, Margins };
 
     public static class Commons
     {
@@ -74,6 +77,20 @@ namespace RailwaymapUI
             }
 
             return (phi * RAD2Deg);
+        }
+
+        public static int Merc2MapX(double mercx, BoundsXY bounds)
+        {
+            return (int)Math.Round(bounds.Scale * (mercx - bounds.X_min));
+        }
+
+        public static int Merc2MapY(double mercy, BoundsXY bounds)
+        {
+            //return (int)Math.Round(bounds.Scale * (mercy - bounds.Y_min));
+            double maph = bounds.Scale * Math.Abs(bounds.Y_max - bounds.Y_min);
+            double offset = bounds.Scale * (mercy - bounds.Y_min);
+
+            return (int)Math.Round(maph - offset);
         }
 
 
@@ -262,6 +279,62 @@ namespace RailwaymapUI
             ws.Ready();
 
             return ws;
+        }
+
+        static public bool Check_Cache_DB(string filename_db, string filename_cache)
+        {
+            bool result = false;
+
+            if (File.Exists(filename_cache))
+            {
+                DateTime db_timestamp = File.GetLastWriteTime(filename_db);
+
+                string timestamp_expect = db_timestamp.ToString("yyyy-MM-dd HH':'mm':'ss");
+
+                System.Diagnostics.Debug.WriteLine("Check_Cache_DB: " + filename_db + " Expect timestamp: " + timestamp_expect);
+
+                using (FileStream fs = File.OpenRead(filename_cache))
+                using (BinaryReader reader = new BinaryReader(fs, Encoding.UTF8, false))
+                {
+                    string timestamp_cache = reader.ReadString();
+
+                    if (timestamp_expect == timestamp_cache)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Check_Cache_DB: " + filename_db + " Timestamp match ok");
+
+                        result = true;
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("Check_Cache_DB: " + filename_db + " Timestamp mismatch: " + timestamp_expect + " -- " + timestamp_cache);
+                    }
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Check_Cache_DB: " + filename_db + " File does not exists: " + filename_cache);
+            }
+
+            GC.Collect();
+
+            return (result);
+        }
+
+        public static BitmapSource Bitmap2BitmapSource(System.Drawing.Bitmap bitmap)
+        {
+            var bitmapData = bitmap.LockBits(
+                new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
+
+            var bitmapSource = BitmapSource.Create(
+                bitmapData.Width, bitmapData.Height,
+                bitmap.HorizontalResolution, bitmap.VerticalResolution,
+                PixelFormats.Pbgra32, null,
+                bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
+
+            bitmap.UnlockBits(bitmapData);
+
+            return bitmapSource;
         }
     }
 }

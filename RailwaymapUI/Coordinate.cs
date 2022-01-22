@@ -16,5 +16,15 @@ namespace RailwaymapUI
             Latitude = lat;
             Longitude = lon;
         }
+
+        public bool Compare(Coordinate c)
+        {
+            const double DIFF_THRESHOLD = 0.00001;
+
+            double diff_lat = Math.Abs(c.Latitude - Latitude);
+            double diff_lon = Math.Abs(c.Longitude - Longitude);
+
+            return ((diff_lat < DIFF_THRESHOLD) && (diff_lon < DIFF_THRESHOLD));
+        }
     }
 }

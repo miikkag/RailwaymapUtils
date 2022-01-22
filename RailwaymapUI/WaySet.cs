@@ -17,6 +17,7 @@ namespace RailwaymapUI
             waycoordsetlist = new List<WayCoordset>();
         }
 
+
         public void AddItem(WayCoordset c)
         {
             waycoordsetlist.Add(c);

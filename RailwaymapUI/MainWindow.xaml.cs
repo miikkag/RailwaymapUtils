@@ -98,6 +98,21 @@ namespace RailwaymapUI
             DB.Reset_Single(MapItems.Cities);
         }
 
+        private void Refresh_ImageSites(object sender, RoutedEventArgs e)
+        {
+            DB.Reset_Single(MapItems.Sites);
+        }
+
+        private void HideAllSites(object sender, RoutedEventArgs e)
+        {
+            DB.HideAll(StationItemType.Site);
+        }
+
+        private void HideAllYards(object sender, RoutedEventArgs e)
+        {
+            DB.HideAll(StationItemType.Yard);
+        }
+
 
         private void Expand_All(object sender, RoutedEventArgs e)
         {
@@ -307,8 +322,14 @@ namespace RailwaymapUI
 
         private void Export_Image_Click(object sender, RoutedEventArgs e)
         {
-            DB.Export_Image();
+            DB.Export_Image(false);
         }
+
+        private void Copy_Image_Click(object sender, RoutedEventArgs e)
+        {
+            DB.Export_Image(true);
+        }
+
 
         private void Click_SaveConfig(object sender, RoutedEventArgs e)
         {

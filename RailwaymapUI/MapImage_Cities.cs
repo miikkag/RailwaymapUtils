@@ -72,7 +72,9 @@ namespace RailwaymapUI
                         float base_offset_x;
                         float base_offset_y;
 
-                        SizeF textsize = gr.MeasureString(stations[i].display_name, usefont);
+                        string draw_name = stations[i].display_name.Replace(@"\n", Environment.NewLine);
+
+                        SizeF textsize = gr.MeasureString(draw_name, usefont);
 
                         if (stations[i].Halign_Left)
                         {
@@ -103,7 +105,7 @@ namespace RailwaymapUI
                         float offset_x = base_offset_x + stations[i].offsetx;
                         float offset_y = base_offset_y + stations[i].offsety;
 
-                        gr.DrawString(stations[i].display_name, usefont, brush_font, (float)x + offset_x, (float)y + offset_y);
+                        gr.DrawString(draw_name, usefont, brush_font, (float)x + offset_x, (float)y + offset_y);
                     }
                 }
             }
