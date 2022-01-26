@@ -17,6 +17,7 @@ namespace RailwaymapUI
         public int gauge1;
         public int gauge2;
         public int tracks;
+        public bool lightrail;
         public string usage;
 
         public WayRail(Int64 id)
@@ -29,6 +30,7 @@ namespace RailwaymapUI
             gauge1 = 0;
             gauge2 = 0;
             tracks = 1;
+            lightrail = false;
             usage = "";
         }
     }

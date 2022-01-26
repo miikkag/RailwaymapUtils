@@ -62,19 +62,20 @@ class osmst(Enum):
 
 
 class OSMNodesHandler ( xml.sax.ContentHandler ):
-	def __init__(self):
+	def __init__(self, linecount):
 		self.elementcount = 0
 		self.state = osmst.ROOT
 		self.unknown_level = 0
 		self.nodecount = 0
 		self.waycount = 0
 		self.relcount = 0
+		self.totalcount = linecount
 		self.way = way(0)
 		self.relation = relation(0)
 		self.node = node(0,0,0)
 
 	def PrintStatus(self):
-		sys.stdout.write(f"\rElements: {self.elementcount}  Nodes: {self.nodecount}  Ways: {self.waycount}  Relations: {self.relcount}")
+		sys.stdout.write(f"\rElements: {self.elementcount} [{int((self.elementcount*100)/self.totalcount)}%]")
 		sys.stdout.flush()
 
 	def startElement(self, tag, attributes):
@@ -165,8 +166,8 @@ class OSMNodesHandler ( xml.sax.ContentHandler ):
 
 		self.elementcount += 1
 
-		#if (self.elementcount % 20000)==0:
-		#	self.PrintStatus()
+		if (self.elementcount % 20000)==0:
+			self.PrintStatus()
 
 	def endElement(self, tag):
 		global c
@@ -228,6 +229,10 @@ class OSMNodesHandler ( xml.sax.ContentHandler ):
 				else:
 					print ("Unexpected OSM end tag " + tag)
 
+def GetLineCount(filename):
+	num_lines = sum(1 for _ in open(filename, 'r', encoding='utf-8'))
+	return num_lines
+
 # =======================================================================================
 
 if len(sys.argv) <= 1:
@@ -265,6 +270,12 @@ for t in use_targets:
 	if os.path.exists(filename_db):
 		os.remove(filename_db)
 	
+	linecount = GetLineCount(filename_osm)
+	
+	if linecount == 0:
+		print(f"OSM file {filename_osm} is empty")
+		continue
+	
 	conn = sqlite3.connect(filename_db)
 	
 	c = conn.cursor()
@@ -283,7 +294,7 @@ for t in use_targets:
 	parser = xml.sax.make_parser()
 	parser.setFeature(xml.sax.handler.feature_namespaces, 0)
 	
-	handler = OSMNodesHandler()
+	handler = OSMNodesHandler( linecount )
 	parser.setContentHandler( handler )
 		
 	try:

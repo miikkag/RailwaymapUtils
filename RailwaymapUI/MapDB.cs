@@ -33,6 +33,7 @@ namespace RailwaymapUI
         private const string BOUNDS_FILENAME = "bbox.txt";
 
         private const string DB_FILENAME_RAILWAYS = "railway.db";
+        private const string DB_FILENAME_LIGHTRAIL = "lightrail.db";
         private const string DB_FILENAME_BORDER = "border.db";
         private const string DB_FILENAME_COASTLINE = "coastline.db";
         private const string DB_FILENAME_COASTLINE_CACHE = "coastline_cache.bin";
@@ -43,6 +44,8 @@ namespace RailwaymapUI
         private string AreaPath;
         private string AreaConfigFilename;
         private string BoundsFilename;
+
+        private object drawlock;
 
         public string OutputFileName { get; set; }
 
@@ -75,6 +78,9 @@ namespace RailwaymapUI
         private bool _edit_yeards;
         public bool EditYards { get { return _edit_yeards; } set { _edit_yeards = value; } }
 
+        private bool _edit_lightrail;
+        public bool EditLightrail { get { return _edit_lightrail; } set { _edit_lightrail = value; } }
+
         public bool Separate_NonVisibleStations { get; set; }
 
         private bool _showallstations;
@@ -83,9 +89,12 @@ namespace RailwaymapUI
         public Visibility ShowAllStationsVisibility { get { if (ShowAllStations) return Visibility.Visible; else return Visibility.Collapsed; } }
 
         private Bounds bounds;
+        private BoundsXY bxy;
 
         private struct DrawItems
         {
+            public bool use_cache;
+
             public bool landarea;
             public bool water;
             public bool borders;
@@ -118,6 +127,7 @@ namespace RailwaymapUI
             Set = new DrawSettings();
 
             bounds = new Bounds();
+            bxy = null;
 
             draw_items = new DrawItems();
 
@@ -130,6 +140,9 @@ namespace RailwaymapUI
             EditStations = true;
             EditSites = true;
             EditYards = true;
+            EditLightrail = true;
+
+            drawlock = new object();
         }
 
         public void Reset_Size()
@@ -147,6 +160,8 @@ namespace RailwaymapUI
 
             OnPropertyChanged("Image_Background");
 
+            draw_items.use_cache = true;
+
             draw_items.landarea = true;
             draw_items.water = true;
             draw_items.borders = true;
@@ -162,6 +177,8 @@ namespace RailwaymapUI
 
         public void Reset_Single(MapItems item)
         {
+            draw_items.use_cache = false;
+
             draw_items.landarea = (item == MapItems.Landarea);
             draw_items.borders = (item == MapItems.Borders);
             draw_items.water = (item == MapItems.Water);
@@ -174,6 +191,30 @@ namespace RailwaymapUI
 
             thr.Start();
         }
+
+        public void AutoSize(bool set_width, bool set_height)
+        {
+            if (bxy != null)
+            {
+                double ratio = Math.Abs(bxy.X_max - bxy.X_min) / Math.Abs(bxy.Y_max - bxy.Y_min);
+
+                if (set_width)
+                {
+                    OutputSizeWidth = (int)Math.Round((double)OutputSizeHeight * ratio);
+                }
+
+                if (set_height)
+                {
+                    OutputSizeHeight = (int)Math.Round((double)OutputSizeWidth / ratio);
+                }
+
+                Load_Bounds();
+
+                OnPropertyChanged("OutputSizeWidth");
+                OnPropertyChanged("OutputSizeHeight");
+            }
+        }
+
 
         public void Set_Station_Valign(Int64 id, StationItem.Valign valign)
         {
@@ -362,6 +403,10 @@ namespace RailwaymapUI
                                 {
                                     set_this = false;
                                 }
+                                else if ((st.Type == StationItemType.Lightrail) && !EditLightrail)
+                                {
+                                    set_this = false;
+                                }
 
                                 if (set_this)
                                 {
@@ -443,18 +488,22 @@ namespace RailwaymapUI
                     try
                     {
                         using (SQLiteConnection sqlite_railways = new SQLiteConnection("Data Source=" + Path.Combine(area_path, DB_FILENAME_RAILWAYS)))
+                        using (SQLiteConnection sqlite_lightrail = new SQLiteConnection("Data Source=" + Path.Combine(area_path, DB_FILENAME_LIGHTRAIL)))
                         {
                             sqlite_railways.Open();
+                            sqlite_lightrail.Open();
 
                             Stations.Clear();
                             Stations = new List<StationItem>();
 
-                            Load_Stations(sqlite_railways);
+                            Load_Stations(sqlite_railways, false);
+                            Load_Stations(sqlite_lightrail, true);
 
                             Stations.Sort((x, y) => x.name.CompareTo(y.name));
 
                             OnPropertyChanged("Stations");
 
+                            sqlite_lightrail.Close();
                             sqlite_railways.Close();
 
                             GC.Collect();
@@ -463,7 +512,7 @@ namespace RailwaymapUI
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Error opening " + Path.Combine(area_path, DB_FILENAME_RAILWAYS) + Environment.NewLine + Environment.NewLine + ex.Message,
+                        MessageBox.Show("Error opening railway/lightrail database" + Environment.NewLine + Environment.NewLine + ex.Message,
                             "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
 
@@ -521,7 +570,7 @@ namespace RailwaymapUI
             }
             else
             {
-                // EXport to file
+                // Export to file
                 string parent = Directory.GetParent(AreaPath).FullName;
                 string output_pathname = Path.Combine(parent, OutputFileName);
 
@@ -595,6 +644,21 @@ namespace RailwaymapUI
                             double.TryParse(parts[3], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double lon2);
 
                             bounds = new Bounds(Math.Min(lat1, lat2), Math.Max(lat1, lat2), Math.Min(lon1, lon2), Math.Max(lon1, lon2));
+
+                            double y_max = Commons.Merc_Y(bounds.Lat_max);
+                            double y_min = Commons.Merc_Y(bounds.Lat_min);
+                            double x_max = Commons.Merc_X(bounds.Lon_max);
+                            double x_min = Commons.Merc_X(bounds.Lon_min);
+
+                            double delta_x = x_max - x_min;
+                            double delta_y = y_max - y_min;
+
+                            double scalex = (double)OutputSizeWidth / delta_x;
+                            double scaley = (double)OutputSizeHeight / delta_y;
+
+                            double scale = Math.Min(scalex, scaley);
+
+                            bxy = new BoundsXY(x_max, x_min, y_max, y_min, scale);
                         }
                         else
                         {
@@ -759,125 +823,148 @@ namespace RailwaymapUI
 
         private void DrawAllThread()
         {
-            double y_max = Commons.Merc_Y(bounds.Lat_max);
-            double y_min = Commons.Merc_Y(bounds.Lat_min);
-            double x_max = Commons.Merc_X(bounds.Lon_max);
-            double x_min = Commons.Merc_X(bounds.Lon_min);
-
-            double delta_x = x_max - x_min;
-            double delta_y = y_max - y_min;
-
-            double scalex = (double)OutputSizeWidth / delta_x;
-            double scaley = (double)OutputSizeHeight / delta_y;
-
-            double scale = Math.Min(scalex, scaley);
-
-
-            BoundsXY bxy = new BoundsXY(x_max, x_min, y_max, y_min, scale);
-
-            string db_file = "Init";
-
-            //try
+            lock (drawlock)
             {
+                string db_file = "Init";
 
-                if (draw_items.landarea)
+                try
                 {
-                    db_file = Path.Combine(AreaPath, DB_FILENAME_COASTLINE);
-                    
-                    string db_cache = Path.Combine(AreaPath, DB_FILENAME_COASTLINE_CACHE);
-
-                    if (!Commons.Check_Cache_DB(db_file, db_cache))
+                    if (draw_items.landarea)
                     {
-                        LandareaCache.Convert_Coastline(db_file, db_cache, Progress);
+                        db_file = Path.Combine(AreaPath, DB_FILENAME_COASTLINE);
+
+                        string db_cache = Path.Combine(AreaPath, DB_FILENAME_COASTLINE_CACHE);
+
+                        if (!Commons.Check_Cache_DB(db_file, db_cache))
+                        {
+                            LandareaCache.Convert_Coastline(db_file, db_cache, Progress);
+                        }
+
+                        string img_cache = Commons.Cache_ImageName(AreaPath, "landarea");
+
+                        bool need_draw = true;
+
+                        if (draw_items.use_cache && Commons.Check_Cache_Image(db_file, img_cache))
+                        {
+                            need_draw = !Image_Landarea.DrawFromCache(img_cache);
+                        }
+
+                        if(need_draw)
+                        {
+                            Image_Landarea.Draw(db_cache, bxy, Progress, Set);
+                            Image_Landarea.Save_ImageCache(img_cache, db_file);
+                        }
+
+                        OnPropertyChanged("Image_Landarea");
                     }
 
-                    Image_Landarea.Draw(db_cache, bxy, Progress, Set);
-
-                    OnPropertyChanged("Image_Landarea");
-                }
-
-                if (draw_items.borders)
-                {
-                    db_file = Path.Combine(AreaPath, DB_FILENAME_BORDER);
-
-                    using (SQLiteConnection sqlite_border = new SQLiteConnection("Data Source=" + db_file))
+                    if (draw_items.borders)
                     {
-                        sqlite_border.Open();
+                        db_file = Path.Combine(AreaPath, DB_FILENAME_BORDER);
 
-                        Image_Borders.Draw(sqlite_border, bxy, Progress, Set);
+                        using (SQLiteConnection sqlite_border = new SQLiteConnection("Data Source=" + db_file))
+                        {
+                            sqlite_border.Open();
 
-                        sqlite_border.Close();
+                            Image_Borders.Draw(sqlite_border, bxy, Progress, Set);
+
+                            sqlite_border.Close();
+                        }
+
+                        OnPropertyChanged("Image_Borders");
                     }
 
-                    OnPropertyChanged("Image_Borders");
-                }
-
-                if (draw_items.water)
-                {
-                    db_file = Path.Combine(AreaPath, DB_FILENAME_LAKES);
-
-                    string db_cache = Path.Combine(AreaPath, DB_FILENAME_LAKES_CACHE);
-
-                    if (!Commons.Check_Cache_DB(db_file, db_cache))
+                    if (draw_items.water)
                     {
-                        LakeCache.Convert_Lakes(db_file, db_cache, Progress);
+                        db_file = Path.Combine(AreaPath, DB_FILENAME_LAKES);
+
+                        string db_cache = Path.Combine(AreaPath, DB_FILENAME_LAKES_CACHE);
+
+                        if (!Commons.Check_Cache_DB(db_file, db_cache))
+                        {
+                            LakeCache.Convert_Lakes(db_file, db_cache, Progress);
+                        }
+
+                        string img_cache = Commons.Cache_ImageName(AreaPath, "lakes");
+
+                        bool need_draw = true;
+
+                        if (draw_items.use_cache && Commons.Check_Cache_Image(db_file, img_cache))
+                        {
+                            need_draw = !Image_Water.DrawFromCache(img_cache);
+                        }
+
+                        if (need_draw)
+                        {
+                            Image_Water.Draw(db_cache, bxy, Progress, Set);
+                            Image_Water.Save_ImageCache(img_cache, db_file);
+                        }
+
+                        OnPropertyChanged("Image_Water");
                     }
 
-                    Image_Water.Draw(db_cache, bxy, Progress, Set);
-
-                    OnPropertyChanged("Image_Water");
-                }
-
-                if (draw_items.railways)
-                {
-                    Progress.Set_Info(true, "Processing railways", 0);
-
-                    db_file = Path.Combine(AreaPath, DB_FILENAME_RAILWAYS);
-
-                    using (SQLiteConnection sqlite_railways = new SQLiteConnection("Data Source=" + db_file))
+                    if (draw_items.railways)
                     {
-                        sqlite_railways.Open();
+                        db_file = "Railways/Lightrail";
 
-                        Image_Railways.Draw(sqlite_railways, bxy, Progress, Set);
+                        Progress.Set_Info(true, "Processing railways", 0);
 
-                        sqlite_railways.Close();
+                        string db_file_railways = Path.Combine(AreaPath, DB_FILENAME_RAILWAYS);
+                        string db_file_lightrail = Path.Combine(AreaPath, DB_FILENAME_LIGHTRAIL);
+
+                        using (SQLiteConnection sqlite_railways = new SQLiteConnection("Data Source=" + db_file_railways))
+                        using (SQLiteConnection sqlite_lightrail = new SQLiteConnection("Data Source=" + db_file_lightrail))
+                        {
+                            sqlite_railways.Open();
+                            sqlite_lightrail.Open();
+
+                            Image_Railways.Draw(sqlite_railways, bxy, Progress, Set, true);
+
+                            if (Set.Draw_Railway_Lightrail)
+                            {
+                                Image_Railways.Draw(sqlite_lightrail, bxy, Progress, Set, false);
+                            }
+
+                            sqlite_lightrail.Close();
+                            sqlite_railways.Close();
+                        }
+
+                        OnPropertyChanged("Image_Railways");
                     }
 
-                    OnPropertyChanged("Image_Railways");
-                }
+                    if (draw_items.cities)
+                    {
+                        db_file = "Cities";
 
-                if (draw_items.cities)
+                        Progress.Set_Info(true, "Drawing cities", 0);
+
+                        Image_Cities.Draw(Stations, bxy, Progress, Set);
+
+                        OnPropertyChanged("Image_Cities");
+                    }
+
+                    if (draw_items.scale)
+                    {
+                        db_file = "Scale";
+
+                        Image_Scale.Draw(bxy, bounds, Set);
+
+                        OnPropertyChanged("Image_Scale");
+                    }
+                }
+                catch (Exception ex)
                 {
-                    db_file = "Cities";
+                    MessageBox.Show("Error processing " + db_file + Environment.NewLine + Environment.NewLine + ex.Message,
+                        "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
-                    Progress.Set_Info(true, "Drawing cities", 0);
-
-                    Image_Cities.Draw(Stations, bxy, Progress, Set);
-
-                    OnPropertyChanged("Image_Cities");
+                    return;
                 }
 
-                if (draw_items.scale)
-                {
-                    db_file = "Scale";
-
-                    Image_Scale.Draw(bxy, bounds, Set);
-
-                    OnPropertyChanged("Image_Scale");
-                }
+                Progress.Set_Info(false, "", 0);
             }
-            /*catch (Exception ex)
-            {
-                MessageBox.Show("Error processing " + db_file + Environment.NewLine + Environment.NewLine + ex.Message,
-                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                return;
-            }*/
-
-            Progress.Set_Info(false, "", 0);
         }
 
-        private void Load_Stations(SQLiteConnection conn)
+        private void Load_Stations(SQLiteConnection conn, bool lightrail)
         {
             using (SQLiteCommand cmd = new SQLiteCommand("SELECT id, lat, lon, station FROM nodes WHERE station>0;", conn))
             {
@@ -895,17 +982,24 @@ namespace RailwaymapUI
 
                     StationItemType st_type = StationItemType.None;
 
-                    if (st_num == 1)
+                    if (lightrail)
                     {
-                        st_type = StationItemType.Station;
+                        st_type = StationItemType.Lightrail;
                     }
-                    else if (st_num == 2)
+                    else
                     {
-                        st_type = StationItemType.Site;
-                    }
-                    else if (st_num == 3)
-                    {
-                        st_type = StationItemType.Yard;
+                        if (st_num == 1)
+                        {
+                            st_type = StationItemType.Station;
+                        }
+                        else if (st_num == 2)
+                        {
+                            st_type = StationItemType.Site;
+                        }
+                        else if (st_num == 3)
+                        {
+                            st_type = StationItemType.Yard;
+                        }
                     }
 
                     StationItem st = new StationItem(st_type);

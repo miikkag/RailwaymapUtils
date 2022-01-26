@@ -281,6 +281,39 @@ namespace RailwaymapUI
             return ws;
         }
 
+        static public string Cache_ImageName(string areapath, string basename)
+        {
+            return Path.Combine(areapath, "cache_" + basename + ".png");
+        }
+
+        static public bool Check_Cache_Image(string filename_db, string filename_cacheimg)
+        {
+            bool result = false;
+
+            if (File.Exists(filename_cacheimg))
+            {
+                DateTime db_timestamp = File.GetLastWriteTime(filename_db);
+                DateTime img_timestamp = File.GetLastWriteTime(filename_cacheimg);
+
+                if (db_timestamp == img_timestamp)
+                {
+                    result = true;
+
+                    System.Diagnostics.Debug.WriteLine("Check_Cache_Image: cache image timestamp match: " + filename_cacheimg);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Check_Cache_Image: cache image timestamp mismatch: " + filename_cacheimg);
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Check_Cache_Image: cache image file does not exist: " + filename_cacheimg);
+            }
+
+            return result;
+        }
+
         static public bool Check_Cache_DB(string filename_db, string filename_cache)
         {
             bool result = false;
@@ -317,7 +350,7 @@ namespace RailwaymapUI
 
             GC.Collect();
 
-            return (result);
+            return result;
         }
 
         public static BitmapSource Bitmap2BitmapSource(System.Drawing.Bitmap bitmap)

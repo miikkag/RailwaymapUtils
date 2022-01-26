@@ -8,17 +8,26 @@ using System.Threading.Tasks;
 
 namespace RailwaymapUI
 {
-    public enum StationItemType { None, Station, Site, Yard }
+    public enum StationItemType { None, Station, Site, Yard, Lightrail }
 
     public class StationItem : INotifyPropertyChanged
     {
         private StationItemType _type;
-        public StationItemType Type { get { return _type; } set { if (_type != value) { _type = value; OnPropertyChanged("Type"); OnPropertyChanged("IsSite"); OnPropertyChanged("IsYard"); OnPropertyChanged("IsStation"); } } }
+        public StationItemType Type { get { return _type; }
+            set { if (_type != value)
+                { _type = value;
+                    OnPropertyChanged("Type");
+                    OnPropertyChanged("IsSite");
+                    OnPropertyChanged("IsYard");
+                    OnPropertyChanged("IsStation");
+                    OnPropertyChanged("IsLightrail");
+                }
+            } }
 
         public bool IsStation { get { return (Type == StationItemType.Station); } }
         public bool IsSite { get { return (Type==StationItemType.Site); } }
         public bool IsYard { get { return (Type==StationItemType.Yard); } }
-
+        public bool IsLightrail { get { return (Type == StationItemType.Lightrail); } }
         public enum Valign { Top, Center, Bottom };
         public enum Halign { Left, Center, Right };
 

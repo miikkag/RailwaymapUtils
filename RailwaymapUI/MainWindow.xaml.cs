@@ -113,6 +113,11 @@ namespace RailwaymapUI
             DB.HideAll(StationItemType.Yard);
         }
 
+        private void HideAllLightrail(object sender, RoutedEventArgs e)
+        {
+            DB.HideAll(StationItemType.Lightrail);
+        }
+
 
         private void Expand_All(object sender, RoutedEventArgs e)
         {
@@ -328,6 +333,16 @@ namespace RailwaymapUI
         private void Copy_Image_Click(object sender, RoutedEventArgs e)
         {
             DB.Export_Image(true);
+        }
+
+        private void AutoSizeW_Click(object sender, RoutedEventArgs e)
+        {
+            DB.AutoSize(true, false);
+        }
+
+        private void AutoSizeH_Click(object sender, RoutedEventArgs e)
+        {
+            DB.AutoSize(false, true);
         }
 
 

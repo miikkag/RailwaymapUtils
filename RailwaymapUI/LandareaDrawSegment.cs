@@ -22,6 +22,9 @@ namespace RailwaymapUI
         public double CrossMercX;
         public int CrossMapX;
 
+        public double MercXMax;
+        public double MercXMin;
+
         public CrossDirection CrossDir;
 
         public LandareaDrawSegment(double lat1, double lon1, double lat2, double lon2)
@@ -34,6 +37,12 @@ namespace RailwaymapUI
 
             LonMax = Math.Max(lon1, lon2);
             LonMin = Math.Min(lon1, lon2);
+
+            double mercx1 = Commons.Merc_X(lon1);
+            double mercx2 = Commons.Merc_X(lon2);
+
+            MercXMin = Math.Min(mercx1, mercx2);
+            MercXMax = Math.Max(mercx1, mercx2);
 
             CrossMercX = 0;
             CrossMapX = -1;

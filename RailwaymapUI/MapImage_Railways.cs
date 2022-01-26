@@ -10,7 +10,7 @@ namespace RailwaymapUI
 {
     public class MapImage_Railways : MapImage
     {
-        public void Draw(SQLiteConnection conn, BoundsXY bounds, ProgressInfo progress, DrawSettings set)
+        public void Draw(SQLiteConnection conn, BoundsXY bounds, ProgressInfo progress, DrawSettings set, bool clear_first)
         {
             progress.Set_Info(true, "Processing railways", 0);
 
@@ -18,7 +18,10 @@ namespace RailwaymapUI
 
             if ((gr != null) && (conn != null))
             {
-                gr.Clear(Color.Transparent);
+                if (clear_first)
+                {
+                    gr.Clear(Color.Transparent);
+                }
 
                 gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
 
@@ -80,6 +83,17 @@ namespace RailwaymapUI
                                             }
                                             break;
 
+                                        case "railway":
+                                            if (v == "narrow_gauge")
+                                            {
+                                                wr.gauge1 = 1;
+                                            }
+                                            else if (v == "light_rail")
+                                            {
+                                                wr.lightrail = true;
+                                            }
+                                            break;
+
                                         case "usage":
                                             wr.usage = v;
                                             break;
@@ -99,6 +113,11 @@ namespace RailwaymapUI
                                             if (v == "rail")
                                             {
                                                 wr.construction = true;
+                                            }
+                                            else if (v == "light_rail")
+                                            {
+                                                wr.construction = true;
+                                                wr.lightrail = true;
                                             }
                                             break;
                                     }

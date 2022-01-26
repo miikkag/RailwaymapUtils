@@ -6,12 +6,46 @@ using System.Windows;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing.Imaging;
 
 namespace RailwaymapUI
 {
     public class MapImage_Landarea : MapImage
     {
         private enum LandOrWater { Unknown = 0,Land=1, Water=2 };
+
+        public bool DrawFromCache(string filename_cache_img)
+        {
+            bool result = true;
+
+            if (gr == null)
+            {
+                return false;
+            }
+
+            if (!File.Exists(filename_cache_img))
+            {
+                return false;
+            }
+
+            gr.Clear(Color.Transparent);
+            gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
+
+            using (Image img = Image.FromFile(filename_cache_img))
+            {
+                if ((img.Width == bmp.Width) && (img.Height == bmp.Height))
+                {
+                    gr.DrawImage(Image.FromFile(filename_cache_img), 0, 0);
+                }
+                else
+                {
+                    result = false;
+                }
+            }
+
+            return result;
+        }
+
 
         public void Draw(string filename_cache, BoundsXY bxy, ProgressInfo progress, DrawSettings set)
         {
@@ -29,7 +63,7 @@ namespace RailwaymapUI
 
             gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
 
-            System.Diagnostics.Debug.WriteLine(bxy.ToString());
+            System.Diagnostics.Debug.WriteLine("Landarea: " + bxy.ToString());
 
             progress.Set_Info(true, "Reading coastline cache", 0);
 
@@ -159,6 +193,21 @@ namespace RailwaymapUI
                     }
                 }
 
+                // Remove out of bounds segments
+                int i = 0;
+
+                while (i < crosslist.Count)
+                {
+                    if (crosslist[i].MercXMax < bxy.X_min)
+                    {
+                        crosslist.RemoveAt(i);
+                    }
+                    else
+                    {
+                        i++;
+                    }
+                }
+
                 if (crosslist.Count > 0)
                 {
                     landwatercount[(int)LandOrWater.Unknown] = 0;
@@ -175,13 +224,23 @@ namespace RailwaymapUI
                     // Sort based on Lon crossing point (x coordinate)
                     crosslist.Sort(new LandareaDrawSegmentComparerCross());
 
+                    // Validate first cross items
+                    if (crosslist.Count > 1)
+                    {
+                        if (crosslist[0].CrossDir == crosslist[1].CrossDir)
+                        {
+                            // If two first items cross to same direction in means first segment likely is out of bbox and it's pair is missing from data
+                            crosslist.RemoveAt(0);
+                        }
+                    }
+
                     // Draw from left edge to first segment
                     Color drawcolor;
 
                     if (crosslist[0].CrossDir == CrossDirection.ToWater)
                     {
                         // Draw land
-                        drawcolor = set.Color_Land;    // TODO
+                        drawcolor = set.Color_Land;
                         landwater = LandOrWater.Land;
                     }
                     else if (crosslist[0].CrossDir == CrossDirection.ToLand)
@@ -220,14 +279,17 @@ namespace RailwaymapUI
                         if (crosslist[c].CrossDir == CrossDirection.ToWater)
                         {
                             drawcolor = set.Color_Water;
+                            landwater = LandOrWater.Water;
                         }
                         else if (crosslist[c].CrossDir == CrossDirection.ToLand)
                         {
                             drawcolor = set.Color_Land;
+                            landwater = LandOrWater.Land;
                         }
                         else
                         {
                             drawcolor = set.Color_DebugPink;
+                            landwater = LandOrWater.Unknown;
                         }
 
                         prevx = currentx;
@@ -292,6 +354,14 @@ namespace RailwaymapUI
             progress.Clear();
 
             GC.Collect();
+        }
+
+
+        public void Save_ImageCache(string imgname_cache, string db_filename)
+        {
+            bmp.Save(imgname_cache, ImageFormat.Png);
+
+            File.SetLastWriteTime(imgname_cache, File.GetLastWriteTime(db_filename));
         }
     }
 }

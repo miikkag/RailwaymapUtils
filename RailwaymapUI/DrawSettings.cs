@@ -57,6 +57,7 @@ namespace RailwaymapUI
         public string Scale_FontName = "Microsoft Sans Serif";
 
         public bool Draw_Railway_Spur { get; set; }
+        public bool Draw_Railway_Lightrail { get; set; }
         public bool Draw_Border { get; set; }
 
         public bool Draw_Landarea_Islands { get; set; }
@@ -240,6 +241,10 @@ namespace RailwaymapUI
                             Draw_Railway_Spur = val_bool;
                             break;
 
+                        case "Draw_Railway_Lightrail":
+                            Draw_Railway_Lightrail = val_bool;
+                            break;
+
                         case "Draw_Border":
                             Draw_Railway_Spur = val_bool;
                             break;
@@ -307,7 +312,7 @@ namespace RailwaymapUI
             str = CONFIG_PREFIX + "FontSize_Cities=" + FontSize_Cities.ToString();
             result.Add(str);
 
-            str = CONFIG_PREFIX + "FontNameBold_Cities=" + FontName_Cities;
+            str = CONFIG_PREFIX + "FontNameBold_Cities=" + FontNameBold_Cities;
             result.Add(str);
 
             str = CONFIG_PREFIX + "FontSizeBold_Cities=" + FontSize_Cities.ToString();
@@ -332,6 +337,9 @@ namespace RailwaymapUI
             result.Add(str);
 
             str = CONFIG_PREFIX + "Draw_Railway_Spur=" + Draw_Railway_Spur.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Draw_Railway_Lightrail=" + Draw_Railway_Lightrail.ToString();
             result.Add(str);
 
             str = CONFIG_PREFIX + "Draw_Border=" + Draw_Railway_Spur.ToString();

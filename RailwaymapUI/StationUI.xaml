@@ -36,6 +36,13 @@
                     </MultiDataTrigger.Conditions>
                     <Setter Property="Background" Value="#F7CB96"/>
                 </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding Highlighted}" Value="True"/>
+                        <Condition Binding="{Binding IsLightrail}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="#C9C9EF"/>
+                </MultiDataTrigger>
             </Style.Triggers>
         </Style>
         <Style x:Key="StyleValign_Bottom" TargetType="Button">
