@@ -116,19 +116,11 @@ namespace RailwaymapUI
         }
 
 
-        static public WaySet Generate_Wayset_Relations(SQLiteConnection conn)   // TODO: inner/outer
+        static public List<List<Coordinate>> Generate_Wayset_Single(SQLiteConnection conn, Int64 way_id)
         {
-            WaySet ws = new WaySet();
+            List<List<Coordinate>> ws = new List<List<Coordinate>>();
 
-
-            return ws;
-        }
-
-        static public WaySet Generate_Wayset_Single(SQLiteConnection conn, Int64 way_id)
-        {
-            WaySet ws = new WaySet();
-
-            WayCoordset tmpset = new WayCoordset();
+            List<Coordinate> tmpset = new List<Coordinate>();
 
             using (SQLiteCommand cmd_nodes = new SQLiteCommand("SELECT node_id FROM way_nodes WHERE way_id=$id;", conn))
             {
@@ -151,7 +143,7 @@ namespace RailwaymapUI
                                     double lat = rdr_coords.GetDouble(0);
                                     double lon = rdr_coords.GetDouble(1);
 
-                                    tmpset.AddItem(new Coordinate(lat, lon));
+                                    tmpset.Add(new Coordinate(lat, lon));
                                 }
                                 else
                                 {
@@ -163,25 +155,21 @@ namespace RailwaymapUI
                 }
             }
 
-            tmpset.Ready();
-
-            if (tmpset.Coords.Length > 0)
+            if (tmpset.Count > 0)
             {
-                ws.AddItem(tmpset);
+                ws.Add(tmpset);
             }
             else
             {
                 System.Diagnostics.Debug.WriteLine("Empty tmpset for way id " + way_id.ToString());
             }
 
-            ws.Ready();
-
             return ws;
         }
 
-        static public WaySet Generate_Wayset(SQLiteConnection conn)
+        static public List<List<Coordinate>> Generate_Wayset(SQLiteConnection conn)
         {
-            WaySet ws = new WaySet();
+            List<List<Coordinate>> ws = new List<List<Coordinate>>();
 
             using (SQLiteCommand cmd_wayid = new SQLiteCommand("SELECT id FROM ways;", conn))
             using (SQLiteDataReader rdr_wayid = cmd_wayid.ExecuteReader())
@@ -190,7 +178,7 @@ namespace RailwaymapUI
 
                 while (rdr_wayid.Read())
                 {
-                    WayCoordset tmpset = new WayCoordset();
+                    List<Coordinate> tmpset = new List<Coordinate>();
 
                     long id_way = rdr_wayid.GetInt64(0);
 
@@ -213,7 +201,7 @@ namespace RailwaymapUI
                                         double lat = rdr_coords.GetDouble(0);
                                         double lon = rdr_coords.GetDouble(1);
 
-                                        tmpset.AddItem(new Coordinate(lat, lon));
+                                        tmpset.Add(new Coordinate(lat, lon));
                                     }
                                     else
                                     {
@@ -224,11 +212,9 @@ namespace RailwaymapUI
                         }
                     }
 
-                    tmpset.Ready();
-
-                    if (tmpset.Coords.Length > 0)
+                    if (tmpset.Count > 0)
                     {
-                        ws.AddItem(tmpset);
+                        ws.Add(tmpset);
                     }
                     else
                     {
@@ -237,49 +223,75 @@ namespace RailwaymapUI
                 }
             }
 
-            ws.Ready();
-
             return ws;
         }
 
-
-        static public WaySet Make_Wayset(SQLiteConnection conn, string tablename)
+        public static System.Drawing.Color Get_Draw_Color(RailwayType draw_type, DrawSettings set)
         {
-            WaySet ws = new WaySet();
+            System.Drawing.Color result;
 
-            int prev_setnum = -1;
-            WayCoordset tmpset = new WayCoordset();
-
-            SQLiteCommand cmd = new SQLiteCommand("SELECT setnum, latitude, longitude FROM " + tablename + ";", conn);
-
-            SQLiteDataReader rdr = cmd.ExecuteReader();
-
-            while (rdr.Read())
+            switch (draw_type)
             {
-                int setnum = rdr.GetInt32(0);
-                double lat = rdr.GetDouble(1);
-                double lon = rdr.GetDouble(2);
+                case RailwayType.Disused:
+                    result = set.Color_Railways_Disused;
+                    break;
 
-                if (setnum != prev_setnum)
-                {
-                    tmpset.Ready();
-                    ws.AddItem(tmpset);
+                case RailwayType.Normal_Construction:
+                    result = set.Color_Railways_Construction_Normal;
+                    break;
 
-                    tmpset = new WayCoordset();
+                case RailwayType.Narrow_Construction:
+                    result = set.Color_Railways_Construction_Narrow;
+                    break;
 
-                    prev_setnum = setnum;
-                }
+                case RailwayType.Dual_Gauge:
+                    result = set.Color_Railways_Dualgauge;
+                    break;
 
-                tmpset.AddItem(new Coordinate(lat, lon));
+                case RailwayType.Narrow_Electrified:
+                    result = set.Color_Railways_Narrow_Electric;
+                    break;
+
+                case RailwayType.Narrow_Non_Electrified:
+                    result = set.Color_Railways_Narrow_Diesel;
+                    break;
+
+                case RailwayType.Normal_Non_Electrified:
+                    result = set.Color_Railways_Diesel;
+                    break;
+
+                case RailwayType.Normal_Electrified_750V:
+                    result = set.Color_Railways_750V;
+                    break;
+
+                case RailwayType.Normal_Electrified_1500V:
+                    result = set.Color_Railways_1500V;
+                    break;
+
+                case RailwayType.Normal_Electrified_3000V:
+                    result = set.Color_Railways_3000V;
+                    break;
+
+                case RailwayType.Normal_Electrified_15kV:
+                    result = set.Color_Railways_15kV;
+                    break;
+
+                case RailwayType.Normal_Electrified_25kV:
+                    result = set.Color_Railways_25kV;
+                    break;
+
+                case RailwayType.Normal_Electrified_Other:
+                    result = set.Color_Railways_Elecrified_other;
+                    break;
+
+                default:
+                    result = System.Drawing.Color.Black;
+                    break;
             }
 
-            tmpset.Ready();
-            ws.AddItem(tmpset);
-
-            ws.Ready();
-
-            return ws;
+            return (result);
         }
+
 
         static public string Cache_ImageName(string areapath, string basename)
         {

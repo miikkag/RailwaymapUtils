@@ -31,6 +31,7 @@ namespace RailwaymapUI
         public Color Color_Land = Color.FromArgb(255, 255, 255);
 
         public Color Color_Railways_Diesel = Color.FromArgb(40, 220, 40);
+        public Color Color_Railways_750V = Color.FromArgb(175, 175, 75);
         public Color Color_Railways_1500V = Color.FromArgb(205, 135, 90);
         public Color Color_Railways_3000V = Color.FromArgb(0, 200, 200);
         public Color Color_Railways_15kV = Color.FromArgb(255, 0, 0);
@@ -40,7 +41,8 @@ namespace RailwaymapUI
         public Color Color_Railways_Narrow_Diesel = Color.FromArgb(255, 128, 224);
         public Color Color_Railways_Dualgauge = Color.FromArgb(128, 40, 255);
         public Color Color_Railways_Disused = Color.FromArgb(210, 210, 210);
-        public Color Color_Railways_Construction = Color.FromArgb(150, 150, 150);
+        public Color Color_Railways_Construction_Narrow = Color.FromArgb(216, 177, 209);
+        public Color Color_Railways_Construction_Normal = Color.FromArgb(150, 150, 150);
 
         public Color Color_Cities_Point = Color.FromArgb(0, 0, 0);
         public Color Color_Cities_Name = Color.FromArgb(0, 0, 0);
@@ -55,6 +57,9 @@ namespace RailwaymapUI
 
         public int Scale_FontSize = 8;
         public string Scale_FontName = "Microsoft Sans Serif";
+
+        public string Legend_FontName { get; set; }
+        public int Legend_FontSize { get; set; }
 
         public bool Draw_Railway_Spur { get; set; }
         public bool Draw_Railway_Lightrail { get; set; }
@@ -96,9 +101,21 @@ namespace RailwaymapUI
         private ScalePosition scale_pos;
         public ScalePosition Scale_Position { get { return scale_pos; } set { scale_pos = value; OnPropertyChanged("Scale_Position"); } }
 
+        private ScalePosition legend_pos;
+        public ScalePosition Legend_Position { get { return legend_pos; } set { legend_pos = value; OnPropertyChanged("Legend_Position"); } }
+
+
+        public bool Scale_Enabled { get; set; }
+        public bool Legend_Enabled { get; set; }
+
+        public int Legend_MarginX { get; set; }
+        public int Legend_MarginY { get; set; }
+
         public int Scale_MarginX { get; set; }
         public int Scale_MarginY { get; set; }
         public int Scale_Km { get; set; }
+        public int Scale_Sections { get; set; }
+        public bool Scale_On_Top { get; set; }
 
 
         public DrawSettings()
@@ -117,6 +134,9 @@ namespace RailwaymapUI
             FontNameBold_Cities = "Arial";
             FontSize_Cities = 8;
             FontSizeBold_Cities = 8;
+
+            Legend_FontName = "Microsoft Sans Serif";
+            Legend_FontSize = 8;
 
             FontName_Sites = FontName_Cities;
             FontNameBold_Sites = FontNameBold_Cities;
@@ -137,21 +157,26 @@ namespace RailwaymapUI
             Debug_Water_SingleItemNumber = 0;
 
             Scale_Position = ScalePosition.LeftBottom;
+            Legend_Position = ScalePosition.LeftBottom;
             Scale_MarginX = 15;
             Scale_MarginY = 15;
+            Legend_MarginX = 15;
+            Legend_MarginY = 15;
             Scale_Km = 100;
+            Scale_Sections = 2;
+            Scale_Enabled = true;
+            Scale_On_Top = false;
+            Legend_Enabled = true;
         }
 
         public void Set_ScalePos(ScalePosition new_pos)
         {
-            if (new_pos == Scale_Position)
-            {
-                Scale_Position = ScalePosition.Off;
-            }
-            else
-            {
-                Scale_Position = new_pos;
-            }
+            Scale_Position = new_pos;
+        }
+
+        public void Set_LegendPos(ScalePosition new_pos)
+        {
+            Legend_Position = new_pos;
         }
 
 
@@ -261,6 +286,10 @@ namespace RailwaymapUI
                             Enum.TryParse(items[1], out scale_pos);
                             break;
 
+                        case "Legend_Position":
+                            Enum.TryParse(items[1], out legend_pos);
+                            break;
+
                         case "Scale_MarginX":
                             Scale_MarginX = val_int;
                             break;
@@ -269,9 +298,42 @@ namespace RailwaymapUI
                             Scale_MarginY = val_int;
                             break;
 
+                        case "Legend_MarginX":
+                            Legend_MarginX = val_int;
+                            break;
+
+                        case "Legend_MarginY":
+                            Legend_MarginY = val_int;
+                            break;
+
                         case "Scale_Km":
                             Scale_Km = val_int;
                             break;
+
+                        case "Scale_Sections":
+                            Scale_Sections = val_int;
+                            break;
+
+                        case "Scale_Enabled":
+                            Scale_Enabled = val_bool;
+                            break;
+
+                        case "Scale_On_Top":
+                            Scale_On_Top = val_bool;
+                            break;
+
+                        case "Legend_Enabled":
+                            Legend_Enabled = val_bool;
+                            break;
+
+                        case "Legend_FontName":
+                            Legend_FontName = items[1];
+                            break;
+
+                        case "Legend_FontSize":
+                            Legend_FontSize = val_int;
+                            break;
+
 
                         default:
                             break;
@@ -354,14 +416,42 @@ namespace RailwaymapUI
             str = CONFIG_PREFIX + "Scale_Position=" + Scale_Position.ToString();
             result.Add(str);
 
+            str = CONFIG_PREFIX + "Legend_Position=" + Legend_Position.ToString();
+            result.Add(str);
+
             str = CONFIG_PREFIX + "Scale_MarginX=" + Scale_MarginX.ToString();
             result.Add(str);
 
             str = CONFIG_PREFIX + "Scale_MarginY=" + Scale_MarginY.ToString();
             result.Add(str);
 
+            str = CONFIG_PREFIX + "Legend_MarginX=" + Legend_MarginX.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Legend_MarginY=" + Legend_MarginY.ToString();
+            result.Add(str);
+
             str = CONFIG_PREFIX + "Scale_Km=" + Scale_Km.ToString();
             result.Add(str);
+
+            str = CONFIG_PREFIX + "Scale_Sections=" + Scale_Sections.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Scale_Enabled=" + Scale_Enabled.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Scale_On_Top=" + Scale_On_Top.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Legend_Enabled=" + Legend_Enabled.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Legend_FontName=" + Legend_FontName.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Legend_FontSize=" + Legend_FontSize.ToString();
+            result.Add(str);
+
 
             return result;
         }

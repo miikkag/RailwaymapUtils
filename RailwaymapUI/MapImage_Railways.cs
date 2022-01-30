@@ -10,7 +10,7 @@ namespace RailwaymapUI
 {
     public class MapImage_Railways : MapImage
     {
-        public void Draw(SQLiteConnection conn, BoundsXY bounds, ProgressInfo progress, DrawSettings set, bool clear_first)
+        public void Draw(SQLiteConnection conn, BoundsXY bounds, ProgressInfo progress, DrawSettings set, RailwayLegend legend, bool clear_first)
         {
             progress.Set_Info(true, "Processing railways", 0);
 
@@ -46,6 +46,9 @@ namespace RailwaymapUI
                                 {
                                     string k = rdr_tags.GetString(0);
                                     string v = rdr_tags.GetString(1);
+
+                                    //if(!clear_first)
+                                    //    System.Diagnostics.Debug.WriteLine("key=" + k + " v=" + v);
 
                                     switch (k)
                                     {
@@ -157,7 +160,7 @@ namespace RailwaymapUI
 
                     if (draw)
                     {
-                        WaySet ws = Commons.Generate_Wayset_Single(conn, wr.way_id);
+                        List<List<Coordinate>> ws = Commons.Generate_Wayset_Single(conn, wr.way_id);
 
                         double filter = set.Filter_Railways_Line;
 
@@ -166,60 +169,76 @@ namespace RailwaymapUI
                         bool filter_drawline = set.Filter_Railways_DrawLine;
 
                         Color color;
+                        RailwayType draw_type;
 
                         if (wr.disused)
                         {
-                            color = set.Color_Railways_Disused;
+                            draw_type = RailwayType.Disused;
                         }
                         else if (wr.construction)
                         {
-                            color = set.Color_Railways_Construction;
+                            if ((wr.gauge1 > 0) && (wr.gauge1 < set.Normal_Gauge_Min))
+                            {
+                                draw_type = RailwayType.Narrow_Construction;
+                            }
+                            else
+                            {
+                                draw_type = RailwayType.Normal_Construction;
+                            }
                         }
                         else if (wr.gauge2 > 0)
                         {
-                            color = set.Color_Railways_Dualgauge;
+                            draw_type = RailwayType.Dual_Gauge;
                         }
                         else if ((wr.gauge1 > 0) && (wr.gauge1 < set.Normal_Gauge_Min))
                         {
                             if (wr.electrified)
                             {
-                                color = set.Color_Railways_Narrow_Electric;
+                                draw_type = RailwayType.Narrow_Electrified;
                             }
                             else
                             {
-                                color = set.Color_Railways_Narrow_Diesel;
+                                draw_type = RailwayType.Narrow_Non_Electrified;
                             }
                         }
                         else if (!wr.electrified)
                         {
                             // Non-electrified
-                            color = set.Color_Railways_Diesel;
+                            draw_type = RailwayType.Normal_Non_Electrified;
                         }
                         else
                         {
                             switch (wr.voltage)
                             {
+                                case 750:
+                                    draw_type = RailwayType.Normal_Electrified_750V;
+                                    break;
+
                                 case 1500:
-                                    color = set.Color_Railways_1500V;
+                                    draw_type = RailwayType.Normal_Electrified_1500V;
                                     break;
 
                                 case 3000:
-                                    color = set.Color_Railways_3000V;
+                                    draw_type = RailwayType.Normal_Electrified_3000V;
                                     break;
 
                                 case 15000:
-                                    color = set.Color_Railways_15kV;
+                                    draw_type = RailwayType.Normal_Electrified_15kV;
                                     break;
 
                                 case 25000:
-                                    color = set.Color_Railways_25kV;
+                                    draw_type = RailwayType.Normal_Electrified_25kV;
                                     break;
 
                                 default:
-                                    color = set.Color_Railways_Elecrified_other;
+                                    draw_type = RailwayType.Normal_Electrified_Other;
                                     break;
                             }
                         }
+
+                        legend.Set_UsedType(draw_type);
+
+                        color = Commons.Get_Draw_Color(draw_type, set);
 
                         Draw_Way_Coordinates(ws, null, filter, thick, color, bounds, filter_drawline);
                     }

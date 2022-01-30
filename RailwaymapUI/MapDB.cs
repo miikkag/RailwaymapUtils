@@ -91,6 +91,8 @@ namespace RailwaymapUI
         private Bounds bounds;
         private BoundsXY bxy;
 
+        private RailwayLegend legend;
+
         private struct DrawItems
         {
             public bool use_cache;
@@ -128,6 +130,8 @@ namespace RailwaymapUI
 
             bounds = new Bounds();
             bxy = null;
+
+            legend = new RailwayLegend();
 
             draw_items = new DrawItems();
 
@@ -471,6 +475,25 @@ namespace RailwaymapUI
                 Reset_Single(MapItems.Cities);
             }
         }
+
+        public void EN_Highlighted()
+        {
+            foreach (StationItem st in Stations_Highlight)
+            {
+                if (st.has_english)
+                {
+                    st.english = true;
+                    st.Force_Refresh();
+                }
+            }
+
+            if (Set.AutoRedraw_Cities)
+            {
+                Reset_Single(MapItems.Cities);
+            }
+
+        }
+
 
         public void Load_Area(string area_path)
         {
@@ -905,6 +928,8 @@ namespace RailwaymapUI
 
                     if (draw_items.railways)
                     {
+                        legend.Clear();
+
                         db_file = "Railways/Lightrail";
 
                         Progress.Set_Info(true, "Processing railways", 0);
@@ -918,11 +943,11 @@ namespace RailwaymapUI
                             sqlite_railways.Open();
                             sqlite_lightrail.Open();
 
-                            Image_Railways.Draw(sqlite_railways, bxy, Progress, Set, true);
+                            Image_Railways.Draw(sqlite_railways, bxy, Progress, Set, legend, true);
 
                             if (Set.Draw_Railway_Lightrail)
                             {
-                                Image_Railways.Draw(sqlite_lightrail, bxy, Progress, Set, false);
+                                Image_Railways.Draw(sqlite_lightrail, bxy, Progress, Set, legend, false);
                             }
 
                             sqlite_lightrail.Close();
@@ -947,7 +972,7 @@ namespace RailwaymapUI
                     {
                         db_file = "Scale";
 
-                        Image_Scale.Draw(bxy, bounds, Set);
+                        Image_Scale.Draw(bxy, bounds, legend, Set);
 
                         OnPropertyChanged("Image_Scale");
                     }

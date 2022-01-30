@@ -112,6 +112,7 @@
     <Compile Include="MapImage_Selection.cs" />
     <Compile Include="MapImage_Lakes.cs" />
     <Compile Include="ProgressInfo.cs" />
+    <Compile Include="RailwayLegend.cs" />
     <Compile Include="RailwaySet.cs" />
     <Compile Include="StationItem.cs" />
     <Compile Include="StationUI.xaml.cs">
@@ -119,8 +120,6 @@
     </Compile>
     <Compile Include="Lake.cs" />
     <Compile Include="Way.cs" />
-    <Compile Include="WayCoordset.cs" />
-    <Compile Include="WaySet.cs" />
     <Compile Include="WayRail.cs" />
     <Compile Include="ZoomBorder.cs" />
     <Page Include="MainWindow.xaml">

@@ -103,22 +103,6 @@ namespace RailwaymapUI
             DB.Reset_Single(MapItems.Sites);
         }
 
-        private void HideAllSites(object sender, RoutedEventArgs e)
-        {
-            DB.HideAll(StationItemType.Site);
-        }
-
-        private void HideAllYards(object sender, RoutedEventArgs e)
-        {
-            DB.HideAll(StationItemType.Yard);
-        }
-
-        private void HideAllLightrail(object sender, RoutedEventArgs e)
-        {
-            DB.HideAll(StationItemType.Lightrail);
-        }
-
-
         private void Expand_All(object sender, RoutedEventArgs e)
         {
             ExpandItems.Expand_All();
@@ -195,6 +179,11 @@ namespace RailwaymapUI
         private void Stations_Deselect_Highlighted(object sender, RoutedEventArgs e)
         {
             DB.Deselect_Highlighted();
+        }
+
+        private void Stations_EN_Highlighted(object sender, RoutedEventArgs e)
+        {
+            DB.EN_Highlighted();
         }
 
         private void Station_valign_bottom(object sender, RoutedEventArgs e)
@@ -325,6 +314,15 @@ namespace RailwaymapUI
             DB.Reset_Single(MapItems.Scale);
         }
 
+        private void LegendPosition_Click(object sender, RoutedEventArgs e)
+        {
+            DrawSettings.ScalePosition newpos = (DrawSettings.ScalePosition)(sender as Button).Tag;
+
+            DB.Set.Set_LegendPos(newpos);
+
+            DB.Reset_Single(MapItems.Scale);
+        }
+
         private void Export_Image_Click(object sender, RoutedEventArgs e)
         {
             DB.Export_Image(false);
@@ -349,6 +347,35 @@ namespace RailwaymapUI
         private void Click_SaveConfig(object sender, RoutedEventArgs e)
         {
             DB.Save_Config();
+        }
+
+        private void Show_HideStationMenu_Click(object sender, RoutedEventArgs e)
+        {
+            ContextMenu cm = this.FindResource("HideStationsMenu") as ContextMenu;
+            cm.PlacementTarget = sender as Button;
+            cm.IsOpen = true;
+        }
+
+        private void HideStationsMenu_Click(object sender, RoutedEventArgs e)
+        {
+            string tagstr = (sender as MenuItem).Tag.ToString();
+
+            if (tagstr == "station")
+            {
+                DB.HideAll(StationItemType.Station);
+            }
+            else if (tagstr == "lightrail")
+            {
+                DB.HideAll(StationItemType.Lightrail);
+            }
+            else if (tagstr == "site")
+            {
+                DB.HideAll(StationItemType.Site);
+            }
+            else if (tagstr == "yard")
+            {
+                DB.HideAll(StationItemType.Yard);
+            }
         }
     }
 }

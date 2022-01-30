@@ -94,32 +94,32 @@ namespace RailwaymapUI
             }
         }
 
-        protected void Debug_Way_EndCoordinates(WaySet ws, System.Drawing.Color color, BoundsXY bounds)
+        protected void Debug_Way_EndCoordinates(List<List<Coordinate>> ws, System.Drawing.Color color, BoundsXY bounds)
         {
-            for (int w = 0; w < ws.WayCoordSets.Length; w++)
+            for (int w = 0; w < ws.Count; w++)
             {
-                if (ws.WayCoordSets[w].Coords.Length > 1)
+                if (ws[w].Count > 1)
                 {
-                    double y1 = bounds.Scale * (bounds.Y_max - Commons.Merc_Y(ws.WayCoordSets[w].Coords[0].Latitude));
-                    double x1 = bounds.Scale * (Commons.Merc_X(ws.WayCoordSets[w].Coords[0].Longitude) - bounds.X_min);
+                    double y1 = bounds.Scale * (bounds.Y_max - Commons.Merc_Y(ws[w][0].Latitude));
+                    double x1 = bounds.Scale * (Commons.Merc_X(ws[w][0].Longitude) - bounds.X_min);
 
-                    double y2 = bounds.Scale * (bounds.Y_max - Commons.Merc_Y(ws.WayCoordSets[w].Coords.Last().Latitude));
-                    double x2 = bounds.Scale * (Commons.Merc_X(ws.WayCoordSets[w].Coords.Last().Longitude) - bounds.X_min);
+                    double y2 = bounds.Scale * (bounds.Y_max - Commons.Merc_Y(ws[w].Last().Latitude));
+                    double x2 = bounds.Scale * (Commons.Merc_X(ws[w].Last().Longitude) - bounds.X_min);
 
                     DrawLine.Draw_Line_1px(new System.Drawing.Point((int)x1, (int)y1), new System.Drawing.Point((int)x2, (int)y2), bmp, color);
                 }
                 else
                 {
-                    Console.Write("coordset " + w.ToString() + " length=" + ws.WayCoordSets[w].Coords.Length.ToString());
+                    Console.Write("coordset " + w.ToString() + " length=" + ws[w].Count.ToString());
                 }
             }
         }
 
-        protected void Draw_Way_Coordinates(WaySet ws, ProgressInfo progress, double filter_px, bool thick, System.Drawing.Color color, BoundsXY bounds, bool filter_drawline)
+        protected void Draw_Way_Coordinates(List<List<Coordinate>> ws, ProgressInfo progress, double filter_px, bool thick, System.Drawing.Color color, BoundsXY bounds, bool filter_drawline)
         {
             DateTime prev_update = DateTime.Now;
 
-            for (int w = 0; w < ws.WayCoordSets.Length; w++)
+            for (int w = 0; w < ws.Count; w++)
             {
                 if (progress != null)
                 {
@@ -127,7 +127,7 @@ namespace RailwaymapUI
 
                     if ((now - prev_update).TotalMilliseconds >= Commons.PROGRESS_INTERVAL)
                     {
-                        int percent = ((w * 100) / ws.WayCoordSets.Length);
+                        int percent = ((w * 100) / ws.Count);
                         progress.Set_Info(percent);
 
                         prev_update = now;
@@ -140,12 +140,12 @@ namespace RailwaymapUI
                 double prev_x = double.MinValue;
                 double prev_y = double.MinValue;
 
-                int lenc = ws.WayCoordSets[w].Coords.Length;
+                int lenc = ws[w].Count;
 
                 for (int c = 0; c < lenc; c++)
                 {
-                    double y = bounds.Scale * (bounds.Y_max - Commons.Merc_Y(ws.WayCoordSets[w].Coords[c].Latitude));
-                    double x = bounds.Scale * (Commons.Merc_X(ws.WayCoordSets[w].Coords[c].Longitude) - bounds.X_min);
+                    double y = bounds.Scale * (bounds.Y_max - Commons.Merc_Y(ws[w][c].Latitude));
+                    double x = bounds.Scale * (Commons.Merc_X(ws[w][c].Longitude) - bounds.X_min);
 
                     // Filter lines too close to each other
                     double dist = Math.Abs(x - prev_x) + Math.Abs(y - prev_y);
