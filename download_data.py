@@ -38,8 +38,8 @@ targets['--lakes'] = ( "lakes",
 	{ 'rel["natural"="water"]["water"="lake"]' } )
 
 
-targets['--water'] = ( "water",
-	{ 'way["natural"="water"]' } )
+#targets['--water'] = ( "water",
+#	{ 'way["natural"="water"]' } )
 
 
 use_targets = []

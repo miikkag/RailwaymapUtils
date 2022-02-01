@@ -20,7 +20,7 @@ targets['--coastline'] = "coastline"
 targets['--railway'] = "railway"
 targets['--lightrail'] = "lightrail"
 targets['--lakes'] = "lakes"
-targets['--water'] = "water"
+#targets['--water'] = "water"
 
 
 use_targets = []
@@ -303,7 +303,10 @@ for t in use_targets:
 		print ("Aborted.")
 		aborted = True
 	
-	c.execute ( "COMMIT;")
+	try:
+		c.execute ( "COMMIT;")
+	except:
+		pass
 	
 	print ("PARSE OSM:  elements=" + str(handler.elementcount) + "  nodes=" + str(handler.nodecount) + "  ways=" + str(handler.waycount) + "  relations=" + str(handler.relcount))
 	

@@ -46,6 +46,7 @@ namespace RailwaymapUI
 
         public Color Color_Cities_Point = Color.FromArgb(0, 0, 0);
         public Color Color_Cities_Name = Color.FromArgb(0, 0, 0);
+        public Color Color_Cities_Outline = Color.FromArgb(255, 255, 255);
 
         public Color Color_Selection_Area = Color.FromArgb(242, 255, 0);
         public Color Color_Selection_Border = Color.FromArgb(93, 124, 0);

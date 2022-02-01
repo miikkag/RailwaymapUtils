@@ -243,6 +243,14 @@ namespace RailwaymapUI
             DB.Change_Bold(id);
         }
 
+        private void Station_Outline_Click(object sender, RoutedEventArgs e)
+        {
+            Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
+
+            DB.Change_Outline(id);
+        }
+
+
         private void Station_EN_Click(object sender, RoutedEventArgs e)
         {
             Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
@@ -275,13 +283,6 @@ namespace RailwaymapUI
             Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
 
             DB.Adjust_Station_OffsetY(id, -1);
-        }
-
-        private void Station_Dot1_Click(object sender, RoutedEventArgs e)
-        {
-            Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
-
-            DB.Set_Station_Dot(id, 1);
         }
 
         private void Station_Dot2_Click(object sender, RoutedEventArgs e)

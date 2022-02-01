@@ -32,9 +32,9 @@ namespace RailwaymapUI
 
         public event RoutedEventHandler Click_Check;
         public event RoutedEventHandler Click_Bold;
+        public event RoutedEventHandler Click_Outline;
         public event RoutedEventHandler Click_EN;
 
-        public event RoutedEventHandler Click_Dot1;
         public event RoutedEventHandler Click_Dot2;
         public event RoutedEventHandler Click_Dot3;
         public event RoutedEventHandler Click_Dot4;
@@ -105,6 +105,10 @@ namespace RailwaymapUI
         {
             Click_Bold?.Invoke(sender, new RoutedEventArgs());
         }
+        private void Station_Outline_Click(object sender, RoutedEventArgs e)
+        {
+            Click_Outline?.Invoke(sender, new RoutedEventArgs());
+        }
 
         private void Station_EN_Click(object sender, RoutedEventArgs e)
         {
@@ -131,10 +135,6 @@ namespace RailwaymapUI
             Click_OffsetX_Minus?.Invoke(sender, new RoutedEventArgs());
         }
 
-        private void Station_Dot1(object sender, RoutedEventArgs e)
-        {
-            Click_Dot1?.Invoke(sender, new RoutedEventArgs());
-        }
         private void Station_Dot2(object sender, RoutedEventArgs e)
         {
             Click_Dot2?.Invoke(sender, new RoutedEventArgs());

@@ -161,6 +161,11 @@ namespace RailwaymapUI
                 bool run = true;
                 int s = 0;
 
+                if (segments.Count == 0)
+                {
+                    run = false;
+                }
+
                 while (run)
                 {
                     if (segments[s] != null)

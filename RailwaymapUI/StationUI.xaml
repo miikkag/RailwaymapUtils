@@ -104,7 +104,17 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-        
+
+        <Style x:Key="StyleButtonOutline" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding outline}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BoldbuttonSelected}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+
         <Style x:Key="StyleButtonEN" TargetType="Button">
             <Setter Property="Foreground" Value="#404040"/>
             <Style.Triggers>
@@ -118,14 +128,6 @@
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="DotButtonStyle1" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding dotsize}" Value="1">
-                    <Setter Property="Background" Value="{StaticResource BoldbuttonSelected}"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
         <Style x:Key="DotButtonStyle2" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
             <Style.Triggers>
@@ -232,14 +234,15 @@
                 <Button Padding="-3" Tag="{Binding id}" Width="18" Height="14" Click="Station_Bold_Click"
                         FontSize="10" FontWeight="Bold" TextOptions.TextFormattingMode="Display"
                         Style="{StaticResource StyleButtonBold}">B</Button>
-                <Border Width="4"/>
                 
-                <Button Padding="-3" Tag="{Binding id}" Width="14" Height="14" Click="Station_Dot1"
-                        FontSize="10" TextOptions.TextFormattingMode="Display"
-                        Style="{StaticResource DotButtonStyle1}">
-                    <Rectangle Width="2" Height="2" Fill="Black"/>
-                </Button>
                 <Border Width="1"/>
+                <Button Padding="-3" Tag="{Binding id}" Width="14" Height="14" Click="Station_Outline_Click"
+                        FontSize="10" FontWeight="Normal" TextOptions.TextFormattingMode="Display"
+                        Style="{StaticResource StyleButtonOutline}">
+                    <Rectangle Width="8" Height="8" Stroke="white" StrokeThickness="2.5"/>
+                </Button>
+                <Border Width="4"/>
+
                 <Button Padding="-3" Tag="{Binding id}" Width="14" Height="14" Click="Station_Dot2"
                         FontSize="12" TextOptions.TextFormattingMode="Display"
                         Style="{StaticResource DotButtonStyle2}">

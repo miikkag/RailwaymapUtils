@@ -313,6 +313,26 @@ namespace RailwaymapUI
             }
         }
 
+        public void Change_Outline(Int64 id)
+        {
+            foreach (StationItem st in Stations)
+            {
+                if (st.id == id)
+                {
+                    st.outline = !st.outline;
+                    st.Force_Refresh();
+
+                    break;
+                }
+            }
+
+            if (Set.AutoRedraw_Cities)
+            {
+                Reset_Single(MapItems.Cities);
+            }
+        }
+
+
         public void Change_EN(Int64 id)
         {
             foreach (StationItem st in Stations)
@@ -631,6 +651,7 @@ namespace RailwaymapUI
                     str.Append("halign=" + st.halign.ToString() + ";");
                     str.Append("visible=" + st.visible.ToString() + ";");
                     str.Append("bold=" + st.bold.ToString() + ";");
+                    str.Append("outline=" + st.outline.ToString() + ";");
                     str.Append("offsetx=" + st.offsetx.ToString() + ";");
                     str.Append("offsety=" + st.offsety.ToString() + ";");
                     str.Append("dotsize=" + st.dotsize.ToString() + ";");
@@ -753,6 +774,7 @@ namespace RailwaymapUI
                         StationItem.Halign halign = StationItem.Halign.Right;
                         bool visible = true;
                         bool bold = false;
+                        bool outline = false;
                         bool english = false;
                         int offsetx = 0;
                         int offsety = 0;
@@ -790,6 +812,10 @@ namespace RailwaymapUI
                                         bool.TryParse(parts[1], out bold);
                                         break;
 
+                                    case "outline":
+                                        bool.TryParse(parts[1], out outline);
+                                        break;
+
                                     case "offsetx":
                                         int.TryParse(parts[1], out offsetx);
                                         break;
@@ -824,6 +850,7 @@ namespace RailwaymapUI
                                     st.halign = halign;
                                     st.visible = visible;
                                     st.bold = bold;
+                                    st.outline = outline;
                                     st.offsetx = offsetx;
                                     st.offsety = offsety;
                                     st.dotsize = dotsize;
@@ -930,28 +957,49 @@ namespace RailwaymapUI
                     {
                         legend.Clear();
 
-                        db_file = "Railways/Lightrail";
+                        db_file = "railway";
 
-                        Progress.Set_Info(true, "Processing railways", 0);
+                        string img_cache = Commons.Cache_ImageName(AreaPath, "railway");
+                        string legend_cache = Path.Combine(AreaPath, "legend_cache.bin");
 
                         string db_file_railways = Path.Combine(AreaPath, DB_FILENAME_RAILWAYS);
                         string db_file_lightrail = Path.Combine(AreaPath, DB_FILENAME_LIGHTRAIL);
 
-                        using (SQLiteConnection sqlite_railways = new SQLiteConnection("Data Source=" + db_file_railways))
-                        using (SQLiteConnection sqlite_lightrail = new SQLiteConnection("Data Source=" + db_file_lightrail))
+                        bool need_draw = true;
+                        bool cache_status_railways = Commons.Check_Cache_Image(db_file_railways, img_cache);
+
+                        if (draw_items.use_cache && cache_status_railways)
                         {
-                            sqlite_railways.Open();
-                            sqlite_lightrail.Open();
+                            need_draw = !Image_Railways.DrawFromCache(img_cache);
+                        }
 
-                            Image_Railways.Draw(sqlite_railways, bxy, Progress, Set, legend, true);
+                        if (need_draw)
+                        {
+                            Progress.Set_Info(true, "Processing railways", 0);
 
-                            if (Set.Draw_Railway_Lightrail)
+                            using (SQLiteConnection sqlite_railways = new SQLiteConnection("Data Source=" + db_file_railways))
+                            using (SQLiteConnection sqlite_lightrail = new SQLiteConnection("Data Source=" + db_file_lightrail))
                             {
-                                Image_Railways.Draw(sqlite_lightrail, bxy, Progress, Set, legend, false);
+                                sqlite_railways.Open();
+                                sqlite_lightrail.Open();
+
+                                Image_Railways.Draw(sqlite_railways, bxy, Progress, Set, legend, true);
+
+                                if (Set.Draw_Railway_Lightrail)
+                                {
+                                    Image_Railways.Draw(sqlite_lightrail, bxy, Progress, Set, legend, false);
+                                }
+
+                                sqlite_lightrail.Close();
+                                sqlite_railways.Close();
                             }
 
-                            sqlite_lightrail.Close();
-                            sqlite_railways.Close();
+                            Image_Railways.Save_ImageCache(img_cache, db_file_railways);
+                            legend.Save_Cache(legend_cache);
+                        }
+                        else
+                        {
+                            legend.Load_Cache(legend_cache);
                         }
 
                         OnPropertyChanged("Image_Railways");

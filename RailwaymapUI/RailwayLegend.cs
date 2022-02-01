@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -117,6 +118,33 @@ namespace RailwaymapUI
         public string Get_Type_Description(RailwayType t)
         {
             return descriptions[(int)t];
+        }
+
+        public void Save_Cache(string filename)
+        {
+            using (FileStream fs = File.OpenWrite(filename))
+            using (BinaryWriter writer = new BinaryWriter(fs, Encoding.UTF8, false))
+            {
+                for (int i = 0; i < Used_Types.Length; i++)
+                {
+                    writer.Write(Used_Types[i]);
+                }
+            }
+        }
+
+        public void Load_Cache(string filename)
+        {
+            if (File.Exists(filename))
+            {
+                using (FileStream fs = File.OpenRead(filename))
+                using (BinaryReader reader = new BinaryReader(fs, Encoding.UTF8, false))
+                {
+                    for (int i = 0; i < Used_Types.Length; i++)
+                    {
+                        Used_Types[i] = reader.ReadBoolean();
+                    }
+                }
+            }
         }
     }
 }

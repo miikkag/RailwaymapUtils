@@ -61,6 +61,7 @@ namespace RailwaymapUI
 
         public bool visible { get; set; }
         public bool bold { get; set; }
+        public bool outline { get; set; }
 
         private bool _english;
         public bool english { get { return _english; } set { _english = value; display_name = use_name; } }

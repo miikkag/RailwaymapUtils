@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +12,39 @@ namespace RailwaymapUI
 {
     public class MapImage_Railways : MapImage
     {
+        public bool DrawFromCache(string filename_cache_img)
+        {
+            bool result = true;
+
+            if (gr == null)
+            {
+                return false;
+            }
+
+            if (!File.Exists(filename_cache_img))
+            {
+                return false;
+            }
+
+            gr.Clear(Color.Transparent);
+            gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
+
+            using (Image img = Image.FromFile(filename_cache_img))
+            {
+                if ((img.Width == bmp.Width) && (img.Height == bmp.Height))
+                {
+                    gr.DrawImage(Image.FromFile(filename_cache_img), 0, 0);
+                }
+                else
+                {
+                    result = false;
+                }
+            }
+
+            return result;
+        }
+
+
         public void Draw(SQLiteConnection conn, BoundsXY bounds, ProgressInfo progress, DrawSettings set, RailwayLegend legend, bool clear_first)
         {
             progress.Set_Info(true, "Processing railways", 0);
@@ -246,6 +281,13 @@ namespace RailwaymapUI
             }
 
             progress.Clear();
+        }
+
+        public void Save_ImageCache(string imgname_cache, string db_filename)
+        {
+            bmp.Save(imgname_cache, ImageFormat.Png);
+
+            File.SetLastWriteTime(imgname_cache, File.GetLastWriteTime(db_filename));
         }
     }
 }
