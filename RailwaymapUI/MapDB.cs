@@ -52,6 +52,12 @@ namespace RailwaymapUI
         public int OutputSizeWidth { get; set; }
         public int OutputSizeHeight { get; set; }
 
+        private int selection_x1;
+        private int selection_y1;
+        private int selection_x2;
+        private int selection_y2;
+        private int selection_ptX;
+        private int selection_ptY;
 
         public MapImage_Background Image_Background { get; private set; }
         public MapImage_Landarea Image_Landarea { get; private set; }
@@ -87,6 +93,21 @@ namespace RailwaymapUI
         public bool ShowAllStations { get { return _showallstations; } set { _showallstations = value; OnPropertyChanged("ShowAllStationsVisibility"); } }
 
         public Visibility ShowAllStationsVisibility { get { if (ShowAllStations) return Visibility.Visible; else return Visibility.Collapsed; } }
+
+        private string _searchstationtext;
+        public string SearchStationText
+        {
+            get { return _searchstationtext; }
+            set
+            {
+                if (_searchstationtext != value)
+                {
+                    _searchstationtext = value;
+
+                    UpdateSelection();
+                }
+            }
+        }
 
         private Bounds bounds;
         private BoundsXY bxy;
@@ -145,6 +166,14 @@ namespace RailwaymapUI
             EditSites = true;
             EditYards = true;
             EditLightrail = true;
+
+            selection_ptX = -1;
+            selection_ptY = -1;
+            selection_x1 = 0;
+            selection_x2 = 0;
+            selection_y1 = 0;
+            selection_y2 = 0;
+            SearchStationText = "";
 
             drawlock = new object();
         }
@@ -392,64 +421,60 @@ namespace RailwaymapUI
             }
         }
 
-        public void Refresh_Selection(ZoomBorder zoomer)
+        private void UpdateSelection()
         {
             Stations_Highlight = new List<StationItem>();
 
-            if (zoomer != null)
+            if ((selection_ptX >= 0) && (selection_ptY >= 0))
             {
-                int x1 = (int)zoomer.Selection_Point.X - (zoomer.Selection_Size / 2);
-                int y1 = (int)zoomer.Selection_Point.Y - (zoomer.Selection_Size / 2);
-                int x2 = x1 + zoomer.Selection_Size;
-                int y2 = y1 + zoomer.Selection_Size;
-
-                if ((zoomer.Selection_Point.X >= 0) && (zoomer.Selection_Point.Y >= 0))
+                foreach (StationItem st in Stations)
                 {
-                    foreach (StationItem st in Stations)
+                    bool set = false;
+
+                    if ((st.coordX >= selection_x1) && (st.coordX <= selection_x2))
                     {
-                        bool set = false;
-
-                        if ((st.coordX >= x1) && (st.coordX <= x2))
+                        if ((st.coordY >= selection_y1) && (st.coordY <= selection_y2))
                         {
-                            if ((st.coordY >= y1) && (st.coordY <= y2))
+                            bool set_this = true;
+
+                            if ((st.Type == StationItemType.Station) && !EditStations)
                             {
-                                bool set_this = true;
+                                set_this = false;
+                            }
+                            else if ((st.Type == StationItemType.Site) && !EditSites)
+                            {
+                                set_this = false;
+                            }
+                            else if ((st.Type == StationItemType.Yard) && !EditYards)
+                            {
+                                set_this = false;
+                            }
+                            else if ((st.Type == StationItemType.Lightrail) && !EditLightrail)
+                            {
+                                set_this = false;
+                            }
 
-                                if ((st.Type == StationItemType.Station) && !EditStations)
+                            if (set_this)
+                            {
+                                if (SearchStationText != "")
                                 {
-                                    set_this = false;
-                                }
-                                else if ((st.Type == StationItemType.Site) && !EditSites)
-                                {
-                                    set_this = false;
-                                }
-                                else if ((st.Type == StationItemType.Yard) && !EditYards)
-                                {
-                                    set_this = false;
-                                }
-                                else if ((st.Type == StationItemType.Lightrail) && !EditLightrail)
-                                {
-                                    set_this = false;
-                                }
-
-                                if (set_this)
-                                {
-                                    Stations_Highlight.Add(st);
-
-                                    set = true;
+                                    if (!st.name.Contains(SearchStationText, StringComparison.OrdinalIgnoreCase) && !st.name_en.Contains(SearchStationText, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        set_this = false;
+                                    }
                                 }
                             }
-                        }
 
-                        st.Highlighted = set;
+                            if (set_this)
+                            {
+                                Stations_Highlight.Add(st);
+
+                                set = true;
+                            }
+                        }
                     }
-                }
-                else
-                {
-                    foreach (StationItem st in Stations)
-                    {
-                        st.Highlighted = false;
-                    }
+
+                    st.Highlighted = set;
                 }
             }
             else
@@ -464,6 +489,32 @@ namespace RailwaymapUI
 
             OnPropertyChanged("Image_Selection");
             OnPropertyChanged("Stations_Highlight");
+        }
+
+        public void Refresh_Selection(ZoomBorder zoomer)
+        {
+            if (zoomer != null)
+            {
+                selection_ptX = (int)zoomer.Selection_Point.X;
+                selection_ptY = (int)zoomer.Selection_Point.Y;
+
+                selection_x1 = selection_ptX - (zoomer.Selection_Size / 2);
+                selection_y1 = selection_ptY - (zoomer.Selection_Size / 2);
+                selection_x2 = selection_x1 + zoomer.Selection_Size;
+                selection_y2 = selection_y1 + zoomer.Selection_Size;
+            }
+            else
+            {
+                selection_ptX = -1;
+                selection_ptY = -1;
+
+                selection_x1 = 0;
+                selection_y1 = 0;
+                selection_x2 = 0;
+                selection_y2 = 0;
+            }
+
+            UpdateSelection();
         }
 
         public void Sort_Stations(SortOrder order)

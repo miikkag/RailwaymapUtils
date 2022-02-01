@@ -559,14 +559,25 @@
                                 <Border Height="5"/>
 
                                 <StackPanel Orientation="Horizontal">
-                                    <Button FontSize="10" Width="60" HorizontalAlignment="Left" Click="Stations_Deselect_Highlighted">Deselect All</Button>
-                                    <Border Width="10"/>
-                                    <Button FontSize="10" Width="50" HorizontalAlignment="Left" Click="Stations_EN_Highlighted">Set all EN</Button>
-                                    <Border Width="10"/>
+                                    <Button FontSize="10" Width="40" HorizontalAlignment="Left" Click="Stations_Deselect_Highlighted">Hide</Button>
+                                    <Border Width="5"/>
+                                    <Button FontSize="10" Width="40" HorizontalAlignment="Left" Click="Stations_EN_Highlighted">Set EN</Button>
+
+                                    <Border Width="5"/>
+
+                                    <TextBox Width="80" Height="18" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" FontSize="10"
+                                             Text="{Binding DB.SearchStationText,UpdateSourceTrigger=PropertyChanged}"
+                                             GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
+
+                                    <Border Width="5"/>
+                                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="1" Background="#909090"/>
+                                    <Border Width="5"/>
+                                    
                                     <Button FontSize="10" Width="50" HorizontalAlignment="Left" Click="Show_HideStationMenu_Click">Hide All...</Button>
                                 </StackPanel>
                                 
                                 <Border Height="3"/>
+
                                 <ItemsControl ItemsSource="{Binding DB.Stations_Highlight}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>

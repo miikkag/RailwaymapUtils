@@ -119,6 +119,7 @@
       <DependentUpon>StationUI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Lake.cs" />
+    <Compile Include="StringExtensions.cs" />
     <Compile Include="Way.cs" />
     <Compile Include="WayRail.cs" />
     <Compile Include="ZoomBorder.cs" />
