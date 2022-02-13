@@ -19,6 +19,7 @@ namespace RailwaymapUI
         }
 
         public event RoutedEventHandler Selection_Update;
+        public event RoutedEventHandler Coordinate_Update;
 
         private UIElement child = null;
         private Point origin;
@@ -31,12 +32,15 @@ namespace RailwaymapUI
         public Point Selection_Point;
         public int Selection_Size;
 
+        public Point Cursor_Point;
+
         private double[] zoomfactors = new double[10]
         { 0.25, 0.50, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0};
 
         private const int zoomindex_default = 3;
         private int zoomindex = zoomindex_default;
 
+        private DateTime last_coordinate_event;
 
         private TranslateTransform GetTranslateTransform(UIElement element)
         {
@@ -90,6 +94,9 @@ namespace RailwaymapUI
             }
 
             Selection_Point = new Point(-1, -1);
+            Cursor_Point = new Point(-1, -1);
+
+            last_coordinate_event = DateTime.Now;
         }
 
         public void Reset()
@@ -288,6 +295,35 @@ namespace RailwaymapUI
                     Vector v = start - e.GetPosition(this);
                     tt.X = Math.Floor(origin.X - v.X);
                     tt.Y = Math.Floor(origin.Y - v.Y);
+                }
+                else
+                {
+                    Point pt = e.GetPosition(this);
+                    TranslateTransform tt = GetTranslateTransform(child);
+
+                    double offsetx = 0;
+                    double offsety = 0;
+
+                    double diffx = ActualWidth - (child as Canvas).Width;
+                    double diffy = ActualHeight - (child as Canvas).Height;
+
+                    if (diffx > 0)
+                    {
+                        offsetx = diffx / 2;
+                    }
+
+                    if (diffy > 0)
+                    {
+                        offsety = diffy / 2;
+                    }
+
+                    double x = (pt.X - (tt.X + offsetx)) / zoomfactors[zoomindex];
+                    double y = (pt.Y - (tt.Y + offsety)) / zoomfactors[zoomindex];
+
+                    Cursor_Point.X = (int)Math.Round(x);
+                    Cursor_Point.Y = (int)Math.Round(y);
+
+                    Coordinate_Update?.Invoke(sender, new RoutedEventArgs());
                 }
             }
         }

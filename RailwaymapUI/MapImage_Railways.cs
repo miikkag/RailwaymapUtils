@@ -82,9 +82,6 @@ namespace RailwaymapUI
                                     string k = rdr_tags.GetString(0);
                                     string v = rdr_tags.GetString(1);
 
-                                    //if(!clear_first)
-                                    //    System.Diagnostics.Debug.WriteLine("key=" + k + " v=" + v);
-
                                     switch (k)
                                     {
                                         case "electrified":
@@ -188,9 +185,17 @@ namespace RailwaymapUI
                     {
                         draw = true;
                     }
+                    else if (wr.usage == "tourism")
+                    {
+                        draw = set.Draw_Railway_Tourism || set.Draw_Railway_All;
+                    }
+                    else if (wr.usage == "")
+                    {
+                        draw = set.Draw_Railway_Unset || set.Draw_Railway_All;
+                    }
                     else
                     {
-                        draw = set.Draw_Railway_Spur;
+                        draw = set.Draw_Railway_All;
                     }
 
                     if (draw)
@@ -199,7 +204,12 @@ namespace RailwaymapUI
 
                         double filter = set.Filter_Railways_Line;
 
-                        bool thick = (wr.tracks > 1);
+                        int thickness = 1;
+
+                        if (wr.tracks > 1)
+                        {
+                            thickness = 3;
+                        }
 
                         bool filter_drawline = set.Filter_Railways_DrawLine;
 
@@ -275,7 +285,7 @@ namespace RailwaymapUI
 
                         color = Commons.Get_Draw_Color(draw_type, set);
 
-                        Draw_Way_Coordinates(ws, null, filter, thick, color, bounds, filter_drawline);
+                        Draw_Way_Coordinates(ws, null, filter, thickness, color, bounds, filter_drawline);
                     }
                 }
             }

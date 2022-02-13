@@ -59,12 +59,16 @@ namespace RailwaymapUI
         private int selection_ptX;
         private int selection_ptY;
 
+        public double CursorLatitude { get; private set; }
+        public double CursorLongitude { get; private set; }
+
         public MapImage_Background Image_Background { get; private set; }
         public MapImage_Landarea Image_Landarea { get; private set; }
         public MapImage_Lakes Image_Water { get; private set; }
         public MapImage_Borders Image_Borders { get; private set; }
         public MapImage_Railways Image_Railways { get; private set; }
         public MapImage_Cities Image_Cities { get; private set; }
+        public MapImage_CountryColors Image_CountryColors { get; private set; }
         public MapImage_Scale Image_Scale { get; private set; }
         public MapImage_Selection Image_Selection { get; private set; }
 
@@ -74,6 +78,9 @@ namespace RailwaymapUI
 
         public List<StationItem> Stations { get; private set; }
         public List<StationItem> Stations_Highlight { get; private set; }
+
+        public ObservableCollection<ColorCoordinate> CountryColors { get; private set; }
+        private Guid? CountryColorEdit_Instance;
 
         private bool _edit_stations;
         public bool EditStations { get { return _edit_stations; } set { _edit_stations = value; } }
@@ -124,7 +131,7 @@ namespace RailwaymapUI
             public bool railways;
             public bool cities;
             public bool scale;
-            public bool margins;
+            public bool countrycolors;
         }
 
         private DrawItems draw_items;
@@ -142,6 +149,7 @@ namespace RailwaymapUI
             Image_Borders = new MapImage_Borders();
             Image_Railways = new MapImage_Railways();
             Image_Cities = new MapImage_Cities();
+            Image_CountryColors = new MapImage_CountryColors();
             Image_Scale = new MapImage_Scale();
             Image_Selection = new MapImage_Selection();
 
@@ -175,6 +183,9 @@ namespace RailwaymapUI
             selection_y2 = 0;
             SearchStationText = "";
 
+            CountryColors = new ObservableCollection<ColorCoordinate>();
+            CountryColorEdit_Instance = null;
+
             drawlock = new object();
         }
 
@@ -186,6 +197,7 @@ namespace RailwaymapUI
             Image_Borders.Set_Size(OutputSizeWidth, OutputSizeHeight);
             Image_Railways.Set_Size(OutputSizeWidth, OutputSizeHeight);
             Image_Cities.Set_Size(OutputSizeWidth, OutputSizeHeight);
+            Image_CountryColors.Set_Size(OutputSizeWidth, OutputSizeHeight);
             Image_Scale.Set_Size(OutputSizeWidth, OutputSizeHeight);
             Image_Selection.Set_Size(OutputSizeWidth, OutputSizeHeight);
 
@@ -201,7 +213,7 @@ namespace RailwaymapUI
             draw_items.railways = true;
             draw_items.cities = true;
             draw_items.scale = true;
-            draw_items.margins = true;
+            draw_items.countrycolors = true;
 
             Thread thr = new Thread(DrawAllThread);
 
@@ -218,7 +230,7 @@ namespace RailwaymapUI
             draw_items.railways = (item == MapItems.Railways);
             draw_items.cities = (item == MapItems.Cities);
             draw_items.scale = (item == MapItems.Scale);
-            draw_items.margins = (item == MapItems.Margins);
+            draw_items.countrycolors = (item == MapItems.CountryColors);
 
             Thread thr = new Thread(DrawAllThread);
 
@@ -421,6 +433,32 @@ namespace RailwaymapUI
             }
         }
 
+        public void AddCountryColor()
+        {
+            CountryColors.Add(new ColorCoordinate());
+
+            System.Diagnostics.Debug.WriteLine(CountryColors.Count.ToString());
+
+            OnPropertyChanged("CountryColors");
+        }
+
+        public void RemoveCountryColor(Guid g)
+        {
+            foreach (ColorCoordinate c in CountryColors)
+            {
+                if (c.InstanceID == g)
+                {
+                    CountryColors.Remove(c);
+                    break;
+                }
+            }
+        }
+
+        public bool IsEditing_CountryColor()
+        {
+            return (CountryColorEdit_Instance != null);
+        }
+
         private void UpdateSelection()
         {
             Stations_Highlight = new List<StationItem>();
@@ -515,6 +553,43 @@ namespace RailwaymapUI
             }
 
             UpdateSelection();
+        }
+
+        public void Set_CountryColorInstance(Guid g)
+        {
+            CountryColorEdit_Instance = g;
+        }
+
+        public void Set_CountryColorLocation(int x, int y)
+        {
+            double lon = Commons.MapX2Lon(x, bxy);
+            double lat = Commons.MapY2Lat(y, bxy);
+
+            if (CountryColorEdit_Instance != null)
+            {
+                foreach(ColorCoordinate c in CountryColors)
+                {
+                    if (c.InstanceID == CountryColorEdit_Instance)
+                    {
+                        c.Latitude = lat;
+                        c.Longitude = lon;
+
+                        c.Refresh();
+
+                        CountryColorEdit_Instance = null;
+                        break;
+                    }
+                }
+            }
+        }
+
+        public void Set_Cursor_Coordinates(int x, int y)
+        {
+            CursorLongitude = Commons.MapX2Lon(x, bxy);
+            CursorLatitude = Commons.MapY2Lat(y,bxy);
+            
+            OnPropertyChanged("CursorLongitude");
+            OnPropertyChanged("CursorLatitude");
         }
 
         public void Sort_Stations(SortOrder order)
@@ -645,6 +720,11 @@ namespace RailwaymapUI
                 gr.DrawImage(Image_Borders.GetBitmap(), 0, 0);
             }
 
+            if (Image_CountryColors.Enabled)
+            {
+                gr.DrawImage(Image_CountryColors.GetBitmap(), 0, 0);
+            }
+
             if (Image_Railways.Enabled)
             {
                 gr.DrawImage(Image_Railways.GetBitmap(), 0, 0);
@@ -677,6 +757,7 @@ namespace RailwaymapUI
 
         private const string DB_CONFIG_PREFIX = "DB.";
         private const string STATION_CONFIG_PREFIX = "Station.";
+        private const string COUNTRYCOLOR_CONFIG_REFIX = "CC.";
 
         public void Save_Config()
         {
@@ -711,6 +792,17 @@ namespace RailwaymapUI
                     all.Add(str.ToString());
                 }
 
+                foreach (ColorCoordinate cc in CountryColors)
+                {
+                    StringBuilder str = new StringBuilder(COUNTRYCOLOR_CONFIG_REFIX);
+                    str.Append("name=" + cc.Name.Replace(" ", "\\ ") + ";");
+                    str.Append("lat=" + cc.Latitude.ToString() + ";");
+                    str.Append("lon=" + cc.Longitude.ToString() + ";");
+                    str.Append("color=" + cc.ColorHex);
+
+                    all.Add(str.ToString());
+                }
+                
                 File.WriteAllLines(AreaConfigFilename, all);
             }
         }
@@ -783,6 +875,8 @@ namespace RailwaymapUI
                 {
                     return;
                 }
+
+                CountryColors.Clear();
 
                 string[] lines = File.ReadAllLines(AreaConfigFilename);
 
@@ -915,6 +1009,49 @@ namespace RailwaymapUI
                             }
                         }
                     }
+                    else if (str.StartsWith(COUNTRYCOLOR_CONFIG_REFIX))
+                    {
+                        string[] items = str.Substring(COUNTRYCOLOR_CONFIG_REFIX.Length).Split(delim_st);
+
+                        string name = "";
+                        double latitude = 0;
+                        double longitude = 0;
+                        string colorhex = "";
+
+                        foreach (string pair in items)
+                        {
+                            string[] parts = pair.Split(delim, 2);
+
+                            if (parts.Length == 2)
+                            {
+                                switch (parts[0])
+                                {
+                                    case "name":
+                                        name = parts[1];
+                                        break;
+
+                                    case "lat":
+                                        double.TryParse(parts[1], out latitude);
+                                        break;
+
+                                    case "lon":
+                                        double.TryParse(parts[1], out longitude);
+                                        break;
+
+                                    case "color":
+                                        colorhex = parts[1];
+                                        break;
+                                }
+                            }
+                        }
+
+                        if (colorhex != "")
+                        {
+                            ColorCoordinate cc = new ColorCoordinate(name, latitude, longitude, colorhex);
+
+                            CountryColors.Add(cc);
+                        }
+                    }
                 }
             }
 
@@ -928,7 +1065,9 @@ namespace RailwaymapUI
             {
                 string db_file = "Init";
 
+#if !DEBUG
                 try
+#endif
                 {
                     if (draw_items.landarea)
                     {
@@ -1004,6 +1143,15 @@ namespace RailwaymapUI
                         OnPropertyChanged("Image_Water");
                     }
 
+                    if (draw_items.countrycolors)
+                    {
+                        db_file = "country colors";
+
+                        Image_CountryColors.Draw(bxy, bounds, Set, Progress, CountryColors.ToList(), Image_Landarea, Image_Borders);
+
+                        OnPropertyChanged("Image_CountryColors");
+                    }
+
                     if (draw_items.railways)
                     {
                         legend.Clear();
@@ -1076,13 +1224,15 @@ namespace RailwaymapUI
                         OnPropertyChanged("Image_Scale");
                     }
                 }
+#if !DEBUG
                 catch (Exception ex)
                 {
                     MessageBox.Show("Error processing " + db_file + Environment.NewLine + Environment.NewLine + ex.Message,
                         "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-
+                
                     return;
                 }
+#endif
 
                 Progress.Set_Info(false, "", 0);
             }

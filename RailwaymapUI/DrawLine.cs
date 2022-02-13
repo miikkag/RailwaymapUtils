@@ -36,7 +36,7 @@ namespace RailwaymapUI
             return result;
         }
 
-        static public void Draw_Line_3px(Point p1, Point p2, Bitmap bmp, Color color)
+        static public void Draw_Line(Point p1, Point p2, Bitmap bmp, Color color, int thickness)
         {
             List<Point> points = Get_Linepoints(p1, p2);
 
@@ -46,38 +46,31 @@ namespace RailwaymapUI
                 {
                     bmp.SetPixel(pt.X, pt.Y, color);
 
-                    if (pt.X > 0)
+                    if (thickness > 1)
                     {
-                        bmp.SetPixel(pt.X - 1, pt.Y, color);
+                        if (pt.X > 0)
+                        {
+                            bmp.SetPixel(pt.X - 1, pt.Y, color);
+                        }
+
+                        if (pt.Y > 0)
+                        {
+                            bmp.SetPixel(pt.X, pt.Y - 1, color);
+                        }
+
+                        if (thickness > 2)
+                        {
+                            if (pt.Y < (bmp.Height - 1))
+                            {
+                                bmp.SetPixel(pt.X, pt.Y + 1, color);
+                            }
+
+                            if (pt.X < (bmp.Width - 1))
+                            {
+                                bmp.SetPixel(pt.X + 1, pt.Y, color);
+                            }
+                        }
                     }
-
-                    if (pt.X < (bmp.Width - 1))
-                    {
-                        bmp.SetPixel(pt.X + 1, pt.Y, color);
-                    }
-
-                    if (pt.Y > 0)
-                    {
-                        bmp.SetPixel(pt.X, pt.Y - 1, color);
-                    }
-
-                    if (pt.Y < (bmp.Height - 1))
-                    {
-                        bmp.SetPixel(pt.X, pt.Y + 1, color);
-                    }
-                }
-            }
-        }
-
-        static public void Draw_Line_1px(Point p1, Point p2, Bitmap bmp, Color color)
-        {
-            List<Point> points = Get_Linepoints(p1, p2);
-
-            foreach (Point pt in points)
-            {
-                if ((pt.X >= 0) && (pt.X < bmp.Width) && (pt.Y >= 0) && (pt.Y < bmp.Height))
-                {
-                    bmp.SetPixel(pt.X, pt.Y, color);
                 }
             }
         }

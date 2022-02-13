@@ -23,9 +23,8 @@ namespace RailwaymapUI
 
         public int Normal_Gauge_Min = 1430;
 
-        public Color Color_Border_Land = Color.Black;
-        public Color Color_Border_Coastline = Color.Black;
-        public Color Color_Border_Territorial = Color.Black;
+        public Color Color_Border = Color.Black;
+        public Color Color_Border_Outline = Color.FromArgb(240, 240, 0);
 
         public Color Color_Water = Color.FromArgb(190, 224, 255);
         public Color Color_Land = Color.FromArgb(255, 255, 255);
@@ -62,9 +61,14 @@ namespace RailwaymapUI
         public string Legend_FontName { get; set; }
         public int Legend_FontSize { get; set; }
 
-        public bool Draw_Railway_Spur { get; set; }
+        public bool Draw_Railway_All { get; set; }
         public bool Draw_Railway_Lightrail { get; set; }
+        public bool Draw_Railway_Tourism { get; set; }
+        public bool Draw_Railway_Unset { get; set; }
+
         public bool Draw_Border { get; set; }
+        public int Border_Thickness { get; set; }
+        public bool Border_Outlined { get; set; }
 
         public bool Draw_Landarea_Islands { get; set; }
         public bool Draw_Landarea_Islets { get; set; }
@@ -146,8 +150,13 @@ namespace RailwaymapUI
 
             AutoRedraw_Cities = true;
 
-            Draw_Railway_Spur = false;
+            Draw_Railway_All = false;
+            Draw_Railway_Tourism = false;
+            Draw_Railway_Unset = false;
+
             Draw_Border = true;
+            Border_Thickness = 1;
+            Border_Outlined = false;
 
             Draw_Landarea_Islands = true;
             Draw_Landarea_Islets = false;
@@ -264,15 +273,31 @@ namespace RailwaymapUI
                             break;
 
                         case "Draw_Railway_Spur":
-                            Draw_Railway_Spur = val_bool;
+                            Draw_Railway_All = val_bool;
                             break;
 
                         case "Draw_Railway_Lightrail":
                             Draw_Railway_Lightrail = val_bool;
                             break;
 
+                        case "Draw_Railway_Unset":
+                            Draw_Railway_Unset = val_bool;
+                            break;
+
+                        case "Draw_Railway_Tourism":
+                            Draw_Railway_Tourism = val_bool;
+                            break;
+
                         case "Draw_Border":
-                            Draw_Railway_Spur = val_bool;
+                            Draw_Border = val_bool;
+                            break;
+
+                        case "Border_Thickness":
+                            Border_Thickness = val_int;
+                            break;
+
+                        case "Border_Outlined":
+                            Border_Outlined = val_bool;
                             break;
 
                         case "Draw_Landarea_Islands":
@@ -399,13 +424,25 @@ namespace RailwaymapUI
             str = CONFIG_PREFIX + "AutoRedraw_Sites=" + AutoRedraw_Sites.ToString();
             result.Add(str);
 
-            str = CONFIG_PREFIX + "Draw_Railway_Spur=" + Draw_Railway_Spur.ToString();
+            str = CONFIG_PREFIX + "Draw_Railway_Spur=" + Draw_Railway_All.ToString();
             result.Add(str);
 
             str = CONFIG_PREFIX + "Draw_Railway_Lightrail=" + Draw_Railway_Lightrail.ToString();
             result.Add(str);
 
-            str = CONFIG_PREFIX + "Draw_Border=" + Draw_Railway_Spur.ToString();
+            str = CONFIG_PREFIX + "Draw_Railway_Unset=" + Draw_Railway_Unset.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Draw_Railway_Tourism=" + Draw_Railway_Tourism.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Draw_Border=" + Draw_Border.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Border_Thickness=" + Border_Thickness.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Border_Outlined=" + Border_Outlined.ToString();
             result.Add(str);
 
             str = CONFIG_PREFIX + "Draw_Landarea_Islands=" + Draw_Landarea_Islands.ToString();

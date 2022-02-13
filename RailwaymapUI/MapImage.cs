@@ -106,7 +106,7 @@ namespace RailwaymapUI
                     double y2 = bounds.Scale * (bounds.Y_max - Commons.Merc_Y(ws[w].Last().Latitude));
                     double x2 = bounds.Scale * (Commons.Merc_X(ws[w].Last().Longitude) - bounds.X_min);
 
-                    DrawLine.Draw_Line_1px(new System.Drawing.Point((int)x1, (int)y1), new System.Drawing.Point((int)x2, (int)y2), bmp, color);
+                    DrawLine.Draw_Line(new System.Drawing.Point((int)x1, (int)y1), new System.Drawing.Point((int)x2, (int)y2), bmp, color, 1);
                 }
                 else
                 {
@@ -115,7 +115,7 @@ namespace RailwaymapUI
             }
         }
 
-        protected void Draw_Way_Coordinates(List<List<Coordinate>> ws, ProgressInfo progress, double filter_px, bool thick, System.Drawing.Color color, BoundsXY bounds, bool filter_drawline)
+        protected void Draw_Way_Coordinates(List<List<Coordinate>> ws, ProgressInfo progress, double filter_px, int thickness, System.Drawing.Color color, BoundsXY bounds, bool filter_drawline)
         {
             DateTime prev_update = DateTime.Now;
 
@@ -178,17 +178,7 @@ namespace RailwaymapUI
 
                     for (int l = 1; l < set_lines.Count; l++)
                     {
-                        if (thick)
-                        {
-                            DrawLine.Draw_Line_3px(set_lines[l - 1], set_lines[l], bmp, color);
-                        }
-                        else
-                        {
-                            if (draw_this)
-                            {
-                                DrawLine.Draw_Line_1px(set_lines[l - 1], set_lines[l], bmp, color);
-                            }
-                        }
+                        DrawLine.Draw_Line(set_lines[l - 1], set_lines[l], bmp, color, thickness);
                     }
                 }
             }

@@ -1,6 +1,7 @@
 import os
 import sys
 import requests
+import time
 
 # ANSI codes to windows
 os.system("color")
@@ -73,7 +74,13 @@ if len(bbox)==0:
 	exit(f"No bbox found for {sys.argv[1]}")
 
 
-for t in use_targets:
+for i,t in enumerate(use_targets):
+	if i>0:
+		for s in range(33,0,-1):
+			print(f"{CLEAR}Sleeping: {s}...", end='')
+			sys.stdout.flush()
+			time.sleep(1)
+		print(f"{CLEAR}")
 	filename = os.path.join("Data", bbox_name, f"{t[0]}.xml")
 	query = "[out:xml][timeout:2000];\n"
 	query = query + "(\n"
@@ -88,7 +95,7 @@ for t in use_targets:
 	print(query)
 
 	# Make request
-	with requests.post(endpoint, data=query, stream=True) as r:
+	with requests.get(endpoint, data=query, stream=True) as r:
 		r.raise_for_status()
 		datalen = 0
 		with open(filename, "wb") as f:
@@ -96,6 +103,7 @@ for t in use_targets:
 				f.write(chunk)
 				datalen += len(chunk)
 				print(f"{CLEAR}Received {round(datalen/(1024*1024))} MB", end='')
+				sys.stdout.flush()
 		if datalen < (1024*1024):
 			print (f"{CLEAR}Received {datalen} bytes, saved as {filename}")
 		else:

@@ -126,12 +126,12 @@ namespace RailwaymapUI
                                     {
                                         if (bmp.GetPixel(dx, dy).ToArgb() == color_text)
                                         {
-                                            if ((dx > usex) && (bmp.GetPixel(dx - 1, dy).ToArgb() == color_transparent))
+                                            if ((dx > usex) && (dx > 0) && (bmp.GetPixel(dx - 1, dy).ToArgb() == color_transparent))
                                             {
                                                 bmp.SetPixel(dx - 1, dy, set.Color_Cities_Outline);
                                             }
 
-                                            if ((dy > usey) && (bmp.GetPixel(dx, dy - 1).ToArgb() == color_transparent))
+                                            if ((dy > usey) && (dy > 0) && (bmp.GetPixel(dx, dy - 1).ToArgb() == color_transparent))
                                             {
                                                 bmp.SetPixel(dx, dy - 1, set.Color_Cities_Outline);
                                             }

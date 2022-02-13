@@ -115,7 +115,9 @@
             <Border Grid.Column="0" Background="WhiteSmoke">
                 <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
                     <StackPanel Grid.Column="0" Orientation="Vertical" Margin="5,5,5,0">
-                        <TextBlock FontWeight="SemiBold" VerticalAlignment="Bottom">Output File:</TextBlock>
+                        <Grid>
+                            <TextBlock FontWeight="SemiBold" HorizontalAlignment="Left">Output File:</TextBlock>
+                        </Grid>
                         <Border Height="2"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -184,7 +186,8 @@
                                       IsChecked="{Binding DB.Set.Scale_Enabled}">Scale</CheckBox>
 
                             <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
-                                <TextBox Width="35" Height="20" VerticalContentAlignment="Center" Text="{Binding DB.Set.Scale_Km}"/>
+                                <TextBox Width="35" Height="20" VerticalContentAlignment="Center" Text="{Binding DB.Set.Scale_Km}"
+                                         GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
                                 <Border Width="3"/>
                                 <TextBlock VerticalAlignment="Center">km</TextBlock>
                                 <Border Width="8"/>
@@ -351,7 +354,71 @@
                                 <CheckBox IsChecked="{Binding DB.Set.Draw_Landarea_Islands}">Draw Islands</CheckBox>
                                 <CheckBox IsChecked="{Binding DB.Set.Draw_Landarea_Islets}">Draw Islets</CheckBox>
 
-                                <Border Height="5"/>
+                                <Separator Background="LightGray" Margin="0,5,0,5"/>
+
+                                <Grid>
+                                    <CheckBox IsChecked="{Binding DB.Image_CountryColors.Enabled}">Country Colors</CheckBox>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Button BorderThickness="0" Width="18" Height="18" Click="AddCountryColor_Click">+</Button>
+                                        <Border Width="8"/>
+                                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" FontFamily="Segoe MDL2 Assets" FontSize="16" FontWeight="Normal" ToolTip="Refresh Image">
+                                            <Hyperlink TextDecorations="None" Foreground="Black" Click="Refresh_ImageCountryColors">&#xEDAB;</Hyperlink>
+                                        </TextBlock>
+                                    </StackPanel>
+
+                                </Grid>
+
+                                <Border Height="2"/>
+
+                                <ItemsControl ItemsSource="{Binding DB.CountryColors}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,0,0,1">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBox Width="45" Height="16" VerticalContentAlignment="Center" VerticalAlignment="Center"
+                                                             FontSize="10" Text="{Binding Name}"
+                                                             GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
+                                                    <Border Width="3"/>
+                                                    <TextBox Width="45" Height="16" VerticalContentAlignment="Center" VerticalAlignment="Center"
+                                                             FontSize="10" Foreground="#317F2D" Text="{Binding Latitude}"
+                                                             GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
+                                                    <Border Width="2"/>
+                                                    <TextBox Width="45" Height="16" VerticalContentAlignment="Center" VerticalAlignment="Center"
+                                                             FontSize="10" Foreground="#317F2D" Text="{Binding Longitude}"
+                                                             GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
+                                                    <Border Width="5"/>
+                                                    
+                                                    <TextBlock VerticalAlignment="Center" FontSize="10">0x</TextBlock>
+                                                    <Border Width="2"/>
+                                                    <TextBox Width="45" Height="16" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                                                             FontSize="10" Text="{Binding ColorHex}"
+                                                             GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
+                                                    <Border Width="4"/>
+
+                                                    <Border Width="16" Height="16" BorderThickness="1" BorderBrush="Black"
+                                                            SnapsToDevicePixels="True" UseLayoutRounding="True"
+                                                            Background="{Binding FillColor}"/>
+                                                    <Border Width="5"/>
+                                                </StackPanel>
+                                                
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                    <Button VerticalAlignment="Center" Width="18" Height="18" Margin="0,0,1,0"
+                                                            FontFamily="Segoe MDL2 Assets" BorderThickness="0" Background="Transparent"
+                                                            Tag="{Binding InstanceID}" Click="EditCountryColor_Click">&#xE70F;</Button>
+
+                                                    <Button VerticalAlignment="Center" Width="18" Height="18"
+                                                            FontFamily="Segoe MDL2 Assets" BorderThickness="0" Background="Transparent"
+                                                            Tag="{Binding InstanceID}" Click="RemoveCountryColor_Click">&#xE74D;</Button>
+                                                </StackPanel>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </StackPanel>
                         </Expander>
 
@@ -438,16 +505,25 @@
                                 <Separator Background="LightGray" Margin="0,3,0,3"/>
 
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock VerticalAlignment="Center" Width="80">Line filter:</TextBlock>
+                                    <TextBlock VerticalAlignment="Center" Width="60">Thickness:</TextBlock>
+                                    <TextBox Text="{Binding DB.Set.Border_Thickness}" Width="30"
+                                             GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
+                                    <Border Width="3"/>
+                                    <TextBlock>px</TextBlock>
+                                    <Border Width="10"/>
+                                    <CheckBox VerticalAlignment="Center" VerticalContentAlignment="Center" IsChecked="{Binding DB.Set.Border_Outlined}">Outlined</CheckBox>
+                                </StackPanel>
+
+                                <Border Height="5"/>
+
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock VerticalAlignment="Center" Width="60">Line filter:</TextBlock>
                                     <TextBox Text="{Binding DB.Set.Filter_Border_Line}" Width="30"
                                              GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
                                     <Border Width="3"/>
                                     <TextBlock>px</TextBlock>
-                                </StackPanel>
-
-                                <Border Height="5"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <CheckBox IsChecked="{Binding DB.Set.Filter_Border_DrawLine}">Filter 1px Waysets</CheckBox>
+                                    <Border Width="10"/>
+                                    <CheckBox VerticalAlignment="Center" VerticalContentAlignment="Center" IsChecked="{Binding DB.Set.Filter_Border_DrawLine}">Filter 1px Waysets</CheckBox>
                                 </StackPanel>
 
                                 <Border Height="8"/>
@@ -471,11 +547,21 @@
 
                                 <Separator Background="LightGray" Margin="0,3,0,3"/>
 
-                                <StackPanel Orientation="Horizontal">
-                                    <CheckBox IsChecked="{Binding DB.Set.Draw_Railway_Spur}">Spur/industrial</CheckBox>
-                                    <Border Width="15"/>
-                                    <CheckBox IsChecked="{Binding DB.Set.Draw_Railway_Lightrail}">Light Rail</CheckBox>
-                                </StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="95"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="18"/>
+                                        <RowDefinition Height="18"/>
+                                    </Grid.RowDefinitions>
+
+                                    <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding DB.Set.Draw_Railway_Lightrail}">Light Rail</CheckBox>
+                                    <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding DB.Set.Draw_Railway_Tourism}">Tourism</CheckBox>
+                                    <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding DB.Set.Draw_Railway_Unset}">Unspecified</CheckBox>
+                                    <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding DB.Set.Draw_Railway_All}">All</CheckBox>
+                                </Grid>
                                 
                                 <Separator Background="LightGray" Margin="0,3,0,3"/>
 
@@ -672,7 +758,8 @@
 
             <Border Grid.Column="2" Background="{StaticResource HatchPattern}">
                 <local:ZoomBorder ClipToBounds="True" x:Name="zoomer"
-                                  Selection_Update="Selection_Handle_Update">
+                                  Selection_Update="Selection_Handle_Update"
+                                  Coordinate_Update="zoomer_Coordinate_Update">
                     <Canvas Cursor="Hand" UseLayoutRounding="True"
                           Width="{Binding DB.Image_Background.Image_Width}" Height="{Binding DB.Image_Background.Image_Height}">
                         <local:ImageNN Source="{Binding DB.Image_Background.ImageSrc}"
@@ -681,6 +768,9 @@
                         <local:ImageNN Source="{Binding DB.Image_Landarea.ImageSrc}"
                                        Width="{Binding DB.Image_Landarea.Image_Width}" Height="{Binding DB.Image_Landarea.Image_Height}"
                                        Visibility="{Binding DB.Image_Landarea.Visible}"/>
+                        <local:ImageNN Source="{Binding DB.Image_CountryColors.ImageSrc}"
+                                       Width="{Binding DB.Image_CountryColors.Image_Width}" Height="{Binding DB.Image_CountryColors.Image_Height}"
+                                       Visibility="{Binding DB.Image_CountryColors.Visible}"/>
                         <local:ImageNN Source="{Binding DB.Image_Water.ImageSrc}"
                                        Width="{Binding DB.Image_Water.Image_Width}" Height="{Binding DB.Image_Water.Image_Height}"
                                        Visibility="{Binding DB.Image_Water.Visible}"/>
@@ -702,38 +792,57 @@
                     </Canvas>
                 </local:ZoomBorder>
             </Border>
+            <Grid Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5">
+                <Border Background="#C0FFFFFF"/>
+                <StackPanel Orientation="Horizontal" Margin="1">
+                    <TextBlock VerticalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="18">
+                        <Hyperlink TextDecorations="None" Click="Selection_Toggle" TextOptions.TextFormattingMode="Display"
+                                   DataContext="{Binding DB.Image_Selection.Visible}" Style="{StaticResource HyperlinkStyleHighlight}">&#xEE6F;</Hyperlink>
+                    </TextBlock>
+                    <Border Width="5"/>
+                    <TextBlock VerticalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="12">
+                        <Hyperlink TextDecorations="None" Foreground="Gray" Click="Selection_Minus" TextOptions.TextFormattingMode="Display">&#xE738;</Hyperlink>
+                    </TextBlock>
+                    <Border Width="5"/>
+                    <TextBlock VerticalAlignment="Center" FontFamily="Segoe MDL2 Assets"  FontSize="12">
+                        <Hyperlink TextDecorations="None" Foreground="Gray" Click="Selection_Plus" TextOptions.TextFormattingMode="Display">&#xE710;</Hyperlink>
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
 
-            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5">
-                <TextBlock VerticalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="18">
-                    <Hyperlink TextDecorations="None" Click="Selection_Toggle" TextOptions.TextFormattingMode="Display"
-                               DataContext="{Binding DB.Image_Selection.Visible}" Style="{StaticResource HyperlinkStyleHighlight}">&#xEE6F;</Hyperlink>
-                </TextBlock>
-                <Border Width="5"/>
-                <TextBlock VerticalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="12">
-                    <Hyperlink TextDecorations="None" Foreground="Gray" Click="Selection_Minus" TextOptions.TextFormattingMode="Display">&#xE738;</Hyperlink>
-                </TextBlock>
-                <Border Width="5"/>
-                <TextBlock VerticalAlignment="Center" FontFamily="Segoe MDL2 Assets"  FontSize="12">
-                    <Hyperlink TextDecorations="None" Foreground="Gray" Click="Selection_Plus" TextOptions.TextFormattingMode="Display">&#xE710;</Hyperlink>
-                </TextBlock>
-            </StackPanel>
+            <Grid Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5">
+                <Border Background="#C0FFFFFF"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" FontSize="11" Text="{Binding zoomer.ZoomString}" Foreground="Gray" Padding="0,0,0,2" Margin="1"/>
+                    <Border Width="5"/>
 
-            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5">
-                <TextBlock VerticalAlignment="Center" FontSize="11" Text="{Binding zoomer.ZoomString}" Foreground="Gray" Padding="0,0,0,2"/>
-                <Border Width="5"/>
+                    <TextBlock VerticalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="18">
+                                <Hyperlink TextDecorations="None" Foreground="Gray" Click="Zoom_Plus">&#xE8A3;</Hyperlink>
+                    </TextBlock>
+                    <Border Width="5"/>
+                    <TextBlock VerticalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="18">
+                                <Hyperlink TextDecorations="None" Foreground="Gray" Click="Zoom_Minus">&#xE71F;</Hyperlink>
+                    </TextBlock>
+                    <Border Width="5"/>
+                    <TextBlock VerticalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="18">
+                                <Hyperlink TextDecorations="None" Foreground="Gray" Click="Zoom_Reset">&#xE759;</Hyperlink>
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
 
-                <TextBlock VerticalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="18">
-                            <Hyperlink TextDecorations="None" Foreground="Gray" Click="Zoom_Plus">&#xE8A3;</Hyperlink>
-                </TextBlock>
-                <Border Width="5"/>
-                <TextBlock VerticalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="18">
-                            <Hyperlink TextDecorations="None" Foreground="Gray" Click="Zoom_Minus">&#xE71F;</Hyperlink>
-                </TextBlock>
-                <Border Width="5"/>
-                <TextBlock VerticalAlignment="Center" FontFamily="Segoe MDL2 Assets" FontSize="18">
-                            <Hyperlink TextDecorations="None" Foreground="Gray" Click="Zoom_Reset">&#xE759;</Hyperlink>
-                </TextBlock>
-            </StackPanel>
+
+            <Grid Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="5">
+                <Border Background="#C0FFFFFF"/>
+                <StackPanel Orientation="Horizontal" Margin="1">
+                    <TextBlock VerticalAlignment="Center" FontSize="10" Foreground="Gray">Lat:</TextBlock>
+                    <Border Width="3"/>
+                    <TextBlock VerticalAlignment="Center" FontSize="10" Foreground="Gray" Text="{Binding DB.CursorLatitude}" Width="45"/>
+                    <Border Width="8"/>
+                    <TextBlock VerticalAlignment="Center" FontSize="10" Foreground="Gray">Lon:</TextBlock>
+                    <Border Width="3"/>
+                    <TextBlock VerticalAlignment="Center" FontSize="10" Foreground="Gray" Text="{Binding DB.CursorLongitude}" Width="45"/>
+                </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

@@ -103,6 +103,12 @@ namespace RailwaymapUI
             DB.Reset_Single(MapItems.Sites);
         }
 
+        private void Refresh_ImageCountryColors(object sender, RoutedEventArgs e)
+        {
+            DB.Reset_Single(MapItems.CountryColors);
+        }
+
+
         private void Expand_All(object sender, RoutedEventArgs e)
         {
             ExpandItems.Expand_All();
@@ -153,16 +159,28 @@ namespace RailwaymapUI
 
         private void Selection_Handle_Update(object sender, RoutedEventArgs e)
         {
-            DB.Image_Selection.Draw(zoomer, DB.Set);
-
-            if (DB.Image_Selection.Enabled)
+            if (!DB.IsEditing_CountryColor())
             {
-                DB.Refresh_Selection(zoomer);
+                DB.Image_Selection.Draw(zoomer, DB.Set);
+
+                if (DB.Image_Selection.Enabled)
+                {
+                    DB.Refresh_Selection(zoomer);
+                }
+                else
+                {
+                    DB.Refresh_Selection(null);
+                }
             }
             else
             {
-                DB.Refresh_Selection(null);
+                DB.Set_CountryColorLocation((int)zoomer.Cursor_Point.X, (int)zoomer.Cursor_Point.Y);
             }
+        }
+
+        private void zoomer_Coordinate_Update(object sender, RoutedEventArgs e)
+        {
+            DB.Set_Cursor_Coordinates((int)zoomer.Cursor_Point.X, (int)zoomer.Cursor_Point.Y);
         }
 
 
@@ -349,6 +367,32 @@ namespace RailwaymapUI
         {
             DB.Save_Config();
         }
+
+        private void AddCountryColor_Click(object sender, RoutedEventArgs e)
+        {
+            DB.AddCountryColor();
+        }
+
+        private void RemoveCountryColor_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender != null)
+            {
+                Guid g = (Guid)(sender as Button).Tag;
+
+                DB.RemoveCountryColor(g);
+            }
+        }
+
+        private void EditCountryColor_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender != null)
+            {
+                Guid g = (Guid)(sender as Button).Tag;
+
+                DB.Set_CountryColorInstance(g);
+            }
+        }
+
 
         private void Show_HideStationMenu_Click(object sender, RoutedEventArgs e)
         {

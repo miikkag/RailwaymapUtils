@@ -89,6 +89,7 @@
     <Compile Include="Bounds.cs" />
     <Compile Include="BoundsPoint.cs" />
     <Compile Include="BoundsXY.cs" />
+    <Compile Include="ColorCoordinate.cs" />
     <Compile Include="CoordinateMinMax.cs" />
     <Compile Include="DrawLine.cs" />
     <Compile Include="DrawSettings.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="LandareaCache.cs" />
     <Compile Include="LandareaDrawSegment.cs" />
     <Compile Include="LandAreaSegment.cs" />
+    <Compile Include="MapImage_CountryColors.cs" />
     <Compile Include="PolygonNode.cs" />
     <Compile Include="MapImage.cs" />
     <Compile Include="MapImage_Background.cs" />

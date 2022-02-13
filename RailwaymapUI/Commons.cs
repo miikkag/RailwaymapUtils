@@ -10,7 +10,7 @@ using System.Windows.Media.Imaging;
 
 namespace RailwaymapUI
 {
-    public enum MapItems { Landarea, Water, Borders, Railways, Cities, Sites, Scale, Margins };
+    public enum MapItems { Landarea, Water, Borders, Railways, Cities, Sites, Scale, CountryColors };
 
     public static class Commons
     {
@@ -86,13 +86,27 @@ namespace RailwaymapUI
 
         public static int Merc2MapY(double mercy, BoundsXY bounds)
         {
-            //return (int)Math.Round(bounds.Scale * (mercy - bounds.Y_min));
             double maph = bounds.Scale * Math.Abs(bounds.Y_max - bounds.Y_min);
             double offset = bounds.Scale * (mercy - bounds.Y_min);
 
             return (int)Math.Round(maph - offset);
         }
 
+        public static double MapX2Lon(int x, BoundsXY bxy)
+        {
+            double mercx = (x / bxy.Scale) + bxy.X_min;
+
+            return Commons.Merc_X2Lon(mercx);
+        }
+
+        public static double MapY2Lat(int y, BoundsXY bxy)
+        {
+            double maph = Math.Abs(bxy.Y_max - bxy.Y_min) / bxy.Scale;
+            double offset = y / bxy.Scale;
+            double mercy = bxy.Y_max - offset;
+
+            return Commons.Merc_Y2Lat(mercy);
+        }
 
         static public double Haversine_km(Coordinate pos1, Coordinate pos2)
         {
