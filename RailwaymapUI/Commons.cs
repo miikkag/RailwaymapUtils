@@ -10,7 +10,7 @@ using System.Windows.Media.Imaging;
 
 namespace RailwaymapUI
 {
-    public enum MapItems { Landarea, Water, Borders, Railways, Cities, Sites, Scale, CountryColors };
+    public enum MapItems { Landarea, Water, Borders, Railways, Cities, Scale, CountryColors, Labels };
 
     public static class Commons
     {
@@ -25,6 +25,12 @@ namespace RailwaymapUI
         private static readonly double RAD2Deg = 180.0 / Math.PI;
 
         static public double PROGRESS_INTERVAL = 200;
+
+        static public readonly char[] DELIM = new char[1] { '=' };
+        static public readonly char[] DELIM_ST = new char[1] { ';' };
+        static public readonly string DELIMs = "=";
+        static public readonly string DELIMs_ST = ";";
+
 
         static public double Merc_X(double lon)
         {

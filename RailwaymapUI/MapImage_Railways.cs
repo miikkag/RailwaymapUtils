@@ -170,7 +170,7 @@ namespace RailwaymapUI
 
                 for (int i = 0; i < rs.ways.Length; i++)
                 {
-                    if ((DateTime.Now - last_progress).TotalMilliseconds >= 200)
+                    if ((DateTime.Now - last_progress).TotalMilliseconds >= 500)
                     {
                         progress.Set_Info((i * 100 / rs.ways.Length));
 

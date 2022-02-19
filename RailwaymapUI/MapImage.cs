@@ -30,6 +30,7 @@ namespace RailwaymapUI
 
         public Visibility Visible { get { if (Enabled) return Visibility.Visible; else return Visibility.Hidden; } }
 
+        protected DirectBitmap Dbmp;
         protected Bitmap bmp;
         protected Graphics gr;
 
@@ -57,7 +58,9 @@ namespace RailwaymapUI
                 bmp.Dispose();
             }
 
-            bmp = new Bitmap(w, h);
+            //bmp = new Bitmap(w, h);
+            Dbmp = new DirectBitmap(w, h);
+            bmp = Dbmp.Bitmap;
 
             gr = Graphics.FromImage(bmp);
 
@@ -72,6 +75,11 @@ namespace RailwaymapUI
         public Bitmap GetBitmap()
         {
             return bmp;
+        }
+
+        public DirectBitmap GetDBitmap()
+        {
+            return Dbmp;
         }
 
         public static ImageSource BitmapToImageSource(Bitmap bmp)
@@ -106,7 +114,7 @@ namespace RailwaymapUI
                     double y2 = bounds.Scale * (bounds.Y_max - Commons.Merc_Y(ws[w].Last().Latitude));
                     double x2 = bounds.Scale * (Commons.Merc_X(ws[w].Last().Longitude) - bounds.X_min);
 
-                    DrawLine.Draw_Line(new System.Drawing.Point((int)x1, (int)y1), new System.Drawing.Point((int)x2, (int)y2), bmp, color, 1);
+                    DrawLine.Draw_Line(new System.Drawing.Point((int)x1, (int)y1), new System.Drawing.Point((int)x2, (int)y2), Dbmp, color, 1);
                 }
                 else
                 {
@@ -178,7 +186,7 @@ namespace RailwaymapUI
 
                     for (int l = 1; l < set_lines.Count; l++)
                     {
-                        DrawLine.Draw_Line(set_lines[l - 1], set_lines[l], bmp, color, thickness);
+                        DrawLine.Draw_Line(set_lines[l - 1], set_lines[l], Dbmp, color, thickness);
                     }
                 }
             }

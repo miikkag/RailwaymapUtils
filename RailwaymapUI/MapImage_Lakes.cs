@@ -123,9 +123,11 @@ namespace RailwaymapUI
             {
                 if ((i % 50) == 0)
                 {
-                    if ((DateTime.Now - last_progress).TotalMilliseconds > 200)
+                    if ((DateTime.Now - last_progress).TotalMilliseconds > 500)
                     {
                         progress.Set_Info((i * 100) / total_items);
+
+                        last_progress = DateTime.Now;
                     }
                 }
 
@@ -148,6 +150,8 @@ namespace RailwaymapUI
                         if ((DateTime.Now - last_progress).TotalMilliseconds > 200)
                         {
                             progress.Set_Info(((base_items + i) * 100) / total_items);
+
+                            last_progress = DateTime.Now;
                         }
                     }
 

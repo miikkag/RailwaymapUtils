@@ -21,6 +21,7 @@ namespace RailwaymapUI
         public bool Water { get; set; }
         public bool Railways { get; set; }
         public bool Cities { get; set; }
+        public bool Labels { get; set; }
 
         public ExpandList()
         {
@@ -29,6 +30,7 @@ namespace RailwaymapUI
             Water = true;
             Railways = true;
             Cities = true;
+            Labels = true;
         }
 
         public void Expand_All()
@@ -38,12 +40,14 @@ namespace RailwaymapUI
             Water = true;
             Railways = true;
             Cities = true;
+            Labels = true;
 
             OnPropertyChanged("Landarea");
             OnPropertyChanged("Borders");
             OnPropertyChanged("Water");
             OnPropertyChanged("Railways");
             OnPropertyChanged("Cities");
+            OnPropertyChanged("Labels");
         }
     }
 }

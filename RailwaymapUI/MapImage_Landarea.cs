@@ -59,7 +59,7 @@ namespace RailwaymapUI
                 throw new Exception("Coastline cache file does not exist.");
             }
 
-            gr.Clear(Color.Transparent);
+            gr.Clear(set.Color_Land);
 
             gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
 
@@ -143,7 +143,7 @@ namespace RailwaymapUI
 
             for (int y = 0; y < bmp.Height; y++)
             {
-                if ((DateTime.Now - last_progress).TotalMilliseconds >= 200)
+                if ((DateTime.Now - last_progress).TotalMilliseconds >= 500)
                 {
                     progress.Set_Info((y * 100) / bmp.Height);
 

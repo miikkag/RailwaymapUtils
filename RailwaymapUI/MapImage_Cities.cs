@@ -124,26 +124,26 @@ namespace RailwaymapUI
                                 {
                                     if ((dx >= 0) && (dx < bmp.Width) && (dy >= 0) && (dy < bmp.Height))
                                     {
-                                        if (bmp.GetPixel(dx, dy).ToArgb() == color_text)
+                                        if (Dbmp.GetPixel(dx, dy).ToArgb() == color_text)
                                         {
-                                            if ((dx > usex) && (dx > 0) && (bmp.GetPixel(dx - 1, dy).ToArgb() == color_transparent))
+                                            if ((dx > usex) && (dx > 0) && (Dbmp.GetPixel(dx - 1, dy).ToArgb() == color_transparent))
                                             {
-                                                bmp.SetPixel(dx - 1, dy, set.Color_Cities_Outline);
+                                                Dbmp.SetPixel(dx - 1, dy, set.Color_Cities_Outline);
                                             }
 
-                                            if ((dy > usey) && (dy > 0) && (bmp.GetPixel(dx, dy - 1).ToArgb() == color_transparent))
+                                            if ((dy > usey) && (dy > 0) && (Dbmp.GetPixel(dx, dy - 1).ToArgb() == color_transparent))
                                             {
-                                                bmp.SetPixel(dx, dy - 1, set.Color_Cities_Outline);
+                                                Dbmp.SetPixel(dx, dy - 1, set.Color_Cities_Outline);
                                             }
 
-                                            if (((dx + 1) < endx) && (bmp.GetPixel(dx + 1, dy).ToArgb() == color_transparent))
+                                            if (((dx + 1) < endx) && (Dbmp.GetPixel(dx + 1, dy).ToArgb() == color_transparent))
                                             {
-                                                bmp.SetPixel(dx + 1, dy, set.Color_Cities_Outline);
+                                                Dbmp.SetPixel(dx + 1, dy, set.Color_Cities_Outline);
                                             }
 
-                                            if (((dy + 1) < endy) && (bmp.GetPixel(dx, dy + 1).ToArgb() == color_transparent))
+                                            if (((dy + 1) < endy) && (Dbmp.GetPixel(dx, dy + 1).ToArgb() == color_transparent))
                                             {
-                                                bmp.SetPixel(dx, dy + 1, set.Color_Cities_Outline);
+                                                Dbmp.SetPixel(dx, dy + 1, set.Color_Cities_Outline);
                                             }
                                         }
                                     }

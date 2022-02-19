@@ -29,6 +29,8 @@ namespace RailwaymapUI
         public Color Color_Water = Color.FromArgb(190, 224, 255);
         public Color Color_Land = Color.FromArgb(255, 255, 255);
 
+        public int ColorValue_CountryColorDefault = 0xEFEFEF;
+
         public Color Color_Railways_Diesel = Color.FromArgb(40, 220, 40);
         public Color Color_Railways_750V = Color.FromArgb(175, 175, 75);
         public Color Color_Railways_1500V = Color.FromArgb(205, 135, 90);
@@ -60,6 +62,12 @@ namespace RailwaymapUI
 
         public string Legend_FontName { get; set; }
         public int Legend_FontSize { get; set; }
+
+        public string Label_FontName_Default = "Arial";
+        public int Label_FontSize_Default = 14;
+        public bool Label_FontBold_Default = true;
+
+        public Color Color_LabelText = Color.Black;
 
         public bool Draw_Railway_All { get; set; }
         public bool Draw_Railway_Lightrail { get; set; }

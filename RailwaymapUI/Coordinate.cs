@@ -8,8 +8,8 @@ namespace RailwaymapUI
 {
     public class Coordinate
     {
-        public double Latitude;
-        public double Longitude;
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
 
         public Coordinate(double lat, double lon)
         {

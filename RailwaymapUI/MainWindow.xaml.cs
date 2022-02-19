@@ -98,9 +98,9 @@ namespace RailwaymapUI
             DB.Reset_Single(MapItems.Cities);
         }
 
-        private void Refresh_ImageSites(object sender, RoutedEventArgs e)
+        private void Refresh_ImageLabels(object sender, RoutedEventArgs e)
         {
-            DB.Reset_Single(MapItems.Sites);
+            DB.Reset_Single(MapItems.Labels);
         }
 
         private void Refresh_ImageCountryColors(object sender, RoutedEventArgs e)
@@ -159,7 +159,19 @@ namespace RailwaymapUI
 
         private void Selection_Handle_Update(object sender, RoutedEventArgs e)
         {
-            if (!DB.IsEditing_CountryColor())
+            if (DB.IsEditing_CountryColor())
+            {
+                DB.Set_CountryColorLocation((int)zoomer.Cursor_Point.X, (int)zoomer.Cursor_Point.Y);
+            }
+            else if (DB.IsEditing_BorderPatchLine())
+            {
+                DB.Set_BorderPatchLineLocation((int)zoomer.Cursor_Point.X, (int)zoomer.Cursor_Point.Y);
+            }
+            else if (DB.Labels.Is_Editing())
+            {
+                DB.Labels.SetItemLocation((int)zoomer.Cursor_Point.X, (int)zoomer.Cursor_Point.Y);
+            }
+            else
             {
                 DB.Image_Selection.Draw(zoomer, DB.Set);
 
@@ -171,10 +183,6 @@ namespace RailwaymapUI
                 {
                     DB.Refresh_Selection(null);
                 }
-            }
-            else
-            {
-                DB.Set_CountryColorLocation((int)zoomer.Cursor_Point.X, (int)zoomer.Cursor_Point.Y);
             }
         }
 
@@ -391,6 +399,62 @@ namespace RailwaymapUI
 
                 DB.Set_CountryColorInstance(g);
             }
+        }
+
+
+        private void AddBorderPatch_Click(object sender, RoutedEventArgs e)
+        {
+            DB.AddBorderPatchLine();
+        }
+
+        private void RemoveBorderPatch_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender != null)
+            {
+                Guid g = (Guid)(sender as Button).Tag;
+
+                DB.RemoveBorderPatchLine(g);
+            }
+        }
+
+        private void EditBorderPatch_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender != null)
+            {
+                Guid g = (Guid)(sender as Button).Tag;
+
+                DB.Set_BorderPatchLineInstance(g);
+            }
+        }
+
+        private void AddLabel_Click(object sender, RoutedEventArgs e)
+        {
+            DB.Labels.NewItem();
+        }
+
+        private void RemoveLabel_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender != null)
+            {
+                Guid g = (Guid)(sender as Button).Tag;
+
+                DB.Labels.RemoveItem(g);
+            }
+        }
+
+        private void EditLabel_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender != null)
+            {
+                Guid g = (Guid)(sender as Button).Tag;
+
+                DB.Labels.SetEditInstance(g);
+            }
+        }
+
+        private void ApplyAllLabel_Click(object sender, RoutedEventArgs e)
+        {
+            DB.Labels.ApplyAllStyle();
         }
 
 

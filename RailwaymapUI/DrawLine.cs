@@ -36,38 +36,38 @@ namespace RailwaymapUI
             return result;
         }
 
-        static public void Draw_Line(Point p1, Point p2, Bitmap bmp, Color color, int thickness)
+        static public void Draw_Line(Point p1, Point p2, DirectBitmap dbmp, Color color, int thickness)
         {
             List<Point> points = Get_Linepoints(p1, p2);
 
             foreach (Point pt in points)
             {
-                if ((pt.X >= 0) && (pt.X < bmp.Width) && (pt.Y >= 0) && (pt.Y < bmp.Height))
+                if ((pt.X >= 0) && (pt.X < dbmp.Width) && (pt.Y >= 0) && (pt.Y < dbmp.Height))
                 {
-                    bmp.SetPixel(pt.X, pt.Y, color);
+                    dbmp.SetPixel(pt.X, pt.Y, color);
 
                     if (thickness > 1)
                     {
                         if (pt.X > 0)
                         {
-                            bmp.SetPixel(pt.X - 1, pt.Y, color);
+                            dbmp.SetPixel(pt.X - 1, pt.Y, color);
                         }
 
                         if (pt.Y > 0)
                         {
-                            bmp.SetPixel(pt.X, pt.Y - 1, color);
+                            dbmp.SetPixel(pt.X, pt.Y - 1, color);
                         }
 
                         if (thickness > 2)
                         {
-                            if (pt.Y < (bmp.Height - 1))
+                            if (pt.Y < (dbmp.Height - 1))
                             {
-                                bmp.SetPixel(pt.X, pt.Y + 1, color);
+                                dbmp.SetPixel(pt.X, pt.Y + 1, color);
                             }
 
-                            if (pt.X < (bmp.Width - 1))
+                            if (pt.X < (dbmp.Width - 1))
                             {
-                                bmp.SetPixel(pt.X + 1, pt.Y, color);
+                                dbmp.SetPixel(pt.X + 1, pt.Y, color);
                             }
                         }
                     }

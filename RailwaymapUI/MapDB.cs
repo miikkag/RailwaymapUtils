@@ -62,6 +62,9 @@ namespace RailwaymapUI
         public double CursorLatitude { get; private set; }
         public double CursorLongitude { get; private set; }
 
+        public int CursorX { get; private set; }
+        public int CursorY { get; private set; }
+
         public MapImage_Background Image_Background { get; private set; }
         public MapImage_Landarea Image_Landarea { get; private set; }
         public MapImage_Lakes Image_Water { get; private set; }
@@ -70,17 +73,24 @@ namespace RailwaymapUI
         public MapImage_Cities Image_Cities { get; private set; }
         public MapImage_CountryColors Image_CountryColors { get; private set; }
         public MapImage_Scale Image_Scale { get; private set; }
+        public MapImage_Labels Image_Labels { get; private set; }
+
         public MapImage_Selection Image_Selection { get; private set; }
 
         public ProgressInfo Progress { get; private set; }
 
         public DrawSettings Set { get; private set; }
 
+        public MapDB_Labels Labels { get; private set; }
+
         public List<StationItem> Stations { get; private set; }
         public List<StationItem> Stations_Highlight { get; private set; }
 
         public ObservableCollection<ColorCoordinate> CountryColors { get; private set; }
         private Guid? CountryColorEdit_Instance;
+
+        public ObservableCollection<PatchLine> BorderPatchLines { get; private set; }
+        private Guid? BorderPatchLineEdit_Instance;
 
         private bool _edit_stations;
         public bool EditStations { get { return _edit_stations; } set { _edit_stations = value; } }
@@ -132,6 +142,7 @@ namespace RailwaymapUI
             public bool cities;
             public bool scale;
             public bool countrycolors;
+            public bool labels;
         }
 
         private DrawItems draw_items;
@@ -151,11 +162,14 @@ namespace RailwaymapUI
             Image_Cities = new MapImage_Cities();
             Image_CountryColors = new MapImage_CountryColors();
             Image_Scale = new MapImage_Scale();
+            Image_Labels = new MapImage_Labels();
             Image_Selection = new MapImage_Selection();
 
             Image_Selection.Enabled = false;
 
             Set = new DrawSettings();
+
+            Labels = new MapDB_Labels(Set);
 
             bounds = new Bounds();
             bxy = null;
@@ -186,6 +200,9 @@ namespace RailwaymapUI
             CountryColors = new ObservableCollection<ColorCoordinate>();
             CountryColorEdit_Instance = null;
 
+            BorderPatchLines = new ObservableCollection<PatchLine>();
+            BorderPatchLineEdit_Instance = null;
+
             drawlock = new object();
         }
 
@@ -199,6 +216,7 @@ namespace RailwaymapUI
             Image_Cities.Set_Size(OutputSizeWidth, OutputSizeHeight);
             Image_CountryColors.Set_Size(OutputSizeWidth, OutputSizeHeight);
             Image_Scale.Set_Size(OutputSizeWidth, OutputSizeHeight);
+            Image_Labels.Set_Size(OutputSizeWidth, OutputSizeHeight);
             Image_Selection.Set_Size(OutputSizeWidth, OutputSizeHeight);
 
             Image_Background.Fill();
@@ -213,6 +231,7 @@ namespace RailwaymapUI
             draw_items.railways = true;
             draw_items.cities = true;
             draw_items.scale = true;
+            draw_items.labels = true;
             draw_items.countrycolors = true;
 
             Thread thr = new Thread(DrawAllThread);
@@ -230,6 +249,7 @@ namespace RailwaymapUI
             draw_items.railways = (item == MapItems.Railways);
             draw_items.cities = (item == MapItems.Cities);
             draw_items.scale = (item == MapItems.Scale);
+            draw_items.labels = (item == MapItems.Labels);
             draw_items.countrycolors = (item == MapItems.CountryColors);
 
             Thread thr = new Thread(DrawAllThread);
@@ -435,11 +455,11 @@ namespace RailwaymapUI
 
         public void AddCountryColor()
         {
-            CountryColors.Add(new ColorCoordinate());
+            ColorCoordinate cc = new ColorCoordinate();
 
-            System.Diagnostics.Debug.WriteLine(CountryColors.Count.ToString());
+            cc.ColorValue = Set.ColorValue_CountryColorDefault;
 
-            OnPropertyChanged("CountryColors");
+            CountryColors.Add(cc);
         }
 
         public void RemoveCountryColor(Guid g)
@@ -454,9 +474,33 @@ namespace RailwaymapUI
             }
         }
 
+        public void AddBorderPatchLine()
+        {
+            PatchLine p = new PatchLine(Set.Color_Border);
+
+            BorderPatchLines.Add(p);
+        }
+
+        public void RemoveBorderPatchLine(Guid g)
+        {
+            foreach (PatchLine p in BorderPatchLines)
+            {
+                if (p.InstanceID == g)
+                {
+                    BorderPatchLines.Remove(p);
+                    break;
+                }
+            }
+        }
+
         public bool IsEditing_CountryColor()
         {
             return (CountryColorEdit_Instance != null);
+        }
+
+        public bool IsEditing_BorderPatchLine()
+        {
+            return (BorderPatchLineEdit_Instance != null);
         }
 
         private void UpdateSelection()
@@ -583,13 +627,70 @@ namespace RailwaymapUI
             }
         }
 
+        public void Set_BorderPatchLineInstance(Guid g)
+        {
+            BorderPatchLineEdit_Instance = g;
+
+            foreach (PatchLine p in BorderPatchLines)
+            {
+                if (p.InstanceID == BorderPatchLineEdit_Instance)
+                {
+                    p.Start.Latitude = 0;
+                    p.Start.Longitude = 0;
+                    p.End.Latitude = 0;
+                    p.End.Longitude = 0;
+
+                    p.Refresh();
+
+                    break;
+                }
+            }
+        }
+
+        public void Set_BorderPatchLineLocation(int x, int y)
+        {
+            double lon = Commons.MapX2Lon(x, bxy);
+            double lat = Commons.MapY2Lat(y, bxy);
+
+            if (BorderPatchLineEdit_Instance != null)
+            {
+                foreach (PatchLine p in BorderPatchLines)
+                {
+                    if (p.InstanceID == BorderPatchLineEdit_Instance)
+                    {
+                        if ((p.Start.Latitude == 0) && (p.Start.Longitude == 0))
+                        {
+                            p.Start.Latitude = lat;
+                            p.Start.Longitude = lon;
+                        }
+                        else
+                        {
+                            p.End.Latitude = lat;
+                            p.End.Longitude = lon;
+
+                            BorderPatchLineEdit_Instance = null;
+                        }
+
+                        p.Refresh();
+
+                        break;
+                    }
+                }
+            }
+        }
+
+
         public void Set_Cursor_Coordinates(int x, int y)
         {
             CursorLongitude = Commons.MapX2Lon(x, bxy);
             CursorLatitude = Commons.MapY2Lat(y,bxy);
+            CursorX = x;
+            CursorY = y;
             
             OnPropertyChanged("CursorLongitude");
             OnPropertyChanged("CursorLatitude");
+            OnPropertyChanged("CursorX");
+            OnPropertyChanged("CursorY");
         }
 
         public void Sort_Stations(SortOrder order)
@@ -758,6 +859,7 @@ namespace RailwaymapUI
         private const string DB_CONFIG_PREFIX = "DB.";
         private const string STATION_CONFIG_PREFIX = "Station.";
         private const string COUNTRYCOLOR_CONFIG_REFIX = "CC.";
+        private const string BORDERPATCHLINE_CONFIG_PREFIX = "BPATCH.";
 
         public void Save_Config()
         {
@@ -769,25 +871,25 @@ namespace RailwaymapUI
 
                 all.AddRange(items_set);
 
-                all.Add(DB_CONFIG_PREFIX + "OutputWidth=" + OutputSizeWidth.ToString());
-                all.Add(DB_CONFIG_PREFIX + "OutputHeight=" + OutputSizeHeight.ToString());
+                all.Add(DB_CONFIG_PREFIX + "OutputWidth"  + Commons.DELIMs + OutputSizeWidth.ToString());
+                all.Add(DB_CONFIG_PREFIX + "OutputHeight" + Commons.DELIMs + OutputSizeHeight.ToString());
 
-                all.Add(DB_CONFIG_PREFIX + "Separate_NonVisibleStations=" + Separate_NonVisibleStations.ToString());
+                all.Add(DB_CONFIG_PREFIX + "Separate_NonVisibleStations" + Commons.DELIMs + Separate_NonVisibleStations.ToString());
 
                 foreach (StationItem st in Stations)
                 {
                     StringBuilder str = new StringBuilder(STATION_CONFIG_PREFIX);
-                    str.Append("id=" + st.id.ToString() + ";");
-                    str.Append("display_name=" + st.display_name + ";");
-                    str.Append("valign=" + st.valign.ToString() + ";");
-                    str.Append("halign=" + st.halign.ToString() + ";");
-                    str.Append("visible=" + st.visible.ToString() + ";");
-                    str.Append("bold=" + st.bold.ToString() + ";");
-                    str.Append("outline=" + st.outline.ToString() + ";");
-                    str.Append("offsetx=" + st.offsetx.ToString() + ";");
-                    str.Append("offsety=" + st.offsety.ToString() + ";");
-                    str.Append("dotsize=" + st.dotsize.ToString() + ";");
-                    str.Append("english=" + st.english.ToString());
+                    str.Append("id"           + Commons.DELIMs + st.id.ToString()      + Commons.DELIMs_ST);
+                    str.Append("display_name" + Commons.DELIMs + st.display_name       + Commons.DELIMs_ST);
+                    str.Append("valign"       + Commons.DELIMs + st.valign.ToString()  + Commons.DELIMs_ST);
+                    str.Append("halign"       + Commons.DELIMs + st.halign.ToString()  + Commons.DELIMs_ST);
+                    str.Append("visible"      + Commons.DELIMs + st.visible.ToString() + Commons.DELIMs_ST);
+                    str.Append("bold"         + Commons.DELIMs + st.bold.ToString()    + Commons.DELIMs_ST);
+                    str.Append("outline"      + Commons.DELIMs + st.outline.ToString() + Commons.DELIMs_ST);
+                    str.Append("offsetx"      + Commons.DELIMs + st.offsetx.ToString() + Commons.DELIMs_ST);
+                    str.Append("offsety"      + Commons.DELIMs + st.offsety.ToString() + Commons.DELIMs_ST);
+                    str.Append("dotsize"      + Commons.DELIMs + st.dotsize.ToString() + Commons.DELIMs_ST);
+                    str.Append("english"      + Commons.DELIMs + st.english.ToString());
 
                     all.Add(str.ToString());
                 }
@@ -795,14 +897,28 @@ namespace RailwaymapUI
                 foreach (ColorCoordinate cc in CountryColors)
                 {
                     StringBuilder str = new StringBuilder(COUNTRYCOLOR_CONFIG_REFIX);
-                    str.Append("name=" + cc.Name.Replace(" ", "\\ ") + ";");
-                    str.Append("lat=" + cc.Latitude.ToString() + ";");
-                    str.Append("lon=" + cc.Longitude.ToString() + ";");
-                    str.Append("color=" + cc.ColorHex);
+                    str.Append("name"  + Commons.DELIMs + cc.Name                 + Commons.DELIMs_ST);
+                    str.Append("lat"   + Commons.DELIMs + cc.Latitude.ToString()  + Commons.DELIMs_ST);
+                    str.Append("lon"   + Commons.DELIMs + cc.Longitude.ToString() + Commons.DELIMs_ST);
+                    str.Append("color" + Commons.DELIMs + cc.ColorHex);
 
                     all.Add(str.ToString());
                 }
-                
+
+                all.AddRange(Labels.Get_Config());
+
+                foreach (PatchLine p in BorderPatchLines)
+                {
+                    StringBuilder str = new StringBuilder(BORDERPATCHLINE_CONFIG_PREFIX);
+                    str.Append("name"      + Commons.DELIMs + p.Name                       + Commons.DELIMs_ST);
+                    str.Append("start.lat" + Commons.DELIMs + p.Start.Latitude.ToString()  + Commons.DELIMs_ST);
+                    str.Append("start.lon" + Commons.DELIMs + p.Start.Longitude.ToString() + Commons.DELIMs_ST);
+                    str.Append("end.lat"   + Commons.DELIMs + p.End.Latitude.ToString()    + Commons.DELIMs_ST);
+                    str.Append("end.lon"   + Commons.DELIMs + p.End.Longitude.ToString());
+
+                    all.Add(str.ToString());
+                }
+
                 File.WriteAllLines(AreaConfigFilename, all);
             }
         }
@@ -846,6 +962,8 @@ namespace RailwaymapUI
                             double scale = Math.Min(scalex, scaley);
 
                             bxy = new BoundsXY(x_max, x_min, y_max, y_min, scale);
+
+                            Labels.SetBounds(bxy);
                         }
                         else
                         {
@@ -866,9 +984,6 @@ namespace RailwaymapUI
 
         public void Load_Config()
         {
-            char[] delim = new char[1] { '=' };
-            char[] delim_st = new char[1] { ';' };
-
             if (AreaConfigFilename != "")
             {
                 if (!File.Exists(AreaConfigFilename))
@@ -877,8 +992,11 @@ namespace RailwaymapUI
                 }
 
                 CountryColors.Clear();
+                BorderPatchLines.Clear();
 
                 string[] lines = File.ReadAllLines(AreaConfigFilename);
+
+                List<string> label_items = new List<string>();
 
                 Set.Read_Config(lines);
 
@@ -886,7 +1004,7 @@ namespace RailwaymapUI
                 {
                     if (str.StartsWith(DB_CONFIG_PREFIX))
                     {
-                        string[] items = str.Substring(DB_CONFIG_PREFIX.Length).Split(delim, 2);
+                        string[] items = str.Substring(DB_CONFIG_PREFIX.Length).Split(Commons.DELIM, 2);
 
                         int.TryParse(items[1], out int val);
 
@@ -911,7 +1029,7 @@ namespace RailwaymapUI
                     }
                     else if (str.StartsWith(STATION_CONFIG_PREFIX))
                     {
-                        string[] items = str.Substring(STATION_CONFIG_PREFIX.Length).Split(delim_st);
+                        string[] items = str.Substring(STATION_CONFIG_PREFIX.Length).Split(Commons.DELIM_ST);
 
                         Int64 id = -1;
                         string display_name = "";
@@ -927,7 +1045,7 @@ namespace RailwaymapUI
 
                         foreach (string pair in items)
                         {
-                            string[] parts = pair.Split(delim, 2);
+                            string[] parts = pair.Split(Commons.DELIM, 2);
 
                             if (parts.Length == 2)
                             {
@@ -1009,9 +1127,13 @@ namespace RailwaymapUI
                             }
                         }
                     }
+                    else if (str.StartsWith(MapDB_Labels.LABEL_CONF_START))
+                    {
+                        label_items.Add(str);
+                    }
                     else if (str.StartsWith(COUNTRYCOLOR_CONFIG_REFIX))
                     {
-                        string[] items = str.Substring(COUNTRYCOLOR_CONFIG_REFIX.Length).Split(delim_st);
+                        string[] items = str.Substring(COUNTRYCOLOR_CONFIG_REFIX.Length).Split(Commons.DELIM_ST);
 
                         string name = "";
                         double latitude = 0;
@@ -1020,7 +1142,7 @@ namespace RailwaymapUI
 
                         foreach (string pair in items)
                         {
-                            string[] parts = pair.Split(delim, 2);
+                            string[] parts = pair.Split(Commons.DELIM, 2);
 
                             if (parts.Length == 2)
                             {
@@ -1052,6 +1174,59 @@ namespace RailwaymapUI
                             CountryColors.Add(cc);
                         }
                     }
+                    else if (str.StartsWith(BORDERPATCHLINE_CONFIG_PREFIX))
+                    {
+                        string[] items = str.Substring(BORDERPATCHLINE_CONFIG_PREFIX.Length).Split(Commons.DELIM_ST);
+
+                        string name = "";
+                        double start_latitude = 0;
+                        double start_longitude = 0;
+                        double end_latitude = 0;
+                        double end_longitude = 0;
+
+                        foreach (string pair in items)
+                        {
+                            string[] parts = pair.Split(Commons.DELIM, 2);
+
+                            if (parts.Length == 2)
+                            {
+                                switch (parts[0])
+                                {
+                                    case "name":
+                                        name = parts[1];
+                                        break;
+
+                                    case "start.lat":
+                                        double.TryParse(parts[1], out start_latitude);
+                                        break;
+
+                                    case "start.lon":
+                                        double.TryParse(parts[1], out start_longitude);
+                                        break;
+
+                                    case "end.lat":
+                                        double.TryParse(parts[1], out end_latitude);
+                                        break;
+
+                                    case "end.lon":
+                                        double.TryParse(parts[1], out end_longitude);
+                                        break;
+                                }
+                            }
+                        }
+
+                        PatchLine p = new PatchLine(Set.Color_Border);
+
+                        p.Name = name;
+                        p.Start.Latitude = start_latitude;
+                        p.Start.Longitude = start_longitude;
+                        p.End.Latitude = end_latitude;
+                        p.End.Longitude = end_longitude;
+
+                        BorderPatchLines.Add(p);
+                    }
+
+                    Labels.Set_Config(label_items);
                 }
             }
 
@@ -1106,7 +1281,7 @@ namespace RailwaymapUI
                         {
                             sqlite_border.Open();
 
-                            Image_Borders.Draw(sqlite_border, bxy, Progress, Set);
+                            Image_Borders.Draw(sqlite_border, BorderPatchLines.ToList(), bxy, Progress, Set);
 
                             sqlite_border.Close();
                         }
@@ -1147,7 +1322,7 @@ namespace RailwaymapUI
                     {
                         db_file = "country colors";
 
-                        Image_CountryColors.Draw(bxy, bounds, Set, Progress, CountryColors.ToList(), Image_Landarea, Image_Borders);
+                        Image_CountryColors.Draw(bxy, bounds, Set, Progress, CountryColors.ToList(), Image_Landarea, Image_Water, Image_Borders);
 
                         OnPropertyChanged("Image_CountryColors");
                     }
@@ -1213,6 +1388,18 @@ namespace RailwaymapUI
                         Image_Cities.Draw(Stations, bxy, Progress, Set);
 
                         OnPropertyChanged("Image_Cities");
+                    }
+
+                    if (draw_items.labels)
+                    {
+                        db_file = "Labels";
+
+                        Progress.Set_Info(true, "Drawing labels", 0);
+
+                        Image_Labels.Draw(Labels.Items.ToList(), Set.Color_LabelText, bxy);
+
+                        OnPropertyChanged("Image_Labels");
+
                     }
 
                     if (draw_items.scale)
