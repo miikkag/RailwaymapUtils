@@ -755,8 +755,10 @@ namespace RailwaymapUI
 
                     OutputFileName = Area + ".png";
 
+#if !DEBUG
                     try
                     {
+#endif
                         using (SQLiteConnection sqlite_railways = new SQLiteConnection("Data Source=" + Path.Combine(area_path, DB_FILENAME_RAILWAYS)))
                         using (SQLiteConnection sqlite_lightrail = new SQLiteConnection("Data Source=" + Path.Combine(area_path, DB_FILENAME_LIGHTRAIL)))
                         {
@@ -778,14 +780,14 @@ namespace RailwaymapUI
 
                             GC.Collect();
                         }
-
+#if !DEBUG
                     }
                     catch (Exception ex)
                     {
                         MessageBox.Show("Error opening railway/lightrail database" + Environment.NewLine + Environment.NewLine + ex.Message,
                             "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
-
+#endif
                     Load_Config();
                     Load_Bounds();
                 }
@@ -834,6 +836,11 @@ namespace RailwaymapUI
             if (Image_Cities.Enabled)
             {
                 gr.DrawImage(Image_Cities.GetBitmap(), 0, 0);
+            }
+
+            if (Image_Labels.Enabled)
+            {
+                gr.DrawImage(Image_Labels.GetBitmap(), 0, 0);
             }
 
             gr.DrawImage(Image_Scale.GetBitmap(), 0, 0);
@@ -1396,7 +1403,7 @@ namespace RailwaymapUI
 
                         Progress.Set_Info(true, "Drawing labels", 0);
 
-                        Image_Labels.Draw(Labels.Items.ToList(), Set.Color_LabelText, bxy);
+                        Image_Labels.Draw(Labels.Items.ToList(), Set.Color_LabelText, Set.Color_LabelOutline, bxy);
 
                         OnPropertyChanged("Image_Labels");
 
@@ -1498,6 +1505,7 @@ namespace RailwaymapUI
                         st.display_name = name;
                         st.id = id;
                         st.Coord = new Coordinate(lat, lon);
+                        st.from_building = false;
 
                         if (name_en != "")
                         {
@@ -1515,6 +1523,83 @@ namespace RailwaymapUI
                 }
 
                 rdr.Close();
+            }
+
+
+            // Station building ways
+            using (SQLiteCommand cmd = new SQLiteCommand("SELECT way_id FROM way_tags WHERE k='railway' AND v='station';", conn))
+            using (SQLiteDataReader rdr = cmd.ExecuteReader())
+            {
+                while (rdr.Read())
+                {
+                    Int64 way_id = rdr.GetInt64(0);
+                    string name = "";
+                    List<Coordinate> st_coords = new List<Coordinate>();
+
+                    using (SQLiteCommand cmd_name = new SQLiteCommand("SELECT v FROM way_tags WHERE way_id=" + way_id.ToString() + " AND k='name';", conn))
+                    using (SQLiteDataReader rdr_name = cmd_name.ExecuteReader())
+                    {
+                        while (rdr_name.Read())
+                        {
+                            name = rdr_name.GetString(0);
+                            break;
+                        }
+                    }
+
+                    using (SQLiteCommand cmd_nodes = new SQLiteCommand("SELECT node_id FROM way_nodes WHERE way_id=" + way_id.ToString() + ";", conn))
+                    using (SQLiteDataReader rdr_nodes = cmd_nodes.ExecuteReader())
+                    {
+                        while (rdr_nodes.Read())
+                        {
+                            Int64 node_id = rdr_nodes.GetInt64(0);
+
+                            using (SQLiteCommand cmd_coords = new SQLiteCommand("SELECT lat, lon FROM nodes WHERE id=" + node_id.ToString() + ";", conn))
+                            using (SQLiteDataReader rdr_coords = cmd_coords.ExecuteReader())
+                            {
+                                while (rdr_coords.Read())
+                                {
+                                    double lat = rdr_coords.GetDouble(0);
+                                    double lon = rdr_coords.GetDouble(1);
+
+                                    st_coords.Add(new Coordinate(lat, lon));
+                                }
+                            }
+                        }
+                    }
+
+                    if ((st_coords.Count > 0) && (name != ""))
+                    {
+                        double avg_lat = 0;
+                        double avg_lon = 0;
+
+                        foreach (Coordinate c in st_coords)
+                        {
+                            avg_lat += c.Latitude;
+                            avg_lon += c.Longitude;
+                        }
+
+                        avg_lat /= st_coords.Count;
+                        avg_lon /= st_coords.Count;
+
+                        StationItem st = new StationItem(StationItemType.Station);
+
+                        if (lightrail)
+                        {
+                            st.Type = StationItemType.Lightrail;
+                        }
+
+                        st.name = name;
+                        st.name_en = name;
+                        st.display_name = name;
+                        st.id = way_id;
+                        st.Coord = new Coordinate(avg_lat, avg_lon);
+                        st.has_english = false;
+                        st.visible = true;
+                        st.from_building = true;
+
+                        Stations.Add(st);
+                    }
+                }
             }
         }
 

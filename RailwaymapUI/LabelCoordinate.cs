@@ -24,6 +24,7 @@ namespace RailwaymapUI
         public int FontSize { get; set; }
         public bool FontBold { get; set; }
 
+        public bool Outline { get; set; }
 
         public Guid InstanceID { get; private set; }
 
@@ -37,10 +38,12 @@ namespace RailwaymapUI
             FontSize = fontsize;
             FontBold = fontbold;
 
+            Outline = false;
+
             InstanceID = Guid.NewGuid();
         }
 
-        public LabelCoordinate(string name, double lat, double lon, string fontname, int fontsize, bool fontbold)
+        public LabelCoordinate(string name, double lat, double lon, string fontname, int fontsize, bool fontbold, bool outline)
         {
             Name = name;
             Latitude = lat;
@@ -49,6 +52,8 @@ namespace RailwaymapUI
             FontName = fontname;
             FontSize = fontsize;
             FontBold = fontbold;
+
+            Outline = outline;
 
             InstanceID = Guid.NewGuid();
         }

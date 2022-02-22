@@ -59,6 +59,7 @@ namespace RailwaymapUI
         public string name_en { get; set; }
         public string display_name { get; set; }
 
+        public bool from_building { get; set; }
         public bool visible { get; set; }
         public bool bold { get; set; }
         public bool outline { get; set; }

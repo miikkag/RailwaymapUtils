@@ -127,6 +127,10 @@ namespace RailwaymapUI
                                             {
                                                 wr.lightrail = true;
                                             }
+                                            else if (v == "station")
+                                            {
+                                                wr.station = true;
+                                            }
                                             break;
 
                                         case "usage":
@@ -181,7 +185,11 @@ namespace RailwaymapUI
 
                     bool draw;
 
-                    if (wr.usage == "main" || wr.usage == "branch")
+                    if (wr.station)
+                    {
+                        draw = false;
+                    }
+                    else if (wr.usage == "main" || wr.usage == "branch")
                     {
                         draw = true;
                     }

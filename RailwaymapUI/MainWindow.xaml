@@ -9,7 +9,7 @@
         Drop="MainWindow_Drop"
         AllowDrop="True"
         WindowStartupLocation="CenterScreen"
-        Title="Railway Map UI" Width="1200" Height="850" Icon="icons/icon.ico">
+        Title="Railway Map UI" Width="1580" Height="1000" Icon="icons/icon.ico">
     <Window.Resources>
         <Brush x:Key="ButtonSelected">#8BD698</Brush>
         <VisualBrush x:Key="HatchPattern" TileMode="Tile" Viewport="0,0,15,15" ViewportUnits="Absolute" Viewbox="0,0,15,15" ViewboxUnits="Absolute"
@@ -21,6 +21,10 @@
                 </Grid>
             </VisualBrush.Visual>
         </VisualBrush>
+        <Brush x:Key="AlignButtonIdle">#E0E0E0</Brush>
+        <Brush x:Key="AlignbuttonSelected">#B6DBC1</Brush>
+        <Brush x:Key="BoldbuttonSelected">#8BD698</Brush>
+
         <Style TargetType="Hyperlink" x:Key="HyperlinkStyleHighlight">
             <Setter Property="Foreground" Value="Gray"/>
             <Style.Triggers>
@@ -58,6 +62,24 @@
                 <DataTrigger Binding="{Binding}" Value="{x:Static local:DrawSettings+ScalePosition.RightBottom}">
                     <Setter Property="Background" Value="{StaticResource ButtonSelected}"/>
                     <Setter Property="Foreground" Value="White"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style x:Key="StyleButtonBold" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding FontBold}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BoldbuttonSelected}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="StyleButtonOutline" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Outline}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource BoldbuttonSelected}"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -103,7 +125,7 @@
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="300" MinWidth="250"/>
+                <ColumnDefinition Width="310" MinWidth="250"/>
                 <ColumnDefinition Width="8"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
@@ -825,7 +847,11 @@
 
                             <StackPanel Orientation="Vertical">
                                 <Border Height="5"/>
-                                <CheckBox IsChecked="{Binding DB.Image_Labels.Enabled}">Visible</CheckBox>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox IsChecked="{Binding DB.Image_Labels.Enabled}" VerticalAlignment="Center" VerticalContentAlignment="Center">Visible</CheckBox>
+                                    <Border Width="10"/>
+                                    <CheckBox IsChecked="{Binding DB.Set.AutoRedraw_Labels}" VerticalAlignment="Center" VerticalContentAlignment="Center">Auto Redraw</CheckBox>
+                                </StackPanel>
 
                                 <Separator Background="LightGray" Margin="0,4,0,4"/>
 
@@ -877,7 +903,17 @@
                                                     <TextBox Width="20" Height="16" VerticalContentAlignment="Center" VerticalAlignment="Center"
                                                                      FontSize="10" Text="{Binding FontSize}"
                                                                      GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
-                                                    <CheckBox IsChecked="{Binding FontBold}" VerticalAlignment="Center" VerticalContentAlignment="Center">B</CheckBox>
+
+                                                    <Button Padding="-3" Tag="{Binding InstanceID}" Width="18" Height="14" Click="Label_Bold_Click"
+                                                            FontSize="10" FontWeight="Bold" TextOptions.TextFormattingMode="Display"
+                                                            Style="{StaticResource StyleButtonBold}">B</Button>
+                                                    <Border Width="1"/>
+                                                    <Button Padding="-3" Tag="{Binding InstanceID}" Width="14" Height="14" Click="Label_Outline_Click"
+                                                            FontSize="10" FontWeight="Normal" TextOptions.TextFormattingMode="Display"
+                                                            Style="{StaticResource StyleButtonOutline}">
+                                                        <Rectangle Width="8" Height="8" Stroke="white" StrokeThickness="2.5"/>
+                                                    </Button>
+
                                                 </StackPanel>
 
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

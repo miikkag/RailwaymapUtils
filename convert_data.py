@@ -134,6 +134,8 @@ class OSMNodesHandler ( xml.sax.ContentHandler ):
 				if (attr_k=="railway"):
 					if (attr_v=="rail") or (attr_v=="abandoned") or (attr_v=="disused") or (attr_v=="narrow_gauge"):
 						self.way.railway = True
+					#if (attr_v=="station"):
+					#	self.way.stationway = True
 				self.way.tags.append( (attr_k, attr_v) )
 				self.state = osmst.WAY_TAG
 			else:
@@ -310,19 +312,27 @@ for t in use_targets:
 	
 	print ("PARSE OSM:  elements=" + str(handler.elementcount) + "  nodes=" + str(handler.nodecount) + "  ways=" + str(handler.waycount) + "  relations=" + str(handler.relcount))
 	
-	print (f"{CLEAR}Creating index 1...", end='')
+	sys.stdout.write (f"{CLEAR}Creating index 1/5...")
+	sys.stdout.flush()
 	c.execute ( "CREATE INDEX node_tags_index ON node_tags ( node_id );" )
-	print (f"{CLEAR}Creating index 2...", end='')
+
+	sys.stdout.write (f"{CLEAR}Creating index 2/5...")
+	sys.stdout.flush()
 	c.execute ( "CREATE INDEX way_nodes_index ON way_nodes ( way_id );" )
-	print (f"{CLEAR}Creating index 3...", end='')
+
+	sys.stdout.write (f"{CLEAR}Creating index 3/5...")
+	sys.stdout.flush()
 	c.execute ( "CREATE INDEX way_tags_index ON way_tags ( way_id );" )
-	print (f"{CLEAR}Creating index 4...", end='')
+
+	sys.stdout.write (f"{CLEAR}Creating index 4/5...")
+	sys.stdout.flush()
 	c.execute ( "CREATE INDEX relation_members_index ON relation_members ( relation_id );" )
 
-	print (f"{CLEAR}Creating index 4...", end='')
+	sys.stdout.write (f"{CLEAR}Creating index 5/5...")
+	sys.stdout.flush()
 	c.execute ( "CREATE INDEX node_idx ON nodes ( id );" )
 	
-	print("")
+	print(f"Done target {t}")
 	
 	conn.close()
 	

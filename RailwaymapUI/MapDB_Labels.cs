@@ -92,6 +92,34 @@ namespace RailwaymapUI
             }
         }
 
+        public void Flip_Bold(Guid g)
+        {
+            foreach (LabelCoordinate l in Items)
+            {
+                if (l.InstanceID == g)
+                {
+                    l.FontBold = !l.FontBold;
+                    l.Refresh();
+
+                    break;
+                }
+            }
+        }
+
+        public void Flip_Outline(Guid g)
+        {
+            foreach (LabelCoordinate l in Items)
+            {
+                if (l.InstanceID == g)
+                {
+                    l.Outline = !l.Outline;
+                    l.Refresh();
+
+                    break;
+                }
+            }
+        }
+
         public bool Is_Editing()
         {
             return (EditInstance != null);
@@ -123,6 +151,7 @@ namespace RailwaymapUI
                 str.Append("fontname"  + Commons.DELIMs + l.FontName             + Commons.DELIMs_ST);
                 str.Append("fontsize"  + Commons.DELIMs + l.FontSize.ToString()  + Commons.DELIMs_ST);
                 str.Append("fontbold"  + Commons.DELIMs + l.FontBold.ToString()  + Commons.DELIMs_ST);
+                str.Append("outline"   + Commons.DELIMs + l.Outline.ToString());
 
                 result.Add(str.ToString());
             }
@@ -144,6 +173,7 @@ namespace RailwaymapUI
                 string fontname = Set.Label_FontName_Default;
                 int fontsize = Set.Label_FontSize_Default;
                 bool fontbold = Set.Label_FontBold_Default;
+                bool outline = false;
 
                 foreach (string pair in items)
                 {
@@ -176,11 +206,15 @@ namespace RailwaymapUI
                             case "fontbold":
                                 bool.TryParse(parts[1], out fontbold);
                                 break;
+
+                            case "outline":
+                                bool.TryParse(parts[1], out outline);
+                                break;
                         }
                     }
                 }
 
-                Items.Add(new LabelCoordinate(name, latitude, longitude, fontname, fontsize, fontbold));
+                Items.Add(new LabelCoordinate(name, latitude, longitude, fontname, fontsize, fontbold, outline));
             }
         }
     }

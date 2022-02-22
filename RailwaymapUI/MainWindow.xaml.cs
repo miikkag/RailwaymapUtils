@@ -170,6 +170,11 @@ namespace RailwaymapUI
             else if (DB.Labels.Is_Editing())
             {
                 DB.Labels.SetItemLocation((int)zoomer.Cursor_Point.X, (int)zoomer.Cursor_Point.Y);
+
+                if (DB.Set.AutoRedraw_Labels)
+                {
+                    DB.Reset_Single(MapItems.Labels);
+                }
             }
             else
             {
@@ -439,6 +444,11 @@ namespace RailwaymapUI
                 Guid g = (Guid)(sender as Button).Tag;
 
                 DB.Labels.RemoveItem(g);
+
+                if (DB.Set.AutoRedraw_Labels)
+                {
+                    DB.Reset_Single(MapItems.Labels);
+                }
             }
         }
 
@@ -455,7 +465,36 @@ namespace RailwaymapUI
         private void ApplyAllLabel_Click(object sender, RoutedEventArgs e)
         {
             DB.Labels.ApplyAllStyle();
+
+            if (DB.Set.AutoRedraw_Labels)
+            {
+                DB.Reset_Single(MapItems.Labels);
+            }
         }
+        private void Label_Bold_Click(object sender, RoutedEventArgs e)
+        {
+            Guid g = (Guid)(sender as Button).Tag;
+
+            DB.Labels.Flip_Bold(g);
+
+            if (DB.Set.AutoRedraw_Labels)
+            {
+                DB.Reset_Single(MapItems.Labels);
+            }
+        }
+
+        private void Label_Outline_Click(object sender, RoutedEventArgs e)
+        {
+            Guid g = (Guid)(sender as Button).Tag;
+
+            DB.Labels.Flip_Outline(g);
+
+            if (DB.Set.AutoRedraw_Labels)
+            {
+                DB.Reset_Single(MapItems.Labels);
+            }
+        }
+
 
 
         private void Show_HideStationMenu_Click(object sender, RoutedEventArgs e)

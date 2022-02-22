@@ -64,15 +64,18 @@ namespace RailwaymapUI
         public int Legend_FontSize { get; set; }
 
         public string Label_FontName_Default = "Arial";
-        public int Label_FontSize_Default = 14;
+        public int Label_FontSize_Default = 12;
         public bool Label_FontBold_Default = true;
 
         public Color Color_LabelText = Color.Black;
+        public Color Color_LabelOutline = Color.FromArgb(255, 255, 255);
 
         public bool Draw_Railway_All { get; set; }
         public bool Draw_Railway_Lightrail { get; set; }
         public bool Draw_Railway_Tourism { get; set; }
         public bool Draw_Railway_Unset { get; set; }
+
+        public bool Draw_Station_Buildings { get; set; }
 
         public bool Draw_Border { get; set; }
         public int Border_Thickness { get; set; }
@@ -108,7 +111,9 @@ namespace RailwaymapUI
 
 
         public bool AutoRedraw_Cities { get; set; }
-        public bool AutoRedraw_Sites { get; set; }
+        public bool AutoRedraw_Labels { get; set; }
+
+        
 
 
         private ScalePosition scale_pos;
@@ -161,6 +166,8 @@ namespace RailwaymapUI
             Draw_Railway_All = false;
             Draw_Railway_Tourism = false;
             Draw_Railway_Unset = false;
+
+            Draw_Station_Buildings = true;
 
             Draw_Border = true;
             Border_Thickness = 1;
@@ -276,8 +283,8 @@ namespace RailwaymapUI
                             AutoRedraw_Cities = val_bool;
                             break;
 
-                        case "AutoRedraw_Sites":
-                            AutoRedraw_Sites = val_bool;
+                        case "AutoRedraw_Labels":
+                            AutoRedraw_Labels = val_bool;
                             break;
 
                         case "Draw_Railway_Spur":
@@ -429,7 +436,7 @@ namespace RailwaymapUI
             str = CONFIG_PREFIX + "AutoRedraw_Cities=" + AutoRedraw_Cities.ToString();
             result.Add(str);
 
-            str = CONFIG_PREFIX + "AutoRedraw_Sites=" + AutoRedraw_Sites.ToString();
+            str = CONFIG_PREFIX + "AutoRedraw_Labels=" + AutoRedraw_Labels.ToString();
             result.Add(str);
 
             str = CONFIG_PREFIX + "Draw_Railway_Spur=" + Draw_Railway_All.ToString();
