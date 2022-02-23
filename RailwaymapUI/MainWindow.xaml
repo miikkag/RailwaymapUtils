@@ -392,7 +392,7 @@
 
                                         </Grid>
 
-                                        <ItemsControl ItemsSource="{Binding DB.CountryColors}">
+                                        <ItemsControl ItemsSource="{Binding DB.CountryColors.Items}">
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
                                                     <StackPanel Orientation="Vertical"/>

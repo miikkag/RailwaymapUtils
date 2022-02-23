@@ -11,7 +11,7 @@ namespace RailwaymapUI
     {
         public ObservableCollection<LabelCoordinate> Items { get; set; }
 
-        public const string LABEL_CONF_START = "LBL.";
+        public const string CONFIG_PREFIX = "LBL.";
 
         public string FontName { get; set; }
         public int FontSize { get; set; }
@@ -92,7 +92,7 @@ namespace RailwaymapUI
             }
         }
 
-        public void Flip_Bold(Guid g)
+        public void FlipBold(Guid g)
         {
             foreach (LabelCoordinate l in Items)
             {
@@ -106,7 +106,7 @@ namespace RailwaymapUI
             }
         }
 
-        public void Flip_Outline(Guid g)
+        public void FlipOutline(Guid g)
         {
             foreach (LabelCoordinate l in Items)
             {
@@ -120,7 +120,7 @@ namespace RailwaymapUI
             }
         }
 
-        public bool Is_Editing()
+        public bool IsEditing()
         {
             return (EditInstance != null);
         }
@@ -137,13 +137,13 @@ namespace RailwaymapUI
             }
         }
 
-        public List<string> Get_Config()
+        public List<string> GetConfig()
         {
             List<string> result = new List<string>();
 
             foreach (LabelCoordinate l in Items)
             {
-                StringBuilder str = new StringBuilder(LABEL_CONF_START);
+                StringBuilder str = new StringBuilder(CONFIG_PREFIX);
 
                 str.Append("name"      + Commons.DELIMs + l.Name                 + Commons.DELIMs_ST);
                 str.Append("latitude"  + Commons.DELIMs + l.Latitude.ToString()  + Commons.DELIMs_ST);
@@ -159,13 +159,13 @@ namespace RailwaymapUI
             return result;
         }
 
-        public void Set_Config(List<string> data)
+        public void SetConfig(List<string> data)
         {
             Items.Clear();
 
             foreach (string str in data)
             {
-                string[] items = str.Substring(LABEL_CONF_START.Length).Split(Commons.DELIM_ST);
+                string[] items = str.Substring(CONFIG_PREFIX.Length).Split(Commons.DELIMs_ST.ToCharArray());
 
                 string name = "";
                 double latitude = 0;
@@ -177,7 +177,7 @@ namespace RailwaymapUI
 
                 foreach (string pair in items)
                 {
-                    string[] parts = pair.Split(Commons.DELIM, 2);
+                    string[] parts = pair.Split(Commons.DELIMs.ToCharArray(), 2);
 
                     if (parts.Length == 2)
                     {

@@ -50,6 +50,17 @@ namespace RailwaymapUI
             InstanceID = Guid.NewGuid();
         }
 
+        public ColorCoordinate(int color)
+        {
+            Name = "";
+            Latitude = 0.0;
+            Longitude = 0.0;
+
+            ColorValue = color;
+
+            InstanceID = Guid.NewGuid();
+        }
+
         public ColorCoordinate(string name, double lat, double lon, string colorhex)
         {
             Name = name;

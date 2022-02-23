@@ -159,15 +159,15 @@ namespace RailwaymapUI
 
         private void Selection_Handle_Update(object sender, RoutedEventArgs e)
         {
-            if (DB.IsEditing_CountryColor())
+            if (DB.CountryColors.IsEditing())
             {
-                DB.Set_CountryColorLocation((int)zoomer.Cursor_Point.X, (int)zoomer.Cursor_Point.Y);
+                DB.CountryColors.SetItemLocation((int)zoomer.Cursor_Point.X, (int)zoomer.Cursor_Point.Y);
             }
             else if (DB.IsEditing_BorderPatchLine())
             {
                 DB.Set_BorderPatchLineLocation((int)zoomer.Cursor_Point.X, (int)zoomer.Cursor_Point.Y);
             }
-            else if (DB.Labels.Is_Editing())
+            else if (DB.Labels.IsEditing())
             {
                 DB.Labels.SetItemLocation((int)zoomer.Cursor_Point.X, (int)zoomer.Cursor_Point.Y);
 
@@ -383,7 +383,7 @@ namespace RailwaymapUI
 
         private void AddCountryColor_Click(object sender, RoutedEventArgs e)
         {
-            DB.AddCountryColor();
+            DB.CountryColors.NewItem();
         }
 
         private void RemoveCountryColor_Click(object sender, RoutedEventArgs e)
@@ -392,7 +392,7 @@ namespace RailwaymapUI
             {
                 Guid g = (Guid)(sender as Button).Tag;
 
-                DB.RemoveCountryColor(g);
+                DB.CountryColors.RemoveItem(g);
             }
         }
 
@@ -401,8 +401,7 @@ namespace RailwaymapUI
             if (sender != null)
             {
                 Guid g = (Guid)(sender as Button).Tag;
-
-                DB.Set_CountryColorInstance(g);
+                DB.CountryColors.SetEditInstance(g);
             }
         }
 
@@ -475,7 +474,7 @@ namespace RailwaymapUI
         {
             Guid g = (Guid)(sender as Button).Tag;
 
-            DB.Labels.Flip_Bold(g);
+            DB.Labels.FlipBold(g);
 
             if (DB.Set.AutoRedraw_Labels)
             {
@@ -487,7 +486,7 @@ namespace RailwaymapUI
         {
             Guid g = (Guid)(sender as Button).Tag;
 
-            DB.Labels.Flip_Outline(g);
+            DB.Labels.FlipOutline(g);
 
             if (DB.Set.AutoRedraw_Labels)
             {

@@ -34,8 +34,8 @@ namespace RailwaymapUI
 
         public Point Cursor_Point;
 
-        private double[] zoomfactors = new double[10]
-        { 0.25, 0.50, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0};
+        private double[] zoomfactors = new double[9]
+        { 0.25, 0.50, 0.75, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 
         private const int zoomindex_default = 3;
         private int zoomindex = zoomindex_default;

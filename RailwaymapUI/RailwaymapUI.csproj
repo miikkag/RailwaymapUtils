@@ -104,6 +104,7 @@
     <Compile Include="LandareaCache.cs" />
     <Compile Include="LandareaDrawSegment.cs" />
     <Compile Include="LandAreaSegment.cs" />
+    <Compile Include="MapDB_CountryColors.cs" />
     <Compile Include="MapDB_Labels.cs" />
     <Compile Include="MapImage_CountryColors.cs" />
     <Compile Include="MapImage_Labels.cs" />

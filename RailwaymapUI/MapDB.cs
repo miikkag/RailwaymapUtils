@@ -82,12 +82,11 @@ namespace RailwaymapUI
         public DrawSettings Set { get; private set; }
 
         public MapDB_Labels Labels { get; private set; }
+        public MapDB_CountryColors CountryColors { get; private set; }
 
         public List<StationItem> Stations { get; private set; }
         public List<StationItem> Stations_Highlight { get; private set; }
 
-        public ObservableCollection<ColorCoordinate> CountryColors { get; private set; }
-        private Guid? CountryColorEdit_Instance;
 
         public ObservableCollection<PatchLine> BorderPatchLines { get; private set; }
         private Guid? BorderPatchLineEdit_Instance;
@@ -170,6 +169,7 @@ namespace RailwaymapUI
             Set = new DrawSettings();
 
             Labels = new MapDB_Labels(Set);
+            CountryColors = new MapDB_CountryColors(Set);
 
             bounds = new Bounds();
             bxy = null;
@@ -196,9 +196,6 @@ namespace RailwaymapUI
             selection_y1 = 0;
             selection_y2 = 0;
             SearchStationText = "";
-
-            CountryColors = new ObservableCollection<ColorCoordinate>();
-            CountryColorEdit_Instance = null;
 
             BorderPatchLines = new ObservableCollection<PatchLine>();
             BorderPatchLineEdit_Instance = null;
@@ -453,27 +450,6 @@ namespace RailwaymapUI
             }
         }
 
-        public void AddCountryColor()
-        {
-            ColorCoordinate cc = new ColorCoordinate();
-
-            cc.ColorValue = Set.ColorValue_CountryColorDefault;
-
-            CountryColors.Add(cc);
-        }
-
-        public void RemoveCountryColor(Guid g)
-        {
-            foreach (ColorCoordinate c in CountryColors)
-            {
-                if (c.InstanceID == g)
-                {
-                    CountryColors.Remove(c);
-                    break;
-                }
-            }
-        }
-
         public void AddBorderPatchLine()
         {
             PatchLine p = new PatchLine(Set.Color_Border);
@@ -491,11 +467,6 @@ namespace RailwaymapUI
                     break;
                 }
             }
-        }
-
-        public bool IsEditing_CountryColor()
-        {
-            return (CountryColorEdit_Instance != null);
         }
 
         public bool IsEditing_BorderPatchLine()
@@ -597,34 +568,6 @@ namespace RailwaymapUI
             }
 
             UpdateSelection();
-        }
-
-        public void Set_CountryColorInstance(Guid g)
-        {
-            CountryColorEdit_Instance = g;
-        }
-
-        public void Set_CountryColorLocation(int x, int y)
-        {
-            double lon = Commons.MapX2Lon(x, bxy);
-            double lat = Commons.MapY2Lat(y, bxy);
-
-            if (CountryColorEdit_Instance != null)
-            {
-                foreach(ColorCoordinate c in CountryColors)
-                {
-                    if (c.InstanceID == CountryColorEdit_Instance)
-                    {
-                        c.Latitude = lat;
-                        c.Longitude = lon;
-
-                        c.Refresh();
-
-                        CountryColorEdit_Instance = null;
-                        break;
-                    }
-                }
-            }
         }
 
         public void Set_BorderPatchLineInstance(Guid g)
@@ -865,7 +808,6 @@ namespace RailwaymapUI
 
         private const string DB_CONFIG_PREFIX = "DB.";
         private const string STATION_CONFIG_PREFIX = "Station.";
-        private const string COUNTRYCOLOR_CONFIG_REFIX = "CC.";
         private const string BORDERPATCHLINE_CONFIG_PREFIX = "BPATCH.";
 
         public void Save_Config()
@@ -901,18 +843,8 @@ namespace RailwaymapUI
                     all.Add(str.ToString());
                 }
 
-                foreach (ColorCoordinate cc in CountryColors)
-                {
-                    StringBuilder str = new StringBuilder(COUNTRYCOLOR_CONFIG_REFIX);
-                    str.Append("name"  + Commons.DELIMs + cc.Name                 + Commons.DELIMs_ST);
-                    str.Append("lat"   + Commons.DELIMs + cc.Latitude.ToString()  + Commons.DELIMs_ST);
-                    str.Append("lon"   + Commons.DELIMs + cc.Longitude.ToString() + Commons.DELIMs_ST);
-                    str.Append("color" + Commons.DELIMs + cc.ColorHex);
-
-                    all.Add(str.ToString());
-                }
-
-                all.AddRange(Labels.Get_Config());
+                all.AddRange(CountryColors.GetConfig());
+                all.AddRange(Labels.GetConfig());
 
                 foreach (PatchLine p in BorderPatchLines)
                 {
@@ -971,6 +903,7 @@ namespace RailwaymapUI
                             bxy = new BoundsXY(x_max, x_min, y_max, y_min, scale);
 
                             Labels.SetBounds(bxy);
+                            CountryColors.SetBounds(bxy);
                         }
                         else
                         {
@@ -998,12 +931,12 @@ namespace RailwaymapUI
                     return;
                 }
 
-                CountryColors.Clear();
                 BorderPatchLines.Clear();
 
                 string[] lines = File.ReadAllLines(AreaConfigFilename);
 
                 List<string> label_items = new List<string>();
+                List<string> cc_items = new List<string>();
 
                 Set.Read_Config(lines);
 
@@ -1134,52 +1067,13 @@ namespace RailwaymapUI
                             }
                         }
                     }
-                    else if (str.StartsWith(MapDB_Labels.LABEL_CONF_START))
+                    else if (str.StartsWith(MapDB_Labels.CONFIG_PREFIX))
                     {
                         label_items.Add(str);
                     }
-                    else if (str.StartsWith(COUNTRYCOLOR_CONFIG_REFIX))
+                    else if (str.StartsWith(MapDB_CountryColors.CONFIG_PREFIX))
                     {
-                        string[] items = str.Substring(COUNTRYCOLOR_CONFIG_REFIX.Length).Split(Commons.DELIM_ST);
-
-                        string name = "";
-                        double latitude = 0;
-                        double longitude = 0;
-                        string colorhex = "";
-
-                        foreach (string pair in items)
-                        {
-                            string[] parts = pair.Split(Commons.DELIM, 2);
-
-                            if (parts.Length == 2)
-                            {
-                                switch (parts[0])
-                                {
-                                    case "name":
-                                        name = parts[1];
-                                        break;
-
-                                    case "lat":
-                                        double.TryParse(parts[1], out latitude);
-                                        break;
-
-                                    case "lon":
-                                        double.TryParse(parts[1], out longitude);
-                                        break;
-
-                                    case "color":
-                                        colorhex = parts[1];
-                                        break;
-                                }
-                            }
-                        }
-
-                        if (colorhex != "")
-                        {
-                            ColorCoordinate cc = new ColorCoordinate(name, latitude, longitude, colorhex);
-
-                            CountryColors.Add(cc);
-                        }
+                        cc_items.Add(str);
                     }
                     else if (str.StartsWith(BORDERPATCHLINE_CONFIG_PREFIX))
                     {
@@ -1233,7 +1127,8 @@ namespace RailwaymapUI
                         BorderPatchLines.Add(p);
                     }
 
-                    Labels.Set_Config(label_items);
+                    Labels.SetConfig(label_items);
+                    CountryColors.SetConfig(cc_items);
                 }
             }
 
@@ -1329,7 +1224,7 @@ namespace RailwaymapUI
                     {
                         db_file = "country colors";
 
-                        Image_CountryColors.Draw(bxy, bounds, Set, Progress, CountryColors.ToList(), Image_Landarea, Image_Water, Image_Borders);
+                        Image_CountryColors.Draw(bxy, bounds, Set, Progress, CountryColors.Items.ToList(), Image_Landarea, Image_Water, Image_Borders);
 
                         OnPropertyChanged("Image_CountryColors");
                     }
