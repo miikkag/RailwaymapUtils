@@ -83,13 +83,11 @@ namespace RailwaymapUI
 
         public MapDB_Labels Labels { get; private set; }
         public MapDB_CountryColors CountryColors { get; private set; }
+        public MapDB_BorderPatch BorderPatch { get; private set; }
 
         public List<StationItem> Stations { get; private set; }
         public List<StationItem> Stations_Highlight { get; private set; }
 
-
-        public ObservableCollection<PatchLine> BorderPatchLines { get; private set; }
-        private Guid? BorderPatchLineEdit_Instance;
 
         private bool _edit_stations;
         public bool EditStations { get { return _edit_stations; } set { _edit_stations = value; } }
@@ -97,8 +95,8 @@ namespace RailwaymapUI
         private bool _edit_sites;
         public bool EditSites { get { return _edit_sites; } set { _edit_sites = value; } }
 
-        private bool _edit_yeards;
-        public bool EditYards { get { return _edit_yeards; } set { _edit_yeards = value; } }
+        private bool _edit_yards;
+        public bool EditYards { get { return _edit_yards; } set { _edit_yards = value; } }
 
         private bool _edit_lightrail;
         public bool EditLightrail { get { return _edit_lightrail; } set { _edit_lightrail = value; } }
@@ -170,6 +168,7 @@ namespace RailwaymapUI
 
             Labels = new MapDB_Labels(Set);
             CountryColors = new MapDB_CountryColors(Set);
+            BorderPatch = new MapDB_BorderPatch(Set);
 
             bounds = new Bounds();
             bxy = null;
@@ -196,9 +195,6 @@ namespace RailwaymapUI
             selection_y1 = 0;
             selection_y2 = 0;
             SearchStationText = "";
-
-            BorderPatchLines = new ObservableCollection<PatchLine>();
-            BorderPatchLineEdit_Instance = null;
 
             drawlock = new object();
         }
@@ -450,29 +446,6 @@ namespace RailwaymapUI
             }
         }
 
-        public void AddBorderPatchLine()
-        {
-            PatchLine p = new PatchLine(Set.Color_Border);
-
-            BorderPatchLines.Add(p);
-        }
-
-        public void RemoveBorderPatchLine(Guid g)
-        {
-            foreach (PatchLine p in BorderPatchLines)
-            {
-                if (p.InstanceID == g)
-                {
-                    BorderPatchLines.Remove(p);
-                    break;
-                }
-            }
-        }
-
-        public bool IsEditing_BorderPatchLine()
-        {
-            return (BorderPatchLineEdit_Instance != null);
-        }
 
         private void UpdateSelection()
         {
@@ -568,58 +541,6 @@ namespace RailwaymapUI
             }
 
             UpdateSelection();
-        }
-
-        public void Set_BorderPatchLineInstance(Guid g)
-        {
-            BorderPatchLineEdit_Instance = g;
-
-            foreach (PatchLine p in BorderPatchLines)
-            {
-                if (p.InstanceID == BorderPatchLineEdit_Instance)
-                {
-                    p.Start.Latitude = 0;
-                    p.Start.Longitude = 0;
-                    p.End.Latitude = 0;
-                    p.End.Longitude = 0;
-
-                    p.Refresh();
-
-                    break;
-                }
-            }
-        }
-
-        public void Set_BorderPatchLineLocation(int x, int y)
-        {
-            double lon = Commons.MapX2Lon(x, bxy);
-            double lat = Commons.MapY2Lat(y, bxy);
-
-            if (BorderPatchLineEdit_Instance != null)
-            {
-                foreach (PatchLine p in BorderPatchLines)
-                {
-                    if (p.InstanceID == BorderPatchLineEdit_Instance)
-                    {
-                        if ((p.Start.Latitude == 0) && (p.Start.Longitude == 0))
-                        {
-                            p.Start.Latitude = lat;
-                            p.Start.Longitude = lon;
-                        }
-                        else
-                        {
-                            p.End.Latitude = lat;
-                            p.End.Longitude = lon;
-
-                            BorderPatchLineEdit_Instance = null;
-                        }
-
-                        p.Refresh();
-
-                        break;
-                    }
-                }
-            }
         }
 
 
@@ -808,7 +729,6 @@ namespace RailwaymapUI
 
         private const string DB_CONFIG_PREFIX = "DB.";
         private const string STATION_CONFIG_PREFIX = "Station.";
-        private const string BORDERPATCHLINE_CONFIG_PREFIX = "BPATCH.";
 
         public void Save_Config()
         {
@@ -845,80 +765,9 @@ namespace RailwaymapUI
 
                 all.AddRange(CountryColors.GetConfig());
                 all.AddRange(Labels.GetConfig());
-
-                foreach (PatchLine p in BorderPatchLines)
-                {
-                    StringBuilder str = new StringBuilder(BORDERPATCHLINE_CONFIG_PREFIX);
-                    str.Append("name"      + Commons.DELIMs + p.Name                       + Commons.DELIMs_ST);
-                    str.Append("start.lat" + Commons.DELIMs + p.Start.Latitude.ToString()  + Commons.DELIMs_ST);
-                    str.Append("start.lon" + Commons.DELIMs + p.Start.Longitude.ToString() + Commons.DELIMs_ST);
-                    str.Append("end.lat"   + Commons.DELIMs + p.End.Latitude.ToString()    + Commons.DELIMs_ST);
-                    str.Append("end.lon"   + Commons.DELIMs + p.End.Longitude.ToString());
-
-                    all.Add(str.ToString());
-                }
+                all.AddRange(BorderPatch.GetConfig());
 
                 File.WriteAllLines(AreaConfigFilename, all);
-            }
-        }
-
-        public void Load_Bounds()
-        {
-            if (BoundsFilename != "")
-            {
-                string[] lines = File.ReadAllLines(BoundsFilename);
-
-                if (lines.Length > 0)
-                {
-                    string line = lines[0].Trim();
-
-                    if (line.StartsWith("(") && line.EndsWith(")"))
-                    {
-                        line = line.Substring(1, line.Length - 2);
-
-                        string[] parts = line.Split(',');
-
-                        if (parts.Length == 4)
-                        {
-                            double.TryParse(parts[0], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double lat1);
-                            double.TryParse(parts[1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double lon1);
-                            double.TryParse(parts[2], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double lat2);
-                            double.TryParse(parts[3], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double lon2);
-
-                            bounds = new Bounds(Math.Min(lat1, lat2), Math.Max(lat1, lat2), Math.Min(lon1, lon2), Math.Max(lon1, lon2));
-
-                            double y_max = Commons.Merc_Y(bounds.Lat_max);
-                            double y_min = Commons.Merc_Y(bounds.Lat_min);
-                            double x_max = Commons.Merc_X(bounds.Lon_max);
-                            double x_min = Commons.Merc_X(bounds.Lon_min);
-
-                            double delta_x = x_max - x_min;
-                            double delta_y = y_max - y_min;
-
-                            double scalex = (double)OutputSizeWidth / delta_x;
-                            double scaley = (double)OutputSizeHeight / delta_y;
-
-                            double scale = Math.Min(scalex, scaley);
-
-                            bxy = new BoundsXY(x_max, x_min, y_max, y_min, scale);
-
-                            Labels.SetBounds(bxy);
-                            CountryColors.SetBounds(bxy);
-                        }
-                        else
-                        {
-                            MessageBox.Show("Invalid bbox file (cannot split parts).", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("Invalid bbox file (invalid line format).", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Invalid bbox file (no data).", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
             }
         }
 
@@ -931,12 +780,11 @@ namespace RailwaymapUI
                     return;
                 }
 
-                BorderPatchLines.Clear();
-
                 string[] lines = File.ReadAllLines(AreaConfigFilename);
 
                 List<string> label_items = new List<string>();
                 List<string> cc_items = new List<string>();
+                List<string> bpatch_items = new List<string>();
 
                 Set.Read_Config(lines);
 
@@ -1075,64 +923,79 @@ namespace RailwaymapUI
                     {
                         cc_items.Add(str);
                     }
-                    else if (str.StartsWith(BORDERPATCHLINE_CONFIG_PREFIX))
+                    else if (str.StartsWith(MapDB_BorderPatch.CONFIG_PREFIX))
                     {
-                        string[] items = str.Substring(BORDERPATCHLINE_CONFIG_PREFIX.Length).Split(Commons.DELIM_ST);
-
-                        string name = "";
-                        double start_latitude = 0;
-                        double start_longitude = 0;
-                        double end_latitude = 0;
-                        double end_longitude = 0;
-
-                        foreach (string pair in items)
-                        {
-                            string[] parts = pair.Split(Commons.DELIM, 2);
-
-                            if (parts.Length == 2)
-                            {
-                                switch (parts[0])
-                                {
-                                    case "name":
-                                        name = parts[1];
-                                        break;
-
-                                    case "start.lat":
-                                        double.TryParse(parts[1], out start_latitude);
-                                        break;
-
-                                    case "start.lon":
-                                        double.TryParse(parts[1], out start_longitude);
-                                        break;
-
-                                    case "end.lat":
-                                        double.TryParse(parts[1], out end_latitude);
-                                        break;
-
-                                    case "end.lon":
-                                        double.TryParse(parts[1], out end_longitude);
-                                        break;
-                                }
-                            }
-                        }
-
-                        PatchLine p = new PatchLine(Set.Color_Border);
-
-                        p.Name = name;
-                        p.Start.Latitude = start_latitude;
-                        p.Start.Longitude = start_longitude;
-                        p.End.Latitude = end_latitude;
-                        p.End.Longitude = end_longitude;
-
-                        BorderPatchLines.Add(p);
+                        bpatch_items.Add(str);
                     }
-
-                    Labels.SetConfig(label_items);
-                    CountryColors.SetConfig(cc_items);
                 }
+
+                Labels.SetConfig(label_items);
+                CountryColors.SetConfig(cc_items);
+                BorderPatch.SetConfig(bpatch_items);
             }
 
             OnPropertyChanged(string.Empty);
+        }
+
+        public void Load_Bounds()
+        {
+            if (BoundsFilename != "")
+            {
+                string[] lines = File.ReadAllLines(BoundsFilename);
+
+                if (lines.Length > 0)
+                {
+                    string line = lines[0].Trim();
+
+                    if (line.StartsWith("(") && line.EndsWith(")"))
+                    {
+                        line = line.Substring(1, line.Length - 2);
+
+                        string[] parts = line.Split(',');
+
+                        if (parts.Length == 4)
+                        {
+                            double.TryParse(parts[0], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double lat1);
+                            double.TryParse(parts[1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double lon1);
+                            double.TryParse(parts[2], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double lat2);
+                            double.TryParse(parts[3], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out double lon2);
+
+                            bounds = new Bounds(Math.Min(lat1, lat2), Math.Max(lat1, lat2), Math.Min(lon1, lon2), Math.Max(lon1, lon2));
+
+                            double y_max = Commons.Merc_Y(bounds.Lat_max);
+                            double y_min = Commons.Merc_Y(bounds.Lat_min);
+                            double x_max = Commons.Merc_X(bounds.Lon_max);
+                            double x_min = Commons.Merc_X(bounds.Lon_min);
+
+                            double delta_x = x_max - x_min;
+                            double delta_y = y_max - y_min;
+
+                            double scalex = (double)OutputSizeWidth / delta_x;
+                            double scaley = (double)OutputSizeHeight / delta_y;
+
+                            double scale = Math.Min(scalex, scaley);
+
+                            bxy = new BoundsXY(x_max, x_min, y_max, y_min, scale);
+
+                            Labels.SetBounds(bxy);
+                            CountryColors.SetBounds(bxy);
+                            BorderPatch.SetBounds(bxy);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Invalid bbox file (cannot split parts).", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Invalid bbox file (invalid line format).", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Invalid bbox file (no data).", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
         }
 
 
@@ -1183,7 +1046,7 @@ namespace RailwaymapUI
                         {
                             sqlite_border.Open();
 
-                            Image_Borders.Draw(sqlite_border, BorderPatchLines.ToList(), bxy, Progress, Set);
+                            Image_Borders.Draw(sqlite_border, BorderPatch.Items.ToList(), bxy, Progress, Set);
 
                             sqlite_border.Close();
                         }

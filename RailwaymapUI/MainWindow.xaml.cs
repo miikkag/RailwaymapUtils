@@ -163,9 +163,9 @@ namespace RailwaymapUI
             {
                 DB.CountryColors.SetItemLocation((int)zoomer.Cursor_Point.X, (int)zoomer.Cursor_Point.Y);
             }
-            else if (DB.IsEditing_BorderPatchLine())
+            else if (DB.BorderPatch.IsEditing())
             {
-                DB.Set_BorderPatchLineLocation((int)zoomer.Cursor_Point.X, (int)zoomer.Cursor_Point.Y);
+                DB.BorderPatch.SetItemLocation((int)zoomer.Cursor_Point.X, (int)zoomer.Cursor_Point.Y);
             }
             else if (DB.Labels.IsEditing())
             {
@@ -408,7 +408,7 @@ namespace RailwaymapUI
 
         private void AddBorderPatch_Click(object sender, RoutedEventArgs e)
         {
-            DB.AddBorderPatchLine();
+            DB.BorderPatch.NewItem();
         }
 
         private void RemoveBorderPatch_Click(object sender, RoutedEventArgs e)
@@ -417,7 +417,7 @@ namespace RailwaymapUI
             {
                 Guid g = (Guid)(sender as Button).Tag;
 
-                DB.RemoveBorderPatchLine(g);
+                DB.BorderPatch.RemoveItem(g);
             }
         }
 
@@ -427,7 +427,7 @@ namespace RailwaymapUI
             {
                 Guid g = (Guid)(sender as Button).Tag;
 
-                DB.Set_BorderPatchLineInstance(g);
+                DB.BorderPatch.SetEditInstance(g);
             }
         }
 

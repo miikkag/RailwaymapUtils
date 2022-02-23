@@ -560,7 +560,7 @@
                                         </Grid>
                                         <Border Height="2"/>
                                         
-                                        <ItemsControl ItemsSource="{Binding DB.BorderPatchLines}">
+                                        <ItemsControl ItemsSource="{Binding DB.BorderPatch.Items}">
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
                                                     <StackPanel Orientation="Vertical"/>
