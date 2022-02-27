@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,6 +31,8 @@ namespace RailwaymapUI
                 Font font_normal = new Font(set.FontName_Cities, (float)set.FontSize_Cities, FontStyle.Regular);
                 Font font_bold = new Font(set.FontNameBold_Cities, (float)set.FontSizeBold_Cities, FontStyle.Bold);
 
+                int color_transparent = 0;
+                int color_text = set.Color_Cities_Name.ToArgb();
 
                 for (int i = 0; i < stations_len; i++)
                 {
@@ -72,66 +75,203 @@ namespace RailwaymapUI
                         float base_offset_x;
                         float base_offset_y;
 
+                        int outline_offset_x;
+                        int outline_offset_y;
+
                         string draw_name = stations[i].display_name.Replace(@"\n", Environment.NewLine);
 
                         SizeF textsize = gr.MeasureString(draw_name, usefont);
 
                         if (stations[i].Halign_Left)
                         {
-                            base_offset_x = textsize.Width * -1;
+                            if (stations[i].rotation == 1)
+                            {
+                                // Rotate 90 left
+                                base_offset_x = textsize.Height * -1;
+                                outline_offset_x = (int)base_offset_x;
+                            }
+                            else if (stations[i].rotation == 2)
+                            {
+                                // Rotate 90 right
+                                base_offset_x = 0;
+                                outline_offset_x = (int)textsize.Height * -1;
+                            }
+                            else
+                            {
+                                base_offset_x = textsize.Width * -1;
+                                outline_offset_x = (int)base_offset_x;
+                            }
                         }
                         else if (stations[i].Halign_Right)
                         {
-                            base_offset_x = 0;
+                            if (stations[i].rotation == 1)
+                            {
+                                // Rotate 90 left
+                                base_offset_x = 0;
+                                outline_offset_x = 0;
+                            }
+                            else if (stations[i].rotation == 2)
+                            {
+                                // Rotate 90 right
+                                base_offset_x = textsize.Height;
+                                outline_offset_x = 0;
+                            }
+                            else
+                            {
+                                base_offset_x = 0;
+                                outline_offset_x = 0;
+                            }
                         }
                         else
                         {
-                            base_offset_x = (textsize.Width / 2) * -1;
+                            if (stations[i].rotation == 1)
+                            {
+                                // Rotate 90 left
+                                base_offset_x = (textsize.Height / 2) * -1;
+                                outline_offset_x = (int)base_offset_x;
+                            }
+                            else if (stations[i].rotation == 2)
+                            {
+                                // Rotate 90 right
+                                base_offset_x = (textsize.Height / 2);
+                                outline_offset_x = (int)base_offset_x * -1;
+                            }
+                            else
+                            {
+                                base_offset_x = (textsize.Width / 2) * -1;
+                                outline_offset_x = (int)base_offset_x;
+                            }
                         }
 
                         if (stations[i].Valign_Bottom)
                         {
-                            base_offset_y = 0;
+                            if (stations[i].rotation == 1)
+                            {
+                                // Rotate 90 left
+                                base_offset_y = textsize.Width;
+                                outline_offset_y = 0;
+                            }
+                            else if (stations[i].rotation == 2)
+                            {
+                                // Rotate 90 right
+                                base_offset_y = 0;
+                                outline_offset_y = 0;
+                            }
+                            else
+                            {
+                                base_offset_y = 0;
+                                outline_offset_y = 0;
+                            }
                         }
                         else if (stations[i].Valign_Top)
                         {
-                            base_offset_y = (textsize.Height) * -1;
+                            if (stations[i].rotation == 1)
+                            {
+                                // Rotate 90 left
+                                base_offset_y = 0;
+                                outline_offset_y = (int)textsize.Width * -1;
+                            }
+                            else if (stations[i].rotation == 2)
+                            {
+                                // Rotate 90 right
+                                base_offset_y = textsize.Width * -1;
+                                outline_offset_y = (int)base_offset_y;
+                            }
+                            else
+                            {
+                                base_offset_y = (textsize.Height) * -1;
+                                outline_offset_y = (int)base_offset_y;
+                            }
                         }
                         else
                         {
-                            base_offset_y = (textsize.Height / 2) * -1;
+                            if (stations[i].rotation == 1)
+                            {
+                                // Rotate 90 left
+                                base_offset_y = (textsize.Width / 2);
+                                outline_offset_y = (int)base_offset_y * -1;
+                            }
+                            else if (stations[i].rotation == 2)
+                            {
+                                // Rotate 90 right
+                                base_offset_y = (textsize.Width / 2) * -1;
+                                outline_offset_y = (int)base_offset_y;
+                            }
+                            else
+                            {
+                                base_offset_y = (textsize.Height / 2) * -1;
+                                outline_offset_y = (int)base_offset_y;
+                            }
                         }
 
                         float offset_x = base_offset_x + stations[i].offsetx;
                         float offset_y = base_offset_y + stations[i].offsety;
 
-                        gr.DrawString(draw_name, usefont, brush_font, (float)x + offset_x, (float)y + offset_y);
+                        int usex;
+                        int usey;
 
-                        int usex = (x + (int)offset_x) - 1;
-                        int usey = (y + (int)offset_y) - 1;
+                        if (stations[i].rotation == 1)
+                        {
+                            usex = 0;
+                            usey = 0;
 
-                        int endx = usex + (int)textsize.Width + 2;
-                        int endy = usey + (int)textsize.Height + 2;
+                            gr.RotateTransform(-90);
+                            gr.TranslateTransform((float)x + offset_x, (float)y + offset_y, MatrixOrder.Append);
+                        }
+                        else if (stations[i].rotation == 2)
+                        {
+                            usex = 0;
+                            usey = 0;
 
-                        int color_transparent = 0;
-                        int color_text = set.Color_Cities_Name.ToArgb();
+                            gr.RotateTransform(90);
+                            gr.TranslateTransform((float)x + offset_x, (float)y + offset_y, MatrixOrder.Append);
+                        }
+                        else
+                        {
+                            usex = x + (int)offset_x;
+                            usey = y + (int)offset_y;
+                        }
+
+                        gr.DrawString(draw_name, usefont, brush_font, (float)usex, (float)usey);
+
+                        if (stations[i].rotation != 0)
+                        {
+                            gr.ResetTransform();
+                        }
 
                         if (stations[i].outline)
                         {
-                            for (int dy = usey; dy < endy; dy++)
+                            int startx = (x + outline_offset_x + stations[i].offsetx) - 1;
+                            int starty = (y + outline_offset_y + stations[i].offsety) - 1;
+
+                            int endx;
+                            int endy;
+
+                            if (stations[i].rotation == 0)
                             {
-                                for (int dx = usex; dx < endx; dx++)
+                                endx = startx + (int)textsize.Width + 2;
+                                endy = starty + (int)textsize.Height + 2;
+                            }
+                            else
+                            {
+                                endx = startx + (int)textsize.Height + 2;
+                                endy = starty + (int)textsize.Width + 2;
+                            }
+
+                            for (int dy = starty; dy < endy; dy++)
+                            {
+                                for (int dx = startx; dx < endx; dx++)
                                 {
                                     if ((dx >= 0) && (dx < bmp.Width) && (dy >= 0) && (dy < bmp.Height))
                                     {
                                         if (Dbmp.GetPixel(dx, dy).ToArgb() == color_text)
                                         {
-                                            if ((dx > usex) && (dx > 0) && (Dbmp.GetPixel(dx - 1, dy).ToArgb() == color_transparent))
+                                            if ((dx > startx) && (dx > 0) && (Dbmp.GetPixel(dx - 1, dy).ToArgb() == color_transparent))
                                             {
                                                 Dbmp.SetPixel(dx - 1, dy, set.Color_Cities_Outline);
                                             }
 
-                                            if ((dy > usey) && (dy > 0) && (Dbmp.GetPixel(dx, dy - 1).ToArgb() == color_transparent))
+                                            if ((dy > starty) && (dy > 0) && (Dbmp.GetPixel(dx, dy - 1).ToArgb() == color_transparent))
                                             {
                                                 Dbmp.SetPixel(dx, dy - 1, set.Color_Cities_Outline);
                                             }

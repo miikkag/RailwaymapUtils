@@ -3,6 +3,23 @@ import sys
 import requests
 import time
 
+def Check_bbox(filename):
+	need_fix = False
+
+	with open(filename, "r") as f:
+		line = f.readline().rstrip()
+		if not (line.startswith('(') and line.endswith(')')):
+			need_fix = True
+			parts = line.split(',')
+	
+	if need_fix:
+		print("Fixing bbox to overpass API format")
+		with open(filename, "w") as f:
+			f.write(f"({parts[1]},{parts[0]},{parts[3]},{parts[2]})\n")
+	else:
+		print("bbox is in overpass API format")
+
+
 # ANSI codes to windows
 os.system("color")
 
@@ -63,6 +80,9 @@ else:
 
 bbox = ""
 bbox_name = sys.argv[1]
+
+Check_bbox(os.path.join("Data",bbox_name,"bbox.txt"))
+
 
 with open(os.path.join("Data",bbox_name,"bbox.txt")) as f:
 	line = f.readline().rstrip()

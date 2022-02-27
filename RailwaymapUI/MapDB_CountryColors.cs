@@ -83,10 +83,10 @@ namespace RailwaymapUI
             {
                 StringBuilder str = new StringBuilder(CONFIG_PREFIX);
 
-                str.Append("name"  + Commons.DELIMs + cc.Name                 + Commons.DELIMs_ST);
-                str.Append("lat"   + Commons.DELIMs + cc.Latitude.ToString()  + Commons.DELIMs_ST);
-                str.Append("lon"   + Commons.DELIMs + cc.Longitude.ToString() + Commons.DELIMs_ST);
-                str.Append("color" + Commons.DELIMs + cc.ColorHex);
+                str.Append("name"  + Commons.DELIM_EQ + cc.Name                 + Commons.DELIM_CONFITEMS);
+                str.Append("lat"   + Commons.DELIM_EQ + cc.Latitude.ToString()  + Commons.DELIM_CONFITEMS);
+                str.Append("lon"   + Commons.DELIM_EQ + cc.Longitude.ToString() + Commons.DELIM_CONFITEMS);
+                str.Append("color" + Commons.DELIM_EQ + cc.ColorHex);
 
                 result.Add(str.ToString());
             }
@@ -101,7 +101,7 @@ namespace RailwaymapUI
 
             foreach (string str in data)
             {
-                string[] items = str.Substring(CONFIG_PREFIX.Length).Split(Commons.DELIMs_ST.ToCharArray());
+                string[] items = str.Substring(CONFIG_PREFIX.Length).Split(Commons.DELIM_CONFITEMS.ToCharArray());
 
                 string name = "";
                 double latitude = 0;
@@ -110,7 +110,7 @@ namespace RailwaymapUI
 
                 foreach (string pair in items)
                 {
-                    string[] parts = pair.Split(Commons.DELIMs.ToCharArray(), 2);
+                    string[] parts = pair.Split(Commons.DELIM_EQ.ToCharArray(), 2);
 
                     if (parts.Length == 2)
                     {

@@ -9,6 +9,8 @@
         <Brush x:Key="AlignButtonIdle">#E0E0E0</Brush>
         <Brush x:Key="AlignbuttonSelected">#B6DBC1</Brush>
         <Brush x:Key="BoldbuttonSelected">#8BD698</Brush>
+        <Brush x:Key="Rotation1Selected">#4FC1FF</Brush>
+        <Brush x:Key="Rotation2Selected">#BF91FF</Brush>
         <Brush x:Key="ENbuttonSelected">#FF975B</Brush>
 
         <Style x:Key="StyleMainBackground" TargetType="Border">
@@ -114,6 +116,21 @@
             </Style.Triggers>
         </Style>
 
+        <Style x:Key="StyleButtonRotation" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding rotation}" Value="1">
+                    <Setter Property="Background" Value="{StaticResource Rotation1Selected}"/>
+                    <Setter Property="Foreground" Value="#FFFFFF"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding rotation}" Value="2">
+                    <Setter Property="Background" Value="{StaticResource Rotation2Selected}"/>
+                    <Setter Property="Foreground" Value="#FFFFFF"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+
 
         <Style x:Key="StyleButtonEN" TargetType="Button">
             <Setter Property="Foreground" Value="#404040"/>
@@ -201,10 +218,11 @@
                         Style="{StaticResource StyleHalign_Right}">&#xF0AF;</Button>
 
                 <Border Width="5"/>
-                <TextBox Text="{Binding display_name}" Width="82"
+                <TextBox Text="{Binding display_name}" Width="96"
                          GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
             </StackPanel>
             <Border Height="2"/>
+            
             <StackPanel Orientation="Horizontal">
                 <Button Padding="-3" Tag="{Binding id}" Width="18" Height="14" Click="Station_offsety_minus"
                         FontFamily="Segoe MDL2 Assets" FontSize="8" TextOptions.TextFormattingMode="Display">&#xE70E;</Button>
@@ -240,6 +258,13 @@
                         FontSize="10" FontWeight="Normal" TextOptions.TextFormattingMode="Display"
                         Style="{StaticResource StyleButtonOutline}">
                     <Rectangle Width="8" Height="8" Stroke="white" StrokeThickness="2.5"/>
+                </Button>
+                <Border Width="1"/>
+                <Button Padding="-3" Tag="{Binding id}" Width="14" Height="14" Click="Station_Rotation_Click"
+                        FontSize="10" FontWeight="Normal" TextOptions.TextFormattingMode="Display"
+                        FontFamily="Segoe MDL2 Assets"
+                        Style="{StaticResource StyleButtonRotation}">
+                    &#xE7AD;
                 </Button>
                 <Border Width="4"/>
 

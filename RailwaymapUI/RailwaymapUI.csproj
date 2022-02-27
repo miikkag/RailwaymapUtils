@@ -107,6 +107,7 @@
     <Compile Include="MapDB_BorderPatch.cs" />
     <Compile Include="MapDB_CountryColors.cs" />
     <Compile Include="MapDB_Labels.cs" />
+    <Compile Include="MapDB_Stations.cs" />
     <Compile Include="MapImage_CountryColors.cs" />
     <Compile Include="MapImage_Labels.cs" />
     <Compile Include="PatchLine.cs" />

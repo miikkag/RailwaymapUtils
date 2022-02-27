@@ -26,10 +26,8 @@ namespace RailwaymapUI
 
         static public double PROGRESS_INTERVAL = 200;
 
-        static public readonly char[] DELIM = new char[1] { '=' };
-        static public readonly char[] DELIM_ST = new char[1] { ';' };
-        static public readonly string DELIMs = "=";
-        static public readonly string DELIMs_ST = ";";
+        static public readonly string DELIM_EQ = "=";
+        static public readonly string DELIM_CONFITEMS = ";";
 
 
         static public double Merc_X(double lon)

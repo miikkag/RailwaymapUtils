@@ -135,7 +135,8 @@ namespace RailwaymapUI
             {
                 DB.Image_Selection.Enabled = false;
 
-                DB.Refresh_Selection(null);
+                DB.Stations.Refresh_Selection(null);
+                DB.Refresh_Selection();
             }
             else
             {
@@ -143,7 +144,8 @@ namespace RailwaymapUI
 
                 DB.Image_Selection.Enabled = true;
 
-                DB.Refresh_Selection(zoomer);
+                DB.Stations.Refresh_Selection(zoomer);
+                DB.Refresh_Selection();
             }
         }
 
@@ -182,12 +184,14 @@ namespace RailwaymapUI
 
                 if (DB.Image_Selection.Enabled)
                 {
-                    DB.Refresh_Selection(zoomer);
+                    DB.Stations.Refresh_Selection(zoomer);
                 }
                 else
                 {
-                    DB.Refresh_Selection(null);
+                    DB.Stations.Refresh_Selection(null);
                 }
+
+                DB.Refresh_Selection();
             }
         }
 
@@ -199,64 +203,94 @@ namespace RailwaymapUI
 
         private void Stations_Sort_Name(object sender, RoutedEventArgs e)
         {
-            DB.Sort_Stations(MapDB.SortOrder.Name);
+            DB.Stations.Sort_Stations(MapDB_Stations.SortOrder.Name);
         }
 
         private void Stations_Sort_Lat(object sender, RoutedEventArgs e)
         {
-            DB.Sort_Stations(MapDB.SortOrder.Lat);
+            DB.Stations.Sort_Stations(MapDB_Stations.SortOrder.Lat);
         }
 
         private void Stations_Deselect_Highlighted(object sender, RoutedEventArgs e)
         {
-            DB.Deselect_Highlighted();
+            DB.Stations.Set_Highlighted_Deselect();
         }
 
         private void Stations_EN_Highlighted(object sender, RoutedEventArgs e)
         {
-            DB.EN_Highlighted();
+            DB.Stations.Set_Highlighted_EN();
         }
 
         private void Station_valign_bottom(object sender, RoutedEventArgs e)
         {
             Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
 
-            DB.Set_Station_Valign(id, StationItem.Valign.Bottom);
+            DB.Stations.Set_Station_Valign(id, StationItem.Valign.Bottom);
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
+            }
         }
 
         private void Station_valign_center(object sender, RoutedEventArgs e)
         {
             Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
 
-            DB.Set_Station_Valign(id, StationItem.Valign.Center);
+            DB.Stations.Set_Station_Valign(id, StationItem.Valign.Center);
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
+            }
         }
 
         private void Station_valign_top(object sender, RoutedEventArgs e)
         {
             Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
 
-            DB.Set_Station_Valign(id, StationItem.Valign.Top);
+            DB.Stations.Set_Station_Valign(id, StationItem.Valign.Top);
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
+            }
         }
 
         private void Station_halign_left(object sender, RoutedEventArgs e)
         {
             Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
 
-            DB.Set_Station_Halign(id, StationItem.Halign.Left);
+            DB.Stations.Set_Station_Halign(id, StationItem.Halign.Left);
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
+            }
         }
 
         private void Station_halign_center(object sender, RoutedEventArgs e)
         {
             Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
 
-            DB.Set_Station_Halign(id, StationItem.Halign.Center);
+            DB.Stations.Set_Station_Halign(id, StationItem.Halign.Center);
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
+            }
         }
 
         private void Station_halign_right(object sender, RoutedEventArgs e)
         {
             Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
 
-            DB.Set_Station_Halign(id, StationItem.Halign.Right);
+            DB.Stations.Set_Station_Halign(id, StationItem.Halign.Right);
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
+            }
         }
 
         private void Station_Check_Click(object sender, RoutedEventArgs e)
@@ -271,14 +305,24 @@ namespace RailwaymapUI
         {
             Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
 
-            DB.Change_Bold(id);
+            DB.Stations.Flip_Station_Bold(id);
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
+            }
         }
 
         private void Station_Outline_Click(object sender, RoutedEventArgs e)
         {
             Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
 
-            DB.Change_Outline(id);
+            DB.Stations.Flip_Station_Outline(id);
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
+            }
         }
 
 
@@ -286,55 +330,106 @@ namespace RailwaymapUI
         {
             Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
 
-            DB.Change_EN(id);
+            DB.Stations.Flip_Station_EN(id);
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
+            }
         }
 
+        private void Station_Rotation_Click(object sender, RoutedEventArgs e)
+        {
+            Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
+
+            DB.Stations.Flip_Station_Rotation(id);
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
+            }
+        }
 
 
         private void Station_OffsetXPlus_Click(object sender, RoutedEventArgs e)
         {
             Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
 
-            DB.Adjust_Station_OffsetX(id, 1);
+            DB.Stations.Adjust_Station_OffsetX(id, 1);
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
+            }
         }
         private void Station_OffsetXMinus_Click(object sender, RoutedEventArgs e)
         {
             Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
 
-            DB.Adjust_Station_OffsetX(id, -1);
+            DB.Stations.Adjust_Station_OffsetX(id, -1);
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
+            }
         }
         private void Station_OffsetYPlus_Click(object sender, RoutedEventArgs e)
         {
             Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
 
-            DB.Adjust_Station_OffsetY(id, 1);
+            DB.Stations.Adjust_Station_OffsetY(id, 1);
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
+            }
         }
         private void Station_OffsetYMinus_Click(object sender, RoutedEventArgs e)
         {
             Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
 
-            DB.Adjust_Station_OffsetY(id, -1);
+            DB.Stations.Adjust_Station_OffsetY(id, -1);
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
+            }
         }
 
         private void Station_Dot2_Click(object sender, RoutedEventArgs e)
         {
             Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
 
-            DB.Set_Station_Dot(id, 2);
+            DB.Stations.Set_Station_Dot(id, 2);
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
+            }
         }
 
         private void Station_Dot3_Click(object sender, RoutedEventArgs e)
         {
             Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
 
-            DB.Set_Station_Dot(id, 3);
+            DB.Stations.Set_Station_Dot(id, 3);
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
+            }
         }
 
         private void Station_Dot4_Click(object sender, RoutedEventArgs e)
         {
             Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
 
-            DB.Set_Station_Dot(id, 4);
+            DB.Stations.Set_Station_Dot(id, 4);
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
+            }
         }
 
         private void ScalePosition_Click(object sender, RoutedEventArgs e)
@@ -509,19 +604,28 @@ namespace RailwaymapUI
 
             if (tagstr == "station")
             {
-                DB.HideAll(StationItemType.Station);
+                DB.Stations.Set_All_Deselected(StationItemType.Station);
             }
             else if (tagstr == "lightrail")
             {
-                DB.HideAll(StationItemType.Lightrail);
+                DB.Stations.Set_All_Deselected(StationItemType.Lightrail);
             }
             else if (tagstr == "site")
             {
-                DB.HideAll(StationItemType.Site);
+                DB.Stations.Set_All_Deselected(StationItemType.Site);
             }
             else if (tagstr == "yard")
             {
-                DB.HideAll(StationItemType.Yard);
+                DB.Stations.Set_All_Deselected(StationItemType.Yard);
+            }
+            else if (tagstr == "building")
+            {
+                DB.Stations.Set_All_FromBuilding_Deselected();
+            }
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
             }
         }
     }

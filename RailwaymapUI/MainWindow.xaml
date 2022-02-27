@@ -90,6 +90,7 @@
             <MenuItem Header="Light Rail" Tag="lightrail" Click="HideStationsMenu_Click"/>
             <MenuItem Header="Sites" Tag="site" Click="HideStationsMenu_Click"/>
             <MenuItem Header="Yards" Tag="yard" Click="HideStationsMenu_Click"/>
+            <MenuItem Header="From Building" Tag="building" Click="HideStationsMenu_Click"/>
         </ContextMenu>
     </Window.Resources>
     <Grid>
@@ -613,6 +614,106 @@
                         </Expander>
 
                         <Separator Background="Silver" Margin="0,8,0,8"/>
+                        
+                        <Expander IsExpanded="{Binding ExpandItems.Labels}" Background="#FFEAEA">
+                            <Expander.Header>
+                                <Grid HorizontalAlignment="{Binding HorizontalAlignment, RelativeSource={RelativeSource AncestorType=ContentPresenter}, Mode=OneWayToSource}">
+                                    <TextBlock>Labels</TextBlock>
+                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" FontFamily="Segoe MDL2 Assets" FontSize="16" FontWeight="Normal" ToolTip="Refresh Image">
+                                        <Hyperlink TextDecorations="None" Foreground="Black" Click="Refresh_ImageLabels">&#xEDAB;</Hyperlink>
+                                    </TextBlock>
+                                </Grid>
+                            </Expander.Header>
+
+                            <StackPanel Orientation="Vertical">
+                                <Border Height="5"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox IsChecked="{Binding DB.Image_Labels.Enabled}" VerticalAlignment="Center" VerticalContentAlignment="Center">Visible</CheckBox>
+                                    <Border Width="10"/>
+                                    <CheckBox IsChecked="{Binding DB.Set.AutoRedraw_Labels}" VerticalAlignment="Center" VerticalContentAlignment="Center">Auto Redraw</CheckBox>
+                                </StackPanel>
+
+                                <Separator Background="LightGray" Margin="0,4,0,4"/>
+
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                        <TextBox Text="{Binding DB.Labels.FontName}" Width="100"
+                                             GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
+                                        <Border Width="3"/>
+                                        <TextBox Text="{Binding DB.Labels.FontSize}" Width="25"
+                                             GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
+                                        <Border Width="5"/>
+                                        <CheckBox IsChecked="{Binding DB.Labels.FontBold}" VerticalAlignment="Center" VerticalContentAlignment="Center">Bold</CheckBox>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Button Width="45" Height="18" FontSize="11" Click="ApplyAllLabel_Click">Set All</Button>
+                                        <Border Width="8"/>
+                                        <Button VerticalAlignment="Center" BorderThickness="0" Background="#C0C0C0" Width="18" Height="18" Click="AddLabel_Click">+</Button>
+                                    </StackPanel>
+                                </Grid>
+                                <Border Height="4"/>
+
+                                <ItemsControl ItemsSource="{Binding DB.Labels.Items}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,0,0,1">
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                                    <TextBox Width="75" Height="16" VerticalContentAlignment="Center" VerticalAlignment="Center"
+                                                                     FontSize="10" Text="{Binding Name}"
+                                                                     GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
+                                                    <Border Width="3"/>
+                                                    <TextBox Width="30" Height="16" VerticalContentAlignment="Center" VerticalAlignment="Center"
+                                                                     FontSize="10" Text="{Binding Latitude}"
+                                                                     GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
+                                                    <Border Width="2"/>
+                                                    <TextBox Width="30" Height="16" VerticalContentAlignment="Center" VerticalAlignment="Center"
+                                                                     FontSize="10" Text="{Binding Longitude}"
+                                                                     GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
+                                                    <Border Width="5"/>
+                                                    
+                                                    <TextBox Width="40" Height="16" VerticalContentAlignment="Center" VerticalAlignment="Center"
+                                                                     FontSize="10" Text="{Binding FontName}"
+                                                                     GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
+                                                    <TextBox Width="20" Height="16" VerticalContentAlignment="Center" VerticalAlignment="Center"
+                                                                     FontSize="10" Text="{Binding FontSize}"
+                                                                     GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
+
+                                                    <Button Padding="-3" Tag="{Binding InstanceID}" Width="18" Height="14" Click="Label_Bold_Click"
+                                                            FontSize="10" FontWeight="Bold" TextOptions.TextFormattingMode="Display"
+                                                            Style="{StaticResource StyleButtonBold}">B</Button>
+                                                    <Border Width="1"/>
+                                                    <Button Padding="-3" Tag="{Binding InstanceID}" Width="14" Height="14" Click="Label_Outline_Click"
+                                                            FontSize="10" FontWeight="Normal" TextOptions.TextFormattingMode="Display"
+                                                            Style="{StaticResource StyleButtonOutline}">
+                                                        <Rectangle Width="8" Height="8" Stroke="white" StrokeThickness="2.5"/>
+                                                    </Button>
+
+                                                </StackPanel>
+
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                    <Button VerticalAlignment="Center" Width="18" Height="18" Margin="0,0,1,0"
+                                                                    FontFamily="Segoe MDL2 Assets" BorderThickness="0" Background="Transparent"
+                                                                    Tag="{Binding InstanceID}" Click="EditLabel_Click">&#xE70F;</Button>
+
+                                                    <Button VerticalAlignment="Center" Width="18" Height="18"
+                                                                    FontFamily="Segoe MDL2 Assets" BorderThickness="0" Background="Transparent"
+                                                                    Tag="{Binding InstanceID}" Click="RemoveLabel_Click">&#xE74D;</Button>
+                                                </StackPanel>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <Border Height="3"/>
+                            </StackPanel>
+                        </Expander>
+
+                        <Separator Background="Silver" Margin="0,8,0,8"/>
 
                         <Expander IsExpanded="{Binding ExpandItems.Railways}" Background="#FFFFFF">
                             <Expander.Header>
@@ -715,13 +816,13 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock FontWeight="SemiBold" VerticalAlignment="Center">Edit:</TextBlock>
                                     <Border Width="5"/>
-                                    <CheckBox IsChecked="{Binding DB.EditStations}" VerticalAlignment="Center" VerticalContentAlignment="Center">Stations</CheckBox>
+                                    <CheckBox IsChecked="{Binding DB.Stations.EditStations}" VerticalAlignment="Center" VerticalContentAlignment="Center">Stations</CheckBox>
                                     <Border Width="5"/>
-                                    <CheckBox IsChecked="{Binding DB.EditSites}" VerticalAlignment="Center" VerticalContentAlignment="Center">Sites</CheckBox>
+                                    <CheckBox IsChecked="{Binding DB.Stations.EditSites}" VerticalAlignment="Center" VerticalContentAlignment="Center">Sites</CheckBox>
                                     <Border Width="5"/>
-                                    <CheckBox IsChecked="{Binding DB.EditYards}" VerticalAlignment="Center" VerticalContentAlignment="Center">Yards</CheckBox>
+                                    <CheckBox IsChecked="{Binding DB.Stations.EditYards}" VerticalAlignment="Center" VerticalContentAlignment="Center">Yards</CheckBox>
                                     <Border Width="5"/>
-                                    <CheckBox IsChecked="{Binding DB.EditLightrail}" VerticalAlignment="Center" VerticalContentAlignment="Center">Light Rail</CheckBox>
+                                    <CheckBox IsChecked="{Binding DB.Stations.EditLightrail}" VerticalAlignment="Center" VerticalContentAlignment="Center">Light Rail</CheckBox>
                                 </StackPanel>
                                 
                                 <Border Height="5"/>
@@ -734,7 +835,7 @@
                                     <Border Width="5"/>
 
                                     <TextBox Width="80" Height="18" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" FontSize="10"
-                                             Text="{Binding DB.SearchStationText,UpdateSourceTrigger=PropertyChanged}"
+                                             Text="{Binding DB.Stations.SearchStationText,UpdateSourceTrigger=PropertyChanged}"
                                              GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
 
                                     <Border Width="5"/>
@@ -746,7 +847,7 @@
                                 
                                 <Border Height="3"/>
 
-                                <ItemsControl ItemsSource="{Binding DB.Stations_Highlight}">
+                                <ItemsControl ItemsSource="{Binding DB.Stations.Items_Highlight}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" MaxWidth="{Binding ActualWidth,ElementName=LeftPanelContainer}"/>
@@ -765,6 +866,7 @@
                                                              Click_Bold="Station_Bold_Click"
                                                              Click_Outline="Station_Outline_Click"
                                                              Click_EN="Station_EN_Click"
+                                                             Click_Rotation="Station_Rotation_Click"
                                                              Click_OffsetX_Minus="Station_OffsetXMinus_Click"
                                                              Click_OffsetX_Plus="Station_OffsetXPlus_Click"
                                                              Click_OffsetY_Minus="Station_OffsetYMinus_Click"
@@ -777,7 +879,7 @@
                                 </ItemsControl>
 
 
-                                <CheckBox IsChecked="{Binding DB.ShowAllStations}">Show All</CheckBox>
+                                <CheckBox IsChecked="{Binding DB.Stations.ShowAllStations}">Show All</CheckBox>
                                 <Border Height="3"/>
                                 <StackPanel Orientation="Horizontal">
                                     <Button FontSize="10" Padding="3,0,3,1" Click="Stations_Sort_Name">
@@ -796,10 +898,10 @@
                                         </StackPanel>
                                     </Button>
                                     <Border Width="5"/>
-                                    <CheckBox IsChecked="{Binding DB.Separate_NonVisibleStations}" VerticalContentAlignment="Center">Separate non-visible</CheckBox>
+                                    <CheckBox IsChecked="{Binding DB.Stations.Separate_NonVisibleStations}" VerticalContentAlignment="Center">Separate non-visible</CheckBox>
                                 </StackPanel>
 
-                                <ItemsControl ItemsSource="{Binding DB.Stations}" Visibility="{Binding DB.ShowAllStationsVisibility}">
+                                <ItemsControl ItemsSource="{Binding DB.Stations.Items}" Visibility="{Binding DB.Stations.ShowAllStationsVisibility}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" MaxWidth="{Binding ActualWidth,ElementName=LeftPanelContainer}"/>
@@ -818,6 +920,7 @@
                                                              Click_Bold="Station_Bold_Click"
                                                              Click_Outline="Station_Outline_Click"
                                                              Click_EN="Station_EN_Click"
+                                                             Click_Rotation="Station_Rotation_Click"
                                                              Click_OffsetX_Minus="Station_OffsetXMinus_Click"
                                                              Click_OffsetX_Plus="Station_OffsetXPlus_Click"
                                                              Click_OffsetY_Minus="Station_OffsetYMinus_Click"
@@ -833,106 +936,6 @@
                             </StackPanel>
                         </Expander>
 
-                        <Separator Background="Silver" Margin="0,8,0,8"/>
-
-                        <Expander IsExpanded="{Binding ExpandItems.Labels}" Background="#FFEAEA">
-                            <Expander.Header>
-                                <Grid HorizontalAlignment="{Binding HorizontalAlignment, RelativeSource={RelativeSource AncestorType=ContentPresenter}, Mode=OneWayToSource}">
-                                    <TextBlock>Labels</TextBlock>
-                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" FontFamily="Segoe MDL2 Assets" FontSize="16" FontWeight="Normal" ToolTip="Refresh Image">
-                                        <Hyperlink TextDecorations="None" Foreground="Black" Click="Refresh_ImageLabels">&#xEDAB;</Hyperlink>
-                                    </TextBlock>
-                                </Grid>
-                            </Expander.Header>
-
-                            <StackPanel Orientation="Vertical">
-                                <Border Height="5"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <CheckBox IsChecked="{Binding DB.Image_Labels.Enabled}" VerticalAlignment="Center" VerticalContentAlignment="Center">Visible</CheckBox>
-                                    <Border Width="10"/>
-                                    <CheckBox IsChecked="{Binding DB.Set.AutoRedraw_Labels}" VerticalAlignment="Center" VerticalContentAlignment="Center">Auto Redraw</CheckBox>
-                                </StackPanel>
-
-                                <Separator Background="LightGray" Margin="0,4,0,4"/>
-
-                                <Grid>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                        <TextBox Text="{Binding DB.Labels.FontName}" Width="100"
-                                             GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
-                                        <Border Width="3"/>
-                                        <TextBox Text="{Binding DB.Labels.FontSize}" Width="25"
-                                             GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
-                                        <Border Width="5"/>
-                                        <CheckBox IsChecked="{Binding DB.Labels.FontBold}" VerticalAlignment="Center" VerticalContentAlignment="Center">Bold</CheckBox>
-                                    </StackPanel>
-
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                        <Button Width="45" Height="18" FontSize="11" Click="ApplyAllLabel_Click">Set All</Button>
-                                        <Border Width="8"/>
-                                        <Button VerticalAlignment="Center" BorderThickness="0" Background="#C0C0C0" Width="18" Height="18" Click="AddLabel_Click">+</Button>
-                                    </StackPanel>
-                                </Grid>
-                                <Border Height="4"/>
-
-                                <ItemsControl ItemsSource="{Binding DB.Labels.Items}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Vertical"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid Margin="0,0,0,1">
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                                    <TextBox Width="75" Height="16" VerticalContentAlignment="Center" VerticalAlignment="Center"
-                                                                     FontSize="10" Text="{Binding Name}"
-                                                                     GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
-                                                    <Border Width="3"/>
-                                                    <TextBox Width="30" Height="16" VerticalContentAlignment="Center" VerticalAlignment="Center"
-                                                                     FontSize="10" Text="{Binding Latitude}"
-                                                                     GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
-                                                    <Border Width="2"/>
-                                                    <TextBox Width="30" Height="16" VerticalContentAlignment="Center" VerticalAlignment="Center"
-                                                                     FontSize="10" Text="{Binding Longitude}"
-                                                                     GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
-                                                    <Border Width="5"/>
-                                                    
-                                                    <TextBox Width="40" Height="16" VerticalContentAlignment="Center" VerticalAlignment="Center"
-                                                                     FontSize="10" Text="{Binding FontName}"
-                                                                     GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
-                                                    <TextBox Width="20" Height="16" VerticalContentAlignment="Center" VerticalAlignment="Center"
-                                                                     FontSize="10" Text="{Binding FontSize}"
-                                                                     GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
-
-                                                    <Button Padding="-3" Tag="{Binding InstanceID}" Width="18" Height="14" Click="Label_Bold_Click"
-                                                            FontSize="10" FontWeight="Bold" TextOptions.TextFormattingMode="Display"
-                                                            Style="{StaticResource StyleButtonBold}">B</Button>
-                                                    <Border Width="1"/>
-                                                    <Button Padding="-3" Tag="{Binding InstanceID}" Width="14" Height="14" Click="Label_Outline_Click"
-                                                            FontSize="10" FontWeight="Normal" TextOptions.TextFormattingMode="Display"
-                                                            Style="{StaticResource StyleButtonOutline}">
-                                                        <Rectangle Width="8" Height="8" Stroke="white" StrokeThickness="2.5"/>
-                                                    </Button>
-
-                                                </StackPanel>
-
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                                    <Button VerticalAlignment="Center" Width="18" Height="18" Margin="0,0,1,0"
-                                                                    FontFamily="Segoe MDL2 Assets" BorderThickness="0" Background="Transparent"
-                                                                    Tag="{Binding InstanceID}" Click="EditLabel_Click">&#xE70F;</Button>
-
-                                                    <Button VerticalAlignment="Center" Width="18" Height="18"
-                                                                    FontFamily="Segoe MDL2 Assets" BorderThickness="0" Background="Transparent"
-                                                                    Tag="{Binding InstanceID}" Click="RemoveLabel_Click">&#xE74D;</Button>
-                                                </StackPanel>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                                <Border Height="3"/>
-                            </StackPanel>
-                        </Expander>
-                    
                         <Border Height="10"/>
                     </StackPanel>
                 </ScrollViewer>

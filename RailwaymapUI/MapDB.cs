@@ -27,7 +27,6 @@ namespace RailwaymapUI
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        public enum SortOrder { Name, Lat }
 
         private const string CONFIG_FILENAME = "area.config";
         private const string BOUNDS_FILENAME = "bbox.txt";
@@ -51,13 +50,6 @@ namespace RailwaymapUI
 
         public int OutputSizeWidth { get; set; }
         public int OutputSizeHeight { get; set; }
-
-        private int selection_x1;
-        private int selection_y1;
-        private int selection_x2;
-        private int selection_y2;
-        private int selection_ptX;
-        private int selection_ptY;
 
         public double CursorLatitude { get; private set; }
         public double CursorLongitude { get; private set; }
@@ -84,44 +76,8 @@ namespace RailwaymapUI
         public MapDB_Labels Labels { get; private set; }
         public MapDB_CountryColors CountryColors { get; private set; }
         public MapDB_BorderPatch BorderPatch { get; private set; }
+        public MapDB_Stations Stations { get; private set; }
 
-        public List<StationItem> Stations { get; private set; }
-        public List<StationItem> Stations_Highlight { get; private set; }
-
-
-        private bool _edit_stations;
-        public bool EditStations { get { return _edit_stations; } set { _edit_stations = value; } }
-
-        private bool _edit_sites;
-        public bool EditSites { get { return _edit_sites; } set { _edit_sites = value; } }
-
-        private bool _edit_yards;
-        public bool EditYards { get { return _edit_yards; } set { _edit_yards = value; } }
-
-        private bool _edit_lightrail;
-        public bool EditLightrail { get { return _edit_lightrail; } set { _edit_lightrail = value; } }
-
-        public bool Separate_NonVisibleStations { get; set; }
-
-        private bool _showallstations;
-        public bool ShowAllStations { get { return _showallstations; } set { _showallstations = value; OnPropertyChanged("ShowAllStationsVisibility"); } }
-
-        public Visibility ShowAllStationsVisibility { get { if (ShowAllStations) return Visibility.Visible; else return Visibility.Collapsed; } }
-
-        private string _searchstationtext;
-        public string SearchStationText
-        {
-            get { return _searchstationtext; }
-            set
-            {
-                if (_searchstationtext != value)
-                {
-                    _searchstationtext = value;
-
-                    UpdateSelection();
-                }
-            }
-        }
 
         private Bounds bounds;
         private BoundsXY bxy;
@@ -169,6 +125,7 @@ namespace RailwaymapUI
             Labels = new MapDB_Labels(Set);
             CountryColors = new MapDB_CountryColors(Set);
             BorderPatch = new MapDB_BorderPatch(Set);
+            Stations = new MapDB_Stations();
 
             bounds = new Bounds();
             bxy = null;
@@ -176,25 +133,6 @@ namespace RailwaymapUI
             legend = new RailwayLegend();
 
             draw_items = new DrawItems();
-
-            Stations = new List<StationItem>();
-            Stations_Highlight = new List<StationItem>();
-
-            Separate_NonVisibleStations = true;
-            ShowAllStations = false;
-
-            EditStations = true;
-            EditSites = true;
-            EditYards = true;
-            EditLightrail = true;
-
-            selection_ptX = -1;
-            selection_ptY = -1;
-            selection_x1 = 0;
-            selection_x2 = 0;
-            selection_y1 = 0;
-            selection_y2 = 0;
-            SearchStationText = "";
 
             drawlock = new object();
         }
@@ -274,276 +212,6 @@ namespace RailwaymapUI
         }
 
 
-        public void Set_Station_Valign(Int64 id, StationItem.Valign valign)
-        {
-            foreach (StationItem st in Stations)
-            {
-                if (st.id == id)
-                {
-                    st.Set_Valign(valign);
-
-                    break;
-                }
-            }
-
-            if (Set.AutoRedraw_Cities)
-            {
-                Reset_Single(MapItems.Cities);
-            }
-        }
-
-        public void Set_Station_Halign(Int64 id, StationItem.Halign halign)
-        {
-            foreach (StationItem st in Stations)
-            {
-                if (st.id == id)
-                {
-                    st.Set_Halign(halign);
-
-                    break;
-                }
-            }
-
-            if (Set.AutoRedraw_Cities)
-            {
-                Reset_Single(MapItems.Cities);
-            }
-        }
-
-        public void Adjust_Station_OffsetX(Int64 id, int adjust)
-        {
-            foreach (StationItem st in Stations)
-            {
-                if (st.id == id)
-                {
-                    st.offsetx += adjust;
-                    st.Force_Refresh();
-
-                    break;
-                }
-            }
-
-            if (Set.AutoRedraw_Cities)
-            {
-                Reset_Single(MapItems.Cities);
-            }
-        }
-
-        public void Adjust_Station_OffsetY(Int64 id, int adjust)
-        {
-            foreach (StationItem st in Stations)
-            {
-                if (st.id == id)
-                {
-                    st.offsety += adjust;
-                    st.Force_Refresh();
-
-                    break;
-                }
-            }
-
-            if (Set.AutoRedraw_Cities)
-            {
-                Reset_Single(MapItems.Cities);
-            }
-        }
-
-        public void Change_Bold(Int64 id)
-        {
-            foreach (StationItem st in Stations)
-            {
-                if (st.id == id)
-                {
-                    st.bold = !st.bold;
-                    st.Force_Refresh();
-
-                    break;
-                }
-            }
-
-            if (Set.AutoRedraw_Cities)
-            {
-                Reset_Single(MapItems.Cities);
-            }
-        }
-
-        public void Change_Outline(Int64 id)
-        {
-            foreach (StationItem st in Stations)
-            {
-                if (st.id == id)
-                {
-                    st.outline = !st.outline;
-                    st.Force_Refresh();
-
-                    break;
-                }
-            }
-
-            if (Set.AutoRedraw_Cities)
-            {
-                Reset_Single(MapItems.Cities);
-            }
-        }
-
-
-        public void Change_EN(Int64 id)
-        {
-            foreach (StationItem st in Stations)
-            {
-                if (st.id == id)
-                {
-                    st.english = !st.english;
-                    st.Force_Refresh();
-
-                    break;
-                }
-            }
-
-            if (Set.AutoRedraw_Cities)
-            {
-                Reset_Single(MapItems.Cities);
-            }
-        }
-
-        public void HideAll(StationItemType hide_type)
-        {
-            foreach (StationItem st in Stations)
-            {
-                if (st.Type == hide_type)
-                {
-                    if (st.visible)
-                    {
-                        st.visible = false;
-                        st.Force_Refresh();
-                    }
-                }
-            }
-
-            if (Set.AutoRedraw_Cities)
-            {
-                Reset_Single(MapItems.Cities);
-            }
-        }
-
-
-        public void Set_Station_Dot(Int64 id, int dotsize)
-        {
-            foreach (StationItem st in Stations)
-            {
-                if (st.id == id)
-                {
-                    st.dotsize = dotsize;
-                    st.Force_Refresh();
-
-                    break;
-                }
-            }
-
-            if (Set.AutoRedraw_Cities)
-            {
-                Reset_Single(MapItems.Cities);
-            }
-        }
-
-
-        private void UpdateSelection()
-        {
-            Stations_Highlight = new List<StationItem>();
-
-            if ((selection_ptX >= 0) && (selection_ptY >= 0))
-            {
-                foreach (StationItem st in Stations)
-                {
-                    bool set = false;
-
-                    if ((st.coordX >= selection_x1) && (st.coordX <= selection_x2))
-                    {
-                        if ((st.coordY >= selection_y1) && (st.coordY <= selection_y2))
-                        {
-                            bool set_this = true;
-
-                            if ((st.Type == StationItemType.Station) && !EditStations)
-                            {
-                                set_this = false;
-                            }
-                            else if ((st.Type == StationItemType.Site) && !EditSites)
-                            {
-                                set_this = false;
-                            }
-                            else if ((st.Type == StationItemType.Yard) && !EditYards)
-                            {
-                                set_this = false;
-                            }
-                            else if ((st.Type == StationItemType.Lightrail) && !EditLightrail)
-                            {
-                                set_this = false;
-                            }
-
-                            if (set_this)
-                            {
-                                if (SearchStationText != "")
-                                {
-                                    if (!st.name.Contains(SearchStationText, StringComparison.OrdinalIgnoreCase) && !st.name_en.Contains(SearchStationText, StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        set_this = false;
-                                    }
-                                }
-                            }
-
-                            if (set_this)
-                            {
-                                Stations_Highlight.Add(st);
-
-                                set = true;
-                            }
-                        }
-                    }
-
-                    st.Highlighted = set;
-                }
-            }
-            else
-            {
-                foreach (StationItem st in Stations)
-                {
-                    st.Highlighted = false;
-                }
-            }
-
-            Stations_Highlight.Sort(Compare_Stations_Latitude);
-
-            OnPropertyChanged("Image_Selection");
-            OnPropertyChanged("Stations_Highlight");
-        }
-
-        public void Refresh_Selection(ZoomBorder zoomer)
-        {
-            if (zoomer != null)
-            {
-                selection_ptX = (int)zoomer.Selection_Point.X;
-                selection_ptY = (int)zoomer.Selection_Point.Y;
-
-                selection_x1 = selection_ptX - (zoomer.Selection_Size / 2);
-                selection_y1 = selection_ptY - (zoomer.Selection_Size / 2);
-                selection_x2 = selection_x1 + zoomer.Selection_Size;
-                selection_y2 = selection_y1 + zoomer.Selection_Size;
-            }
-            else
-            {
-                selection_ptX = -1;
-                selection_ptY = -1;
-
-                selection_x1 = 0;
-                selection_y1 = 0;
-                selection_x2 = 0;
-                selection_y2 = 0;
-            }
-
-            UpdateSelection();
-        }
-
-
         public void Set_Cursor_Coordinates(int x, int y)
         {
             CursorLongitude = Commons.MapX2Lon(x, bxy);
@@ -555,54 +223,6 @@ namespace RailwaymapUI
             OnPropertyChanged("CursorLatitude");
             OnPropertyChanged("CursorX");
             OnPropertyChanged("CursorY");
-        }
-
-        public void Sort_Stations(SortOrder order)
-        {
-            if (order == SortOrder.Name)
-            {
-                Stations.Sort(Compare_Stations_Name);
-            }
-            else
-            {
-                Stations.Sort(Compare_Stations_Latitude);
-            }
-
-            Stations = new List<StationItem>(Stations);
-
-            OnPropertyChanged("Stations");
-        }
-
-        public void Deselect_Highlighted()
-        {
-            foreach (StationItem st in Stations_Highlight)
-            {
-                st.visible = false;
-                st.Force_Refresh();
-            }
-
-            if (Set.AutoRedraw_Cities)
-            {
-                Reset_Single(MapItems.Cities);
-            }
-        }
-
-        public void EN_Highlighted()
-        {
-            foreach (StationItem st in Stations_Highlight)
-            {
-                if (st.has_english)
-                {
-                    st.english = true;
-                    st.Force_Refresh();
-                }
-            }
-
-            if (Set.AutoRedraw_Cities)
-            {
-                Reset_Single(MapItems.Cities);
-            }
-
         }
 
 
@@ -623,27 +243,7 @@ namespace RailwaymapUI
                     try
                     {
 #endif
-                        using (SQLiteConnection sqlite_railways = new SQLiteConnection("Data Source=" + Path.Combine(area_path, DB_FILENAME_RAILWAYS)))
-                        using (SQLiteConnection sqlite_lightrail = new SQLiteConnection("Data Source=" + Path.Combine(area_path, DB_FILENAME_LIGHTRAIL)))
-                        {
-                            sqlite_railways.Open();
-                            sqlite_lightrail.Open();
-
-                            Stations.Clear();
-                            Stations = new List<StationItem>();
-
-                            Load_Stations(sqlite_railways, false);
-                            Load_Stations(sqlite_lightrail, true);
-
-                            Stations.Sort((x, y) => x.name.CompareTo(y.name));
-
-                            OnPropertyChanged("Stations");
-
-                            sqlite_lightrail.Close();
-                            sqlite_railways.Close();
-
-                            GC.Collect();
-                        }
+                    Stations.Load_Stations(Path.Combine(area_path, DB_FILENAME_RAILWAYS), Path.Combine(AreaPath, DB_FILENAME_LIGHTRAIL));
 #if !DEBUG
                     }
                     catch (Exception ex)
@@ -728,7 +328,6 @@ namespace RailwaymapUI
         }
 
         private const string DB_CONFIG_PREFIX = "DB.";
-        private const string STATION_CONFIG_PREFIX = "Station.";
 
         public void Save_Config()
         {
@@ -740,29 +339,12 @@ namespace RailwaymapUI
 
                 all.AddRange(items_set);
 
-                all.Add(DB_CONFIG_PREFIX + "OutputWidth"  + Commons.DELIMs + OutputSizeWidth.ToString());
-                all.Add(DB_CONFIG_PREFIX + "OutputHeight" + Commons.DELIMs + OutputSizeHeight.ToString());
+                all.Add(DB_CONFIG_PREFIX + "OutputWidth"  + Commons.DELIM_EQ + OutputSizeWidth.ToString());
+                all.Add(DB_CONFIG_PREFIX + "OutputHeight" + Commons.DELIM_EQ + OutputSizeHeight.ToString());
 
-                all.Add(DB_CONFIG_PREFIX + "Separate_NonVisibleStations" + Commons.DELIMs + Separate_NonVisibleStations.ToString());
+                all.Add(DB_CONFIG_PREFIX + "Separate_NonVisibleStations" + Commons.DELIM_EQ + Stations.Separate_NonVisibleStations.ToString());
 
-                foreach (StationItem st in Stations)
-                {
-                    StringBuilder str = new StringBuilder(STATION_CONFIG_PREFIX);
-                    str.Append("id"           + Commons.DELIMs + st.id.ToString()      + Commons.DELIMs_ST);
-                    str.Append("display_name" + Commons.DELIMs + st.display_name       + Commons.DELIMs_ST);
-                    str.Append("valign"       + Commons.DELIMs + st.valign.ToString()  + Commons.DELIMs_ST);
-                    str.Append("halign"       + Commons.DELIMs + st.halign.ToString()  + Commons.DELIMs_ST);
-                    str.Append("visible"      + Commons.DELIMs + st.visible.ToString() + Commons.DELIMs_ST);
-                    str.Append("bold"         + Commons.DELIMs + st.bold.ToString()    + Commons.DELIMs_ST);
-                    str.Append("outline"      + Commons.DELIMs + st.outline.ToString() + Commons.DELIMs_ST);
-                    str.Append("offsetx"      + Commons.DELIMs + st.offsetx.ToString() + Commons.DELIMs_ST);
-                    str.Append("offsety"      + Commons.DELIMs + st.offsety.ToString() + Commons.DELIMs_ST);
-                    str.Append("dotsize"      + Commons.DELIMs + st.dotsize.ToString() + Commons.DELIMs_ST);
-                    str.Append("english"      + Commons.DELIMs + st.english.ToString());
-
-                    all.Add(str.ToString());
-                }
-
+                all.AddRange(Stations.GetConfig());
                 all.AddRange(CountryColors.GetConfig());
                 all.AddRange(Labels.GetConfig());
                 all.AddRange(BorderPatch.GetConfig());
@@ -785,6 +367,7 @@ namespace RailwaymapUI
                 List<string> label_items = new List<string>();
                 List<string> cc_items = new List<string>();
                 List<string> bpatch_items = new List<string>();
+                List<string> st_items = new List<string>();
 
                 Set.Read_Config(lines);
 
@@ -792,7 +375,7 @@ namespace RailwaymapUI
                 {
                     if (str.StartsWith(DB_CONFIG_PREFIX))
                     {
-                        string[] items = str.Substring(DB_CONFIG_PREFIX.Length).Split(Commons.DELIM, 2);
+                        string[] items = str.Substring(DB_CONFIG_PREFIX.Length).Split(Commons.DELIM_EQ.ToCharArray(), 2);
 
                         int.TryParse(items[1], out int val);
 
@@ -808,112 +391,16 @@ namespace RailwaymapUI
 
                             case "Separate_NonVisibleStations":
                                 bool.TryParse(items[1], out bool tmpval);
-                                Separate_NonVisibleStations = tmpval;
+                                Stations.Separate_NonVisibleStations = tmpval;
                                 break;
 
                             default:
                                 break;
                         }
                     }
-                    else if (str.StartsWith(STATION_CONFIG_PREFIX))
+                    else if (str.StartsWith(MapDB_Stations.CONFIG_PREFIX))
                     {
-                        string[] items = str.Substring(STATION_CONFIG_PREFIX.Length).Split(Commons.DELIM_ST);
-
-                        Int64 id = -1;
-                        string display_name = "";
-                        StationItem.Valign valign = StationItem.Valign.Top;
-                        StationItem.Halign halign = StationItem.Halign.Right;
-                        bool visible = true;
-                        bool bold = false;
-                        bool outline = false;
-                        bool english = false;
-                        int offsetx = 0;
-                        int offsety = 0;
-                        int dotsize = DrawSettings.Dotsize_Station_Default;
-
-                        foreach (string pair in items)
-                        {
-                            string[] parts = pair.Split(Commons.DELIM, 2);
-
-                            if (parts.Length == 2)
-                            {
-                                switch (parts[0])
-                                {
-                                    case "id":
-                                        Int64.TryParse(parts[1], out id);
-                                        break;
-
-                                    case "display_name":
-                                        display_name = parts[1];
-                                        break;
-
-                                    case "valign":
-                                        Enum.TryParse(parts[1], out valign);
-                                        break;
-
-                                    case "halign":
-                                        Enum.TryParse(parts[1], out halign);
-                                        break;
-
-                                    case "visible":
-                                        bool.TryParse(parts[1], out visible);
-                                        break;
-
-                                    case "bold":
-                                        bool.TryParse(parts[1], out bold);
-                                        break;
-
-                                    case "outline":
-                                        bool.TryParse(parts[1], out outline);
-                                        break;
-
-                                    case "offsetx":
-                                        int.TryParse(parts[1], out offsetx);
-                                        break;
-
-                                    case "offsety":
-                                        int.TryParse(parts[1], out offsety);
-                                        break;
-
-                                    case "dotsize":
-                                        int.TryParse(parts[1], out dotsize);
-                                        break;
-
-                                    case "english":
-                                        bool.TryParse(parts[1], out english);
-                                        break;
-
-                                    default:
-                                        break;
-                                }
-                            }
-                        }
-
-                        //Console.WriteLine("Config line " + str + "  id " + id.ToString());
-
-                        if (id >= 0)
-                        {
-                            foreach (StationItem st in Stations)
-                            {
-                                if (st.id == id)
-                                {
-                                    st.valign = valign;
-                                    st.halign = halign;
-                                    st.visible = visible;
-                                    st.bold = bold;
-                                    st.outline = outline;
-                                    st.offsetx = offsetx;
-                                    st.offsety = offsety;
-                                    st.dotsize = dotsize;
-                                    st.english = english;
-                                    st.display_name = display_name; // setting english flag resets display name
-
-                                    st.Force_Refresh();
-
-                                    break;
-                                }
-                            }
-                        }
+                        st_items.Add(str);
                     }
                     else if (str.StartsWith(MapDB_Labels.CONFIG_PREFIX))
                     {
@@ -929,6 +416,7 @@ namespace RailwaymapUI
                     }
                 }
 
+                Stations.SetConfig(st_items);
                 Labels.SetConfig(label_items);
                 CountryColors.SetConfig(cc_items);
                 BorderPatch.SetConfig(bpatch_items);
@@ -1150,7 +638,7 @@ namespace RailwaymapUI
 
                         Progress.Set_Info(true, "Drawing cities", 0);
 
-                        Image_Cities.Draw(Stations, bxy, Progress, Set);
+                        Image_Cities.Draw(Stations.Items, bxy, Progress, Set);
 
                         OnPropertyChanged("Image_Cities");
                     }
@@ -1190,231 +678,9 @@ namespace RailwaymapUI
             }
         }
 
-        private void Load_Stations(SQLiteConnection conn, bool lightrail)
+        public void Refresh_Selection()
         {
-            using (SQLiteCommand cmd = new SQLiteCommand("SELECT id, lat, lon, station FROM nodes WHERE station>0;", conn))
-            {
-                SQLiteDataReader rdr = cmd.ExecuteReader();
-
-                while (rdr.Read())
-                {
-                    Int64 id = rdr.GetInt64(0);
-                    double lat = rdr.GetDouble(1);
-                    double lon = rdr.GetDouble(2);
-                    int st_num = rdr.GetInt32(3);
-
-                    string name = "";
-                    string name_en = "";
-
-                    StationItemType st_type = StationItemType.None;
-
-                    if (lightrail)
-                    {
-                        st_type = StationItemType.Lightrail;
-                    }
-                    else
-                    {
-                        if (st_num == 1)
-                        {
-                            st_type = StationItemType.Station;
-                        }
-                        else if (st_num == 2)
-                        {
-                            st_type = StationItemType.Site;
-                        }
-                        else if (st_num == 3)
-                        {
-                            st_type = StationItemType.Yard;
-                        }
-                    }
-
-                    StationItem st = new StationItem(st_type);
-
-                    using (SQLiteCommand cmd2 = new SQLiteCommand("SELECT k, v FROM node_tags WHERE node_id=" + id.ToString() + ";", conn))
-                    {
-                        SQLiteDataReader rdr2 = cmd2.ExecuteReader();
-
-                        while (rdr2.Read())
-                        {
-                            string k = rdr2.GetString(0);
-                            string v = rdr2.GetString(1);
-
-                            if (k == "name")
-                            {
-                                name = v;
-                            }
-                            else if (k == "name:en")
-                            {
-                                name_en = v;
-                            }
-                            else
-                            {
-                                // Do Nothing
-                            }
-                        }
-
-                        rdr2.Close();
-                    }
-
-                    if (name != "")
-                    {
-                        st.name = name;
-                        st.name_en = name_en;
-                        st.display_name = name;
-                        st.id = id;
-                        st.Coord = new Coordinate(lat, lon);
-                        st.from_building = false;
-
-                        if (name_en != "")
-                        {
-                            st.has_english = true;
-                        }
-                        else
-                        {
-                            st.has_english = false;
-                        }
-
-                        st.visible = true;
-
-                        Stations.Add(st);
-                    }
-                }
-
-                rdr.Close();
-            }
-
-
-            // Station building ways
-            using (SQLiteCommand cmd = new SQLiteCommand("SELECT way_id FROM way_tags WHERE k='railway' AND v='station';", conn))
-            using (SQLiteDataReader rdr = cmd.ExecuteReader())
-            {
-                while (rdr.Read())
-                {
-                    Int64 way_id = rdr.GetInt64(0);
-                    string name = "";
-                    List<Coordinate> st_coords = new List<Coordinate>();
-
-                    using (SQLiteCommand cmd_name = new SQLiteCommand("SELECT v FROM way_tags WHERE way_id=" + way_id.ToString() + " AND k='name';", conn))
-                    using (SQLiteDataReader rdr_name = cmd_name.ExecuteReader())
-                    {
-                        while (rdr_name.Read())
-                        {
-                            name = rdr_name.GetString(0);
-                            break;
-                        }
-                    }
-
-                    using (SQLiteCommand cmd_nodes = new SQLiteCommand("SELECT node_id FROM way_nodes WHERE way_id=" + way_id.ToString() + ";", conn))
-                    using (SQLiteDataReader rdr_nodes = cmd_nodes.ExecuteReader())
-                    {
-                        while (rdr_nodes.Read())
-                        {
-                            Int64 node_id = rdr_nodes.GetInt64(0);
-
-                            using (SQLiteCommand cmd_coords = new SQLiteCommand("SELECT lat, lon FROM nodes WHERE id=" + node_id.ToString() + ";", conn))
-                            using (SQLiteDataReader rdr_coords = cmd_coords.ExecuteReader())
-                            {
-                                while (rdr_coords.Read())
-                                {
-                                    double lat = rdr_coords.GetDouble(0);
-                                    double lon = rdr_coords.GetDouble(1);
-
-                                    st_coords.Add(new Coordinate(lat, lon));
-                                }
-                            }
-                        }
-                    }
-
-                    if ((st_coords.Count > 0) && (name != ""))
-                    {
-                        double avg_lat = 0;
-                        double avg_lon = 0;
-
-                        foreach (Coordinate c in st_coords)
-                        {
-                            avg_lat += c.Latitude;
-                            avg_lon += c.Longitude;
-                        }
-
-                        avg_lat /= st_coords.Count;
-                        avg_lon /= st_coords.Count;
-
-                        StationItem st = new StationItem(StationItemType.Station);
-
-                        if (lightrail)
-                        {
-                            st.Type = StationItemType.Lightrail;
-                        }
-
-                        st.name = name;
-                        st.name_en = name;
-                        st.display_name = name;
-                        st.id = way_id;
-                        st.Coord = new Coordinate(avg_lat, avg_lon);
-                        st.has_english = false;
-                        st.visible = true;
-                        st.from_building = true;
-
-                        Stations.Add(st);
-                    }
-                }
-            }
-        }
-
-        private int Compare_Stations_Name(StationItem item1, StationItem item2)
-        {
-            int result;
-
-            if (Separate_NonVisibleStations)
-            {
-                if (item1.visible == item2.visible)
-                {
-                    // Same visibility -- compare normally
-                    result = item1.name.CompareTo(item2.name);
-                }
-                else if (item1.visible == true)
-                {
-                    result = -1;
-                }
-                else
-                {
-                    result = 1;
-                }
-            }
-            else
-            {
-                result = item1.name.CompareTo(item2.name);
-            }
-
-            return result;
-        }
-
-        private int Compare_Stations_Latitude(StationItem item1, StationItem item2)
-        {
-            int result;
-
-            if (Separate_NonVisibleStations)
-            {
-                if (item1.visible == item2.visible)
-                {
-                    // Same visibility -- compare normally
-                    result = item2.Coord.Latitude.CompareTo(item1.Coord.Latitude);
-                }
-                else if (item1.visible == true)
-                {
-                    result = -1;
-                }
-                else
-                {
-                    result = 1;
-                }
-            }
-            else
-            {
-                result = item2.Coord.Latitude.CompareTo(item1.Coord.Latitude);
-            }
-
-            return result;
+            OnPropertyChanged("Image_Selection");
         }
     }
 }

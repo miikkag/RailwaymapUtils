@@ -34,6 +34,7 @@ namespace RailwaymapUI
         public event RoutedEventHandler Click_Bold;
         public event RoutedEventHandler Click_Outline;
         public event RoutedEventHandler Click_EN;
+        public event RoutedEventHandler Click_Rotation;
 
         public event RoutedEventHandler Click_Dot2;
         public event RoutedEventHandler Click_Dot3;
@@ -113,6 +114,10 @@ namespace RailwaymapUI
         private void Station_EN_Click(object sender, RoutedEventArgs e)
         {
             Click_EN?.Invoke(sender, new RoutedEventArgs());
+        }
+        private void Station_Rotation_Click(object sender, RoutedEventArgs e)
+        {
+            Click_Rotation?.Invoke(sender, new RoutedEventArgs());
         }
 
         private void Station_offsety_plus(object sender, RoutedEventArgs e)

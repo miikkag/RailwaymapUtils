@@ -64,6 +64,8 @@ namespace RailwaymapUI
         public bool bold { get; set; }
         public bool outline { get; set; }
 
+        public int rotation { get; set; }
+
         private bool _english;
         public bool english { get { return _english; } set { _english = value; display_name = use_name; } }
         public bool has_english { get; set; }
@@ -83,6 +85,11 @@ namespace RailwaymapUI
         public void Set_CoordinatesXY(int x, int y)
         {
             xy = string.Format("({0},{1})", x, y);
+
+            if (from_building)
+            {
+                xy += " b";
+            }
 
             coordX = x;
             coordY = y;
@@ -155,6 +162,7 @@ namespace RailwaymapUI
             dotsize = DrawSettings.Dotsize_Station_Default;
 
             Highlighted = false;
+            rotation = 0;
         }
     }
 }

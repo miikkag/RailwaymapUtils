@@ -145,13 +145,13 @@ namespace RailwaymapUI
             {
                 StringBuilder str = new StringBuilder(CONFIG_PREFIX);
 
-                str.Append("name"      + Commons.DELIMs + l.Name                 + Commons.DELIMs_ST);
-                str.Append("latitude"  + Commons.DELIMs + l.Latitude.ToString()  + Commons.DELIMs_ST);
-                str.Append("longitude" + Commons.DELIMs + l.Longitude.ToString() + Commons.DELIMs_ST);
-                str.Append("fontname"  + Commons.DELIMs + l.FontName             + Commons.DELIMs_ST);
-                str.Append("fontsize"  + Commons.DELIMs + l.FontSize.ToString()  + Commons.DELIMs_ST);
-                str.Append("fontbold"  + Commons.DELIMs + l.FontBold.ToString()  + Commons.DELIMs_ST);
-                str.Append("outline"   + Commons.DELIMs + l.Outline.ToString());
+                str.Append("name"      + Commons.DELIM_EQ + l.Name                 + Commons.DELIM_CONFITEMS);
+                str.Append("latitude"  + Commons.DELIM_EQ + l.Latitude.ToString()  + Commons.DELIM_CONFITEMS);
+                str.Append("longitude" + Commons.DELIM_EQ + l.Longitude.ToString() + Commons.DELIM_CONFITEMS);
+                str.Append("fontname"  + Commons.DELIM_EQ + l.FontName             + Commons.DELIM_CONFITEMS);
+                str.Append("fontsize"  + Commons.DELIM_EQ + l.FontSize.ToString()  + Commons.DELIM_CONFITEMS);
+                str.Append("fontbold"  + Commons.DELIM_EQ + l.FontBold.ToString()  + Commons.DELIM_CONFITEMS);
+                str.Append("outline"   + Commons.DELIM_EQ + l.Outline.ToString());
 
                 result.Add(str.ToString());
             }
@@ -165,7 +165,7 @@ namespace RailwaymapUI
 
             foreach (string str in data)
             {
-                string[] items = str.Substring(CONFIG_PREFIX.Length).Split(Commons.DELIMs_ST.ToCharArray());
+                string[] items = str.Substring(CONFIG_PREFIX.Length).Split(Commons.DELIM_CONFITEMS.ToCharArray());
 
                 string name = "";
                 double latitude = 0;
@@ -177,7 +177,7 @@ namespace RailwaymapUI
 
                 foreach (string pair in items)
                 {
-                    string[] parts = pair.Split(Commons.DELIMs.ToCharArray(), 2);
+                    string[] parts = pair.Split(Commons.DELIM_EQ.ToCharArray(), 2);
 
                     if (parts.Length == 2)
                     {
