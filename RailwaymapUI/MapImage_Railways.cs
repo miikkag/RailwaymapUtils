@@ -168,19 +168,21 @@ namespace RailwaymapUI
                     }
                 }
 
-                rs.Ready();
+                progress.Set_Info(true, "Processing railways", 0);
 
-                progress.Set_Info(true, "Drawing railways", 0);
+                var items_single = new Dictionary<RailwayType, List<List<List<Coordinate>>>>();
+                var items_dual = new Dictionary<RailwayType, List<List<List<Coordinate>>>>();
 
-                for (int i = 0; i < rs.ways.Length; i++)
+                foreach (RailwayType rt in Enum.GetValues(typeof(RailwayType)))
                 {
-                    if ((DateTime.Now - last_progress).TotalMilliseconds >= 500)
-                    {
-                        progress.Set_Info((i * 100 / rs.ways.Length));
+                    items_single.Add(rt, new List<List<List<Coordinate>>>());
+                    items_dual.Add(rt, new List<List<List<Coordinate>>>());
+                }
 
-                        last_progress = DateTime.Now;
-                    }
+                int total = rs.ways.Count;
 
+                for (int i = 0; i < rs.ways.Count; i++)
+                {
                     WayRail wr = rs.ways[i];
 
                     bool draw;
@@ -210,90 +212,140 @@ namespace RailwaymapUI
                     {
                         List<List<Coordinate>> ws = Commons.Generate_Wayset_Single(conn, wr.way_id);
 
-                        double filter = set.Filter_Railways_Line;
-
-                        int thickness = 1;
+                        Dictionary<RailwayType, List<List<List<Coordinate>>>> use_items;
 
                         if (wr.tracks > 1)
                         {
-                            thickness = 3;
+                            use_items = items_dual;
                         }
-
-                        bool filter_drawline = set.Filter_Railways_DrawLine;
-
-                        Color color;
-                        RailwayType draw_type;
+                        else
+                        {
+                            use_items = items_single;
+                        }
 
                         if (wr.disused)
                         {
-                            draw_type = RailwayType.Disused;
+                            use_items[RailwayType.Disused].Add(ws); ;
                         }
                         else if (wr.construction)
                         {
                             if ((wr.gauge1 > 0) && (wr.gauge1 < set.Normal_Gauge_Min))
                             {
-                                draw_type = RailwayType.Narrow_Construction;
+                                use_items[RailwayType.Narrow_Construction].Add(ws);
                             }
                             else
                             {
-                                draw_type = RailwayType.Normal_Construction;
+                                use_items[RailwayType.Normal_Construction].Add(ws);
                             }
                         }
                         else if (wr.gauge2 > 0)
                         {
-                            draw_type = RailwayType.Dual_Gauge;
+                            use_items[RailwayType.Dual_Gauge].Add(ws);
                         }
                         else if ((wr.gauge1 > 0) && (wr.gauge1 < set.Normal_Gauge_Min))
                         {
                             if (wr.electrified)
                             {
-                                draw_type = RailwayType.Narrow_Electrified;
+                                use_items[RailwayType.Narrow_Electrified].Add(ws);
                             }
                             else
                             {
-                                draw_type = RailwayType.Narrow_Non_Electrified;
+                                use_items[RailwayType.Narrow_Non_Electrified].Add(ws);
                             }
                         }
                         else if (!wr.electrified)
                         {
                             // Non-electrified
-                            draw_type = RailwayType.Normal_Non_Electrified;
+                            use_items[RailwayType.Normal_Non_Electrified].Add(ws);
                         }
                         else
                         {
                             switch (wr.voltage)
                             {
                                 case 750:
-                                    draw_type = RailwayType.Normal_Electrified_750V;
+                                    use_items[RailwayType.Normal_Electrified_750V].Add(ws);
                                     break;
 
                                 case 1500:
-                                    draw_type = RailwayType.Normal_Electrified_1500V;
+                                    use_items[RailwayType.Normal_Electrified_1500V].Add(ws);
                                     break;
 
                                 case 3000:
-                                    draw_type = RailwayType.Normal_Electrified_3000V;
+                                    use_items[RailwayType.Normal_Electrified_3000V].Add(ws);
                                     break;
 
                                 case 15000:
-                                    draw_type = RailwayType.Normal_Electrified_15kV;
+                                    use_items[RailwayType.Normal_Electrified_15kV].Add(ws);
                                     break;
 
                                 case 25000:
-                                    draw_type = RailwayType.Normal_Electrified_25kV;
+                                    use_items[RailwayType.Normal_Electrified_25kV].Add(ws);
                                     break;
 
                                 default:
-                                    draw_type = RailwayType.Normal_Electrified_Other;
+                                    use_items[RailwayType.Normal_Electrified_Other].Add(ws);
                                     break;
                             }
                         }
 
-                        legend.Set_UsedType(draw_type);
+                        if ((DateTime.Now - last_progress).TotalMilliseconds >= 500)
+                        {
+                            progress.Set_Info((i * 100 / total));
 
-                        color = Commons.Get_Draw_Color(draw_type, set);
+                            last_progress = DateTime.Now;
+                        }
+                    }
+                }
 
-                        Draw_Way_Coordinates(ws, null, filter, thickness, color, bounds, filter_drawline);
+                progress.Set_Info(true, "Drawing railways", 0);
+
+                int t = 0;
+
+                foreach (RailwayType rt in Enum.GetValues(typeof(RailwayType)))
+                {
+                    if (items_dual[rt].Count > 0)
+                    {
+                        legend.Set_UsedType(rt);
+
+                        Color color = Commons.Get_Draw_Color(rt, set);
+
+                        for (int i = 0; i < items_dual[rt].Count; i++)
+                        {
+                            Draw_Way_Coordinates(items_dual[rt][i], null, set.Filter_Railways_Line, 3, color, bounds, set.Filter_Railways_DrawLine);
+
+                            t++;
+
+                            if ((DateTime.Now - last_progress).TotalMilliseconds >= 500)
+                            {
+                                progress.Set_Info((t * 100 / total));
+
+                                last_progress = DateTime.Now;
+                            }
+                        }
+                    }
+                }
+
+                foreach (RailwayType rt in Enum.GetValues(typeof(RailwayType)))
+                {
+                    if (items_single[rt].Count > 0)
+                    {
+                        legend.Set_UsedType(rt);
+
+                        Color color = Commons.Get_Draw_Color(rt, set);
+
+                        for (int i = 0; i < items_single[rt].Count; i++)
+                        {
+                            Draw_Way_Coordinates(items_single[rt][i], null, set.Filter_Railways_Line, 1, color, bounds, set.Filter_Railways_DrawLine);
+
+                            t++;
+
+                            if ((DateTime.Now - last_progress).TotalMilliseconds >= 500)
+                            {
+                                progress.Set_Info((t * 100 / total));
+
+                                last_progress = DateTime.Now;
+                            }
+                        }
                     }
                 }
             }

@@ -42,7 +42,8 @@ targets['--railway'] = ( "railway",
 	  'way["construction"="narrow_gauge"]',
 	  'node["railway"="station"]["station"!="subway"]["station"!="light_rail"]',
 	  'node["railway"="site"]',
-	  'node["railway"="yard"]'
+	  'node["railway"="yard"]',
+	  'node["railway"="halt"]'
       } )
 
 #targets['--railwaysites'] = ( "railway-sites",

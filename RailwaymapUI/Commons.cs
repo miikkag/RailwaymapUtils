@@ -344,6 +344,11 @@ namespace RailwaymapUI
             return result;
         }
 
+        static public DateTime Get_DB_Timestamp(string filename_db)
+        {
+            return File.GetLastWriteTime(filename_db);
+        }
+
         static public bool Check_Cache_DB(string filename_db, string filename_cache)
         {
             bool result = false;

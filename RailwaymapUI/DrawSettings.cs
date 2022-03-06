@@ -39,7 +39,7 @@ namespace RailwaymapUI
         public Color Color_Railways_25kV = Color.FromArgb(0, 120, 255);
         public Color Color_Railways_Elecrified_other = Color.FromArgb(0, 224, 255);
         public Color Color_Railways_Narrow_Electric = Color.FromArgb(255, 0, 224);
-        public Color Color_Railways_Narrow_Diesel = Color.FromArgb(255, 128, 224);
+        public Color Color_Railways_Narrow_Diesel = Color.FromArgb(224, 192, 10);
         public Color Color_Railways_Dualgauge = Color.FromArgb(128, 40, 255);
         public Color Color_Railways_Disused = Color.FromArgb(210, 210, 210);
         public Color Color_Railways_Construction_Narrow = Color.FromArgb(216, 177, 209);

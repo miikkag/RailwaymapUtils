@@ -9,24 +9,16 @@ namespace RailwaymapUI
 {
     public class RailwaySet
     {
-        private List<WayRail> ways_list;
-        public WayRail[] ways;
+        public readonly List<WayRail> ways;
 
         public RailwaySet()
         {
-            ways_list = new List<WayRail>();
-            ways = null;
+            ways = new List<WayRail>();
         }
 
         public void Add_Item(WayRail item)
         {
-            ways_list.Add(item);
-        }
-
-        public void Ready()
-        {
-            ways = ways_list.ToArray();
-            ways_list.Clear();
+            ways.Add(item);
         }
     }
 }

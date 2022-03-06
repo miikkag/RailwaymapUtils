@@ -40,6 +40,9 @@ namespace RailwaymapUI
         private bool _edit_lightrail;
         public bool EditLightrail { get { return _edit_lightrail; } set { _edit_lightrail = value; } }
 
+        private bool _edit_halt;
+        public bool EditHalt { get { return _edit_halt; } set { _edit_halt = value; } }
+
         public bool Separate_NonVisibleStations { get; set; }
 
         private bool _showallstations;
@@ -79,9 +82,10 @@ namespace RailwaymapUI
             ShowAllStations = false;
 
             EditStations = true;
-            EditSites = true;
-            EditYards = true;
-            EditLightrail = true;
+            EditSites = false;
+            EditYards = false;
+            EditLightrail = false;
+            EditHalt = true;
 
             selection_ptX = -1;
             selection_ptY = -1;
@@ -294,6 +298,10 @@ namespace RailwaymapUI
                         {
                             st_type = StationItemType.Yard;
                         }
+                        else if (st_num == 4)
+                        {
+                            st_type = StationItemType.Halt;
+                        }
                     }
 
                     StationItem st = new StationItem(st_type);
@@ -465,6 +473,10 @@ namespace RailwaymapUI
                                 set_this = false;
                             }
                             else if ((st.Type == StationItemType.Lightrail) && !EditLightrail)
+                            {
+                                set_this = false;
+                            }
+                            else if ((st.Type == StationItemType.Halt) && !EditHalt)
                             {
                                 set_this = false;
                             }

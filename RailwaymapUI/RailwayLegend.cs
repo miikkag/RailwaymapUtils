@@ -9,6 +9,7 @@ namespace RailwaymapUI
 {
     public enum RailwayType
     {
+        Disused,
         Normal_Electrified_25kV,
         Normal_Electrified_15kV,
         Normal_Electrified_3000V,
@@ -16,13 +17,11 @@ namespace RailwaymapUI
         Normal_Electrified_750V,
         Normal_Electrified_Other,
         Normal_Non_Electrified,
-        Dual_Gauge,
         Normal_Construction,
-        Disused,
+        Dual_Gauge,
         Narrow_Electrified,
         Narrow_Non_Electrified,
         Narrow_Construction,
-        RailwayType_MAX
     }
 
     public class RailwayLegend
@@ -39,9 +38,11 @@ namespace RailwaymapUI
 
         public RailwayLegend()
         {
-            Used_Types = new bool[(int)RailwayType.RailwayType_MAX];
+            int typecount = Enum.GetValues(typeof(RailwayType)).Length;
 
-            types_normal = new bool[(int)RailwayType.RailwayType_MAX];
+            Used_Types = new bool[typecount];
+
+            types_normal = new bool[typecount];
 
             types_normal[(int)RailwayType.Disused] = true;
             types_normal[(int)RailwayType.Dual_Gauge] = true;
@@ -54,13 +55,13 @@ namespace RailwaymapUI
             types_normal[(int)RailwayType.Normal_Electrified_Other] = true;
             types_normal[(int)RailwayType.Normal_Non_Electrified] = true;
 
-            types_narrow = new bool[(int)RailwayType.RailwayType_MAX];
+            types_narrow = new bool[typecount];
 
             types_narrow[(int)RailwayType.Narrow_Construction] = true;
             types_narrow[(int)RailwayType.Narrow_Electrified] = true;
             types_narrow[(int)RailwayType.Narrow_Non_Electrified] = true;
 
-            descriptions = new string[(int)RailwayType.RailwayType_MAX];
+            descriptions = new string[typecount];
 
             descriptions[(int)RailwayType.Disused] = "Disused";
             descriptions[(int)RailwayType.Dual_Gauge] = "Dual gauge";

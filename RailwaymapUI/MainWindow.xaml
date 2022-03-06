@@ -90,6 +90,7 @@
             <MenuItem Header="Light Rail" Tag="lightrail" Click="HideStationsMenu_Click"/>
             <MenuItem Header="Sites" Tag="site" Click="HideStationsMenu_Click"/>
             <MenuItem Header="Yards" Tag="yard" Click="HideStationsMenu_Click"/>
+            <MenuItem Header="Halts" Tag="halt" Click="HideStationsMenu_Click"/>
             <MenuItem Header="From Building" Tag="building" Click="HideStationsMenu_Click"/>
         </ContextMenu>
     </Window.Resources>
@@ -814,15 +815,20 @@
                                 <Separator Background="LightGray" Margin="1,3,1,3"/>
 
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontWeight="SemiBold" VerticalAlignment="Center">Edit:</TextBlock>
+                                    <TextBlock FontWeight="SemiBold" VerticalAlignment="Top">Edit:</TextBlock>
                                     <Border Width="5"/>
-                                    <CheckBox IsChecked="{Binding DB.Stations.EditStations}" VerticalAlignment="Center" VerticalContentAlignment="Center">Stations</CheckBox>
-                                    <Border Width="5"/>
-                                    <CheckBox IsChecked="{Binding DB.Stations.EditSites}" VerticalAlignment="Center" VerticalContentAlignment="Center">Sites</CheckBox>
-                                    <Border Width="5"/>
-                                    <CheckBox IsChecked="{Binding DB.Stations.EditYards}" VerticalAlignment="Center" VerticalContentAlignment="Center">Yards</CheckBox>
-                                    <Border Width="5"/>
-                                    <CheckBox IsChecked="{Binding DB.Stations.EditLightrail}" VerticalAlignment="Center" VerticalContentAlignment="Center">Light Rail</CheckBox>
+                                    <StackPanel Orientation="Vertical">
+                                        <StackPanel Orientation="Horizontal">
+                                            <CheckBox IsChecked="{Binding DB.Stations.EditStations}" Width="75" VerticalAlignment="Center" VerticalContentAlignment="Center">Stations</CheckBox>
+                                            <CheckBox IsChecked="{Binding DB.Stations.EditSites}" Width="75" VerticalAlignment="Center" VerticalContentAlignment="Center">Sites</CheckBox>
+                                            <CheckBox IsChecked="{Binding DB.Stations.EditYards}" Width="75" VerticalAlignment="Center" VerticalContentAlignment="Center">Yards</CheckBox>
+                                        </StackPanel>
+                                        <Border Height="2"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <CheckBox IsChecked="{Binding DB.Stations.EditHalt}" Width="75" VerticalAlignment="Center" VerticalContentAlignment="Center">Halts</CheckBox>
+                                            <CheckBox IsChecked="{Binding DB.Stations.EditLightrail}" Width="75" VerticalAlignment="Center" VerticalContentAlignment="Center">Light Rail</CheckBox>
+                                        </StackPanel>
+                                    </StackPanel>
                                 </StackPanel>
                                 
                                 <Border Height="5"/>

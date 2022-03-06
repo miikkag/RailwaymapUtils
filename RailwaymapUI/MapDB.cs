@@ -78,6 +78,7 @@ namespace RailwaymapUI
         public MapDB_BorderPatch BorderPatch { get; private set; }
         public MapDB_Stations Stations { get; private set; }
 
+        private DateTime railways_timestamp;
 
         private Bounds bounds;
         private BoundsXY bxy;
@@ -133,6 +134,8 @@ namespace RailwaymapUI
             legend = new RailwayLegend();
 
             draw_items = new DrawItems();
+
+            railways_timestamp = DateTime.MinValue;
 
             drawlock = new object();
         }
@@ -595,6 +598,8 @@ namespace RailwaymapUI
                         bool need_draw = true;
                         bool cache_status_railways = Commons.Check_Cache_Image(db_file_railways, img_cache);
 
+                        railways_timestamp = Commons.Get_DB_Timestamp(db_file_railways);
+
                         if (draw_items.use_cache && cache_status_railways)
                         {
                             need_draw = !Image_Railways.DrawFromCache(img_cache);
@@ -659,7 +664,7 @@ namespace RailwaymapUI
                     {
                         db_file = "Scale";
 
-                        Image_Scale.Draw(bxy, bounds, legend, Set);
+                        Image_Scale.Draw(bxy, bounds, legend, Set, railways_timestamp);
 
                         OnPropertyChanged("Image_Scale");
                     }

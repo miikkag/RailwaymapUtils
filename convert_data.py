@@ -111,8 +111,10 @@ class OSMNodesHandler ( xml.sax.ContentHandler ):
 				attr_v = attributes.getValue("v")
 				self.node.tags.append( ( attr_k, attr_v ) )
 				if (attr_k== "railway"):
-					if(attr_v=="station"):
+					if (attr_v=="station"):
 						self.node.railwaystation = 1
+					elif (attr_v=="halt"):
+						self.node.railwaystation = 4
 					elif (attr_v=="site"):
 						self.node.railwaystation = 2
 					elif (attr_v=="yard"):

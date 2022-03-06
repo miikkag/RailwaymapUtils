@@ -622,6 +622,10 @@ namespace RailwaymapUI
             {
                 DB.Stations.Set_All_FromBuilding_Deselected();
             }
+            else if (tagstr == "halt")
+            {
+                DB.Stations.Set_All_Deselected(StationItemType.Halt);
+            }
 
             if (DB.Set.AutoRedraw_Cities)
             {

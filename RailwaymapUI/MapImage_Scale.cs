@@ -16,7 +16,7 @@ namespace RailwaymapUI
         private readonly int SAMPLEW = 25;
         private readonly int SAMPLESPACE = 6;
 
-        public void Draw(BoundsXY bounds, Bounds bounds_coord, RailwayLegend legend, DrawSettings set)
+        public void Draw(BoundsXY bounds, Bounds bounds_coord, RailwayLegend legend, DrawSettings set, DateTime db_timestamp)
         {
             if (gr == null)
             {
@@ -32,7 +32,7 @@ namespace RailwaymapUI
 
             if (set.Legend_Enabled)
             {
-                legend_h = Draw_Legend(legend, set);
+                legend_h = Draw_Legend(legend, set, db_timestamp);
             }
 
             if (set.Scale_Enabled)
@@ -160,7 +160,7 @@ namespace RailwaymapUI
         }
 
 
-        private int Draw_Legend(RailwayLegend legend, DrawSettings set)
+        private int Draw_Legend(RailwayLegend legend, DrawSettings set, DateTime db_timestamp)
         {
             Brush brush_text = Brushes.Black;
             Font font_text = new Font(set.Legend_FontName, (float)set.Legend_FontSize, FontStyle.Regular);
@@ -182,6 +182,10 @@ namespace RailwaymapUI
                 h += ITEMH; // header
                 h += (used_narrow.Count * ITEMH);
             }
+
+            // Timestamp
+            h += ITEMH;
+            h += MARGIN;
 
             h += (MARGIN * 2);
 
@@ -270,9 +274,18 @@ namespace RailwaymapUI
 
                 if (used_narrow.Count > 0)
                 {
-                    _ = Draw_Legend_ListPart(usex, usey, RailwayLegend.HEADER_NARROW, used_narrow, legend, set, font_text, brush_text);
+                    usey += Draw_Legend_ListPart(usex, usey, RailwayLegend.HEADER_NARROW, used_narrow, legend, set, font_text, brush_text);
                 }
 
+                usey += MARGIN / 2;
+
+                gr.DrawLine(new Pen(Color.FromArgb(192, 192, 192)), basex + 1, usey, basex + (w - 2), usey);
+
+                usey += MARGIN;
+
+                string timestamp_str = db_timestamp.ToString("yyyy-MM-dd");
+
+                gr.DrawString("Data retrieved: " + timestamp_str, font_text, brush_text, usex, usey);
             }
 
             return h;
