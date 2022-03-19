@@ -163,7 +163,19 @@ namespace RailwaymapUI
 
         public void SetEditInstance(Guid g)
         {
-            EditInstance = g;
+            foreach (PatchLine p in Items)
+            {
+                if (p.InstanceID == g)
+                {
+                    p.Start = new Coordinate(0, 0);
+                    p.End = new Coordinate(0, 0);
+
+                    p.Refresh();
+
+                    EditInstance = g;
+                    break;
+                }
+            }
         }
 
         public bool IsEditing()
