@@ -404,5 +404,74 @@ namespace RailwaymapUI
 
             return bitmapSource;
         }
+
+
+        public static List<Way> Combine_Ways(List<Way> ways)
+        {
+            List<Way> new_ways = new List<Way>();
+
+            for (int w = 0; w < ways.Count; w++)
+            {
+                bool found = false;
+
+                for (int n = 0; n < new_ways.Count; n++)
+                {
+                    Way.WayMatch match = new_ways[n].Compare_EndsID(ways[w]);
+
+                    if (match == Way.WayMatch.StartEnd)
+                    {
+                        // First item of n matches last item of w
+                        // --> Attach w to start of n
+                        List<Coordinate> tmp = new List<Coordinate>(ways[w].Coordinates);
+                        tmp.RemoveAt(tmp.Count - 1);
+                        tmp.AddRange(new_ways[n].Coordinates);
+
+                        new_ways[n].Coordinates = tmp;
+                    }
+                    else if (match == Way.WayMatch.EndStart)
+                    {
+                        // Last item of n matches first item of w
+                        // --> Attach w to end of n
+                        new_ways[n].Coordinates.RemoveAt(new_ways[n].Coordinates.Count - 1);
+                        new_ways[n].Coordinates.AddRange(ways[w].Coordinates);
+                    }
+                    else if (match == Way.WayMatch.StartStart)
+                    {
+                        // Reverse w and attach to start of n
+                        List<Coordinate> tmp = new List<Coordinate>(ways[w].Coordinates);
+                        tmp.Reverse();
+                        tmp.RemoveAt(tmp.Count - 1);
+                        tmp.AddRange(new_ways[n].Coordinates);
+
+                        new_ways[n].Coordinates = tmp;
+                    }
+                    else if (match == Way.WayMatch.EndEnd)
+                    {
+                        // Reverse w and attach to end of n
+                        List<Coordinate> tmp = new List<Coordinate>(ways[w].Coordinates);
+                        tmp.Reverse();
+                        tmp.RemoveAt(tmp.Count - 1);
+                        new_ways[n].Coordinates.AddRange(tmp);
+                    }
+                    else
+                    {
+                        // No match -- Do Nothing
+                    }
+
+                    if (match != Way.WayMatch.None)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    new_ways.Add(ways[w]);
+                }
+            }
+
+            return new_ways;
+        }
     }
 }

@@ -126,6 +126,7 @@ namespace RailwaymapUI
                             }
                         }
 
+                        lakes_outer[i].Ways = Commons.Combine_Ways(lakes_outer[i].Ways);
                         lakes_outer[i].Make_Segments();
                     }
 
@@ -143,6 +144,7 @@ namespace RailwaymapUI
                             }
                         }
 
+                        lakes_inner[i].Ways = Commons.Combine_Ways(lakes_inner[i].Ways);
                         lakes_inner[i].Make_Segments();
                     }
 
@@ -221,7 +223,7 @@ namespace RailwaymapUI
                                         double lat = rdr_coords.GetDouble(0);
                                         double lon = rdr_coords.GetDouble(1);
 
-                                        way.Add_Node(lat, lon);
+                                        way.Add_Node(node_id, lat, lon);
                                     }
                                     else
                                     {
