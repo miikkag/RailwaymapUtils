@@ -184,9 +184,20 @@
             Style="{StaticResource StyleMainBackground}" >
         <StackPanel Orientation="Vertical">
             <Grid>
-                <CheckBox Content="{Binding use_name}" VerticalContentAlignment="Center" FontWeight="SemiBold"
+                <CheckBox VerticalContentAlignment="Center"
                               IsChecked="{Binding visible}"
-                              Click="Station_Check_click"/>
+                              Click="Station_Check_click">
+                    <CheckBox.Content>
+                        <StackPanel Orientation="Horizontal" SnapsToDevicePixels="True" UseLayoutRounding="True">
+                            <TextBlock Text="{Binding use_name}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <TextBlock Margin="3,0,0,0" VerticalAlignment="Center">
+                                <Hyperlink FontFamily="Segoe MDL2 Assets" FontSize="10" FontWeight="Normal" TextDecorations="None" TextOptions.TextFormattingMode="Display"
+                                           Foreground="#303030" Click="Station_CopyStationName" ToolTip="Copy Station Name"
+                                           Tag="{Binding id}">&#xE8C8;</Hyperlink>
+                            </TextBlock>
+                        </StackPanel>
+                    </CheckBox.Content>
+                </CheckBox>
                 <StackPanel Orientation="Horizontal" TextElement.FontSize="11" HorizontalAlignment="Right">
                     <TextBlock Text="{Binding xy}"/>
                     <Border Width="3"/>

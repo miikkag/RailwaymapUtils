@@ -40,6 +40,8 @@ namespace RailwaymapUI
         public event RoutedEventHandler Click_Dot3;
         public event RoutedEventHandler Click_Dot4;
 
+        public event RoutedEventHandler Click_CopyStationName;
+
         public StationUI()
         {
             InitializeComponent();
@@ -151,6 +153,11 @@ namespace RailwaymapUI
         private void Station_Dot4(object sender, RoutedEventArgs e)
         {
             Click_Dot4?.Invoke(sender, new RoutedEventArgs());
+        }
+
+        private void Station_CopyStationName(object sender, RoutedEventArgs e)
+        {
+            Click_CopyStationName?.Invoke(sender, new RoutedEventArgs());
         }
     }
 }

@@ -879,7 +879,8 @@
                                                              Click_OffsetY_Plus="Station_OffsetYPlus_Click"
                                                              Click_Dot2="Station_Dot2_Click"
                                                              Click_Dot3="Station_Dot3_Click"
-                                                             Click_Dot4="Station_Dot4_Click"/>
+                                                             Click_Dot4="Station_Dot4_Click"
+                                                             Click_CopyStationName="Station_CopyStationName_Click"/>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>

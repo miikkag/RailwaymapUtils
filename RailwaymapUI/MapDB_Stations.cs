@@ -544,6 +544,18 @@ namespace RailwaymapUI
         }
 
 
+        public string Get_Station_UseName(Int64 id)
+        {
+            foreach (StationItem st in Items)
+            {
+                if (st.id == id)
+                {
+                    return st.use_name;
+                }
+            }
+
+            return null;
+        }
 
         public void Set_Station_Valign(Int64 id, StationItem.Valign valign)
         {

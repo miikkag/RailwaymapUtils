@@ -35,9 +35,12 @@ namespace RailwaymapUI
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-            if (files.Length > 0)
+            if (files != null)
             {
-                DB.Load_Area(files[0]);
+                if (files.Length > 0)
+                {
+                    DB.Load_Area(files[0]);
+                }
             }
         }
 
@@ -429,6 +432,18 @@ namespace RailwaymapUI
             if (DB.Set.AutoRedraw_Cities)
             {
                 DB.Reset_Single(MapItems.Cities);
+            }
+        }
+
+        private void Station_CopyStationName_Click(object sender, RoutedEventArgs e)
+        {
+            Int64.TryParse((sender as Hyperlink).Tag.ToString(), out Int64 id);
+
+            string usename = DB.Stations.Get_Station_UseName(id);
+
+            if (usename != null)
+            {
+                Clipboard.SetText(usename);
             }
         }
 
