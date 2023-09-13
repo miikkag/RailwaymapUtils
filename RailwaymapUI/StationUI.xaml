@@ -54,6 +54,58 @@
                 </MultiDataTrigger>
             </Style.Triggers>
         </Style>
+        <Style x:Key="StyleMainShortTypeText" TargetType="TextBlock">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsStation}" Value="True">
+                    <Setter Property="Text" Value="St"/>
+                    <Setter Property="ToolTip" Value="Station"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsSite}" Value="True">
+                    <Setter Property="Text" Value="S"/>
+                    <Setter Property="ToolTip" Value="Site"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsYard}" Value="True">
+                    <Setter Property="Text" Value="Y"/>
+                    <Setter Property="ToolTip" Value="Yard"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsLightrail}" Value="True">
+                    <Setter Property="Text" Value="LR"/>
+                    <Setter Property="ToolTip" Value="Light Rail"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsHalt}" Value="True">
+                    <Setter Property="Text" Value="H"/>
+                    <Setter Property="ToolTip" Value="Halt"/>
+                </DataTrigger>
+
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="StyleMainShortTypeBackground" TargetType="Border">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsStation}" Value="True">
+                    <Setter Property="Background" Value="#9CC46F"/>
+                    <Setter Property="ToolTip" Value="Station"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsSite}" Value="True">
+                    <Setter Property="Background" Value="#8DC8E0"/>
+                    <Setter Property="ToolTip" Value="Site"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsYard}" Value="True">
+                    <Setter Property="Background" Value="#E5B379"/>
+                    <Setter Property="ToolTip" Value="Yard"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsLightrail}" Value="True">
+                    <Setter Property="Background" Value="#AAAADD"/>
+                    <Setter Property="ToolTip" Value="Light Rail"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsHalt}" Value="True">
+                    <Setter Property="Background" Value="#A3C19C"/>
+                    <Setter Property="ToolTip" Value="Halt"/>
+                </DataTrigger>
+
+            </Style.Triggers>
+        </Style>
+
         <Style x:Key="StyleValign_Bottom" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
             <Style.Triggers>
@@ -204,7 +256,11 @@
                     <Button Padding="-3" Tag="{Binding id}" Width="16" Height="14" Click="Station_EN_Click"
                         FontSize="9" FontWeight="Normal" TextOptions.TextFormattingMode="Display"
                         Style="{StaticResource StyleButtonEN}">EN</Button>
-
+                    <Border Width="16" Margin="1,0,0,0" CornerRadius="2"
+                            SnapsToDevicePixels="True" UseLayoutRounding="True" Style="{StaticResource StyleMainShortTypeBackground}">
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="10" Foreground="#ffffff"
+                                   Style="{StaticResource StyleMainShortTypeText}"/>
+                    </Border>
                 </StackPanel>
             </Grid>
             <Border Height="2"/>
