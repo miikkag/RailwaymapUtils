@@ -82,10 +82,10 @@ else:
 bbox = ""
 bbox_name = sys.argv[1]
 
-Check_bbox(os.path.join("Data",bbox_name,"bbox.txt"))
+Check_bbox(os.path.join("..", "Data",bbox_name,"bbox.txt"))
 
 
-with open(os.path.join("Data",bbox_name,"bbox.txt")) as f:
+with open(os.path.join("..", "Data",bbox_name,"bbox.txt")) as f:
 	line = f.readline().rstrip()
 	if line.startswith('('):
 		bbox = line
@@ -103,7 +103,7 @@ for i,t in enumerate(use_targets):
 			sys.stdout.flush()
 			time.sleep(1)
 		print(f"{CLEAR}")
-	filename = os.path.join("Data", bbox_name, f"{t[0]}.xml")
+	filename = os.path.join("..", "Data", bbox_name, f"{t[0]}.xml")
 	query = "[out:xml][timeout:2000];\n"
 	query = query + "(\n"
 	for l in t[1]:

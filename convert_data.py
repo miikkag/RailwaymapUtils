@@ -254,7 +254,7 @@ else:
 bbox = ""
 bbox_name = sys.argv[1]
 
-with open(os.path.join("Data",bbox_name,"bbox.txt")) as f:
+with open(os.path.join("..", "Data",bbox_name,"bbox.txt")) as f:
 	line = f.readline().rstrip()
 	if line.startswith('('):
 		bbox = line
@@ -268,8 +268,8 @@ aborted = False
 
 for t in use_targets:
 	print(f"\nProcessing target {t}")
-	filename_osm = os.path.join("Data", bbox_name, f"{t}.xml")
-	filename_db  = os.path.join("Data", bbox_name, f"{t}.db")
+	filename_osm = os.path.join("..", "Data", bbox_name, f"{t}.xml")
+	filename_db  = os.path.join("..", "Data", bbox_name, f"{t}.db")
 	
 	if os.path.exists(filename_db):
 		os.remove(filename_db)
