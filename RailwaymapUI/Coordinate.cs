@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +25,20 @@ namespace RailwaymapUI
             NodeID = id;
             Latitude = lat;
             Longitude = lon;
+        }
+
+        public Coordinate(BinaryReader reader)
+        {
+            Latitude = reader.ReadDouble();
+            Longitude = reader.ReadDouble();
+            NodeID = reader.ReadInt64();
+        }
+
+        public void Write_Cache(BinaryWriter writer)
+        {
+            writer.Write(Latitude);
+            writer.Write(Longitude);
+            writer.Write(NodeID);
         }
 
         public bool Compare(Coordinate c)

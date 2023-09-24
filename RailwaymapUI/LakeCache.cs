@@ -28,8 +28,8 @@ namespace RailwaymapUI
 
                 List<Int64> relations = new List<Int64>();
 
-                List<Lake> lakes_inner = new List<Lake>();
-                List<Lake> lakes_outer = new List<Lake>();
+                List<WaterBody> lakes_inner = new List<WaterBody>();
+                List<WaterBody> lakes_outer = new List<WaterBody>();
 
                 int total_items;
                 int base_items;
@@ -95,11 +95,11 @@ namespace RailwaymapUI
                             }
                         }
 
-                        Lake tmp_lake_inner = new Lake(relations[i]);
-                        Lake tmp_lake_outer = new Lake(relations[i]);
+                        WaterBody tmp_lake_inner = new WaterBody(relations[i]);
+                        WaterBody tmp_lake_outer = new WaterBody(relations[i]);
 
-                        Read_Nodes(members_outer, tmp_lake_outer, sqlite_lakes);
-                        Read_Nodes(members_inner, tmp_lake_inner, sqlite_lakes);
+                        tmp_lake_inner.Read_Nodes(members_inner, sqlite_lakes);
+                        tmp_lake_outer.Read_Nodes(members_outer, sqlite_lakes);
 
                         lakes_inner.Add(tmp_lake_inner);
                         lakes_outer.Add(tmp_lake_outer);
@@ -113,6 +113,11 @@ namespace RailwaymapUI
 
                     total_items = lakes_outer.Count + lakes_inner.Count;
                     base_items = 0;
+
+                    if (total_items == 0)
+                    {
+                        total_items = 1;
+                    }
 
                     for (int i = 0; i < lakes_outer.Count; i++)
                     {
@@ -192,50 +197,6 @@ namespace RailwaymapUI
                     writer.Write(LAKE_INNER_DESCRIPTOR);
                     lakes_inner[i].Write_Cache(writer);
                 }
-            }
-        }
-
-
-        private static void Read_Nodes(List<Int64> way_ids, Lake lake, SQLiteConnection conn)
-        {
-            for (int w = 0; w < way_ids.Count; w++)
-            {
-                Way way = new Way();
-
-                using (SQLiteCommand cmd_nodes = new SQLiteCommand("SELECT node_id FROM way_nodes WHERE way_id=$id;", conn))
-                {
-                    cmd_nodes.Parameters.AddWithValue("$id", way_ids[w]);
-
-                    using (SQLiteDataReader rdr_nodes = cmd_nodes.ExecuteReader())
-                    {
-                        while (rdr_nodes.Read())
-                        {
-                            Int64 node_id = rdr_nodes.GetInt64(0);
-
-                            using (SQLiteCommand cmd_coords = new SQLiteCommand("SELECT lat,lon FROM nodes WHERE id=$id;", conn))
-                            {
-                                cmd_coords.Parameters.AddWithValue("$id", node_id);
-
-                                using (SQLiteDataReader rdr_coords = cmd_coords.ExecuteReader())
-                                {
-                                    if (rdr_coords.Read())
-                                    {
-                                        double lat = rdr_coords.GetDouble(0);
-                                        double lon = rdr_coords.GetDouble(1);
-
-                                        way.Add_Node(node_id, lat, lon);
-                                    }
-                                    else
-                                    {
-                                        System.Diagnostics.Debug.WriteLine("Coordinates for node " + node_id.ToString() + " not found");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                lake.Add_Way(way);
             }
         }
     }

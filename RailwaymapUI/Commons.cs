@@ -10,7 +10,7 @@ using System.Windows.Media.Imaging;
 
 namespace RailwaymapUI
 {
-    public enum MapItems { Landarea, Water, Borders, Railways, Cities, Scale, CountryColors, Labels };
+    public enum MapItems { Landarea, Water, Rivers, Borders, Railways, Cities, Scale, CountryColors, Labels };
 
     public static class Commons
     {

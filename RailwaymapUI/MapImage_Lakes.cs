@@ -53,7 +53,7 @@ namespace RailwaymapUI
 
             if (!File.Exists(filename_cache))
             {
-                throw new Exception("Coastline cache file does not exist.");
+                throw new Exception("Lake cache file does not exist.");
             }
 
 
@@ -64,8 +64,8 @@ namespace RailwaymapUI
             progress.Set_Info(true, "Reading lake cache", 0);
             DateTime last_progress = DateTime.Now;
 
-            List<Lake> lakes_outer = new List<Lake>();
-            List<Lake> lakes_inner = new List<Lake>();
+            List<WaterBody> lakes_outer = new List<WaterBody>();
+            List<WaterBody> lakes_inner = new List<WaterBody>();
 
             using (FileStream fs = File.OpenRead(filename_cache))
             using (BinaryReader reader = new BinaryReader(fs, Encoding.UTF8, false))
@@ -86,7 +86,7 @@ namespace RailwaymapUI
 
                         UInt64 lake_descriptor = reader.ReadUInt64();
 
-                        Lake tmp_lake = new Lake(reader);
+                        WaterBody tmp_lake = new WaterBody(reader);
 
                         if (lake_descriptor == LakeCache.LAKE_OUTER_DESCRIPTOR)
                         {
@@ -176,7 +176,7 @@ namespace RailwaymapUI
         }
 
 
-        private void Draw_Lake(Lake lake, BoundsXY bounds, int min_areasize, Color draw_color)
+        private void Draw_Lake(WaterBody lake, BoundsXY bounds, int min_areasize, Color draw_color)
         {
             // Determine lake size
             int xmin = Commons.Merc2MapX(Commons.Merc_X(lake.MinMax.LonMin), bounds);
@@ -227,7 +227,6 @@ namespace RailwaymapUI
                         {
                             if ((lake.Segments[s].LatMax >= lat) && (lake.Segments[s].LatMin <= lat))
                             {
-                                //AddIfNotDuplicate(lake.Segments[s], crosslist);
                                 crosslist.Add(lake.Segments[s]);
                             }
                             else if (lake.Segments[s].LatMin > lat)
@@ -304,26 +303,6 @@ namespace RailwaymapUI
                         }
                     }
                 }
-            }
-        }
-
-        private static void AddIfNotDuplicate(LakeSegment seg, List<LakeSegment> segments)
-        {
-            bool found = false;
-
-            for (int i = 0; i < segments.Count; i++)
-            {
-                if (seg.Compare(segments[i]))
-                {
-                    found = true;
-                    System.Diagnostics.Debug.WriteLine("Duplicate segment");
-                    break;
-                }
-            }
-
-            if (!found)
-            {
-                segments.Add(seg);
             }
         }
     }

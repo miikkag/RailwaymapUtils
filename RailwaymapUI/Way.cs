@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,6 +34,43 @@ namespace RailwaymapUI
         public void Add_Node(long id, double lat, double lon)
         {
             Coordinates.Add(new Coordinate(id, lat, lon));
+        }
+
+        public void Read_Nodes(Int64 way_id, SQLiteConnection conn)
+        {
+            using (SQLiteCommand cmd_nodes = new SQLiteCommand("SELECT node_id FROM way_nodes WHERE way_id=$id;", conn))
+            {
+                cmd_nodes.Parameters.AddWithValue("$id", way_id);
+
+                using (SQLiteDataReader rdr_nodes = cmd_nodes.ExecuteReader())
+                {
+                    while (rdr_nodes.Read())
+                    {
+                        Int64 node_id = rdr_nodes.GetInt64(0);
+
+                        using (SQLiteCommand cmd_coords = new SQLiteCommand("SELECT lat,lon FROM nodes WHERE id=$id;", conn))
+                        {
+                            cmd_coords.Parameters.AddWithValue("$id", node_id);
+
+                            using (SQLiteDataReader rdr_coords = cmd_coords.ExecuteReader())
+                            {
+                                if (rdr_coords.Read())
+                                {
+                                    double lat = rdr_coords.GetDouble(0);
+                                    double lon = rdr_coords.GetDouble(1);
+
+                                    Add_Node(lat, lon);
+                                }
+                                else
+                                {
+                                    System.Diagnostics.Debug.WriteLine("Coordinates for node " + node_id.ToString() + " not found");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
         }
 
         public WayMatch Compare_EndsID(Way other)

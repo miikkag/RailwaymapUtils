@@ -92,10 +92,11 @@ namespace RailwaymapUI
         public int Filter_Railways_Line { get; set; }
         public bool Filter_Railways_DrawLine { get; set; }
 
-        public bool Debug_Water_ID { get; set; }
-        public bool Debug_Water_BorderOnly { get; set; }
-        public bool Debug_Water_SingleItem { get; set; }
-        public int Debug_Water_SingleItemNumber { get; set; }
+        public bool Draw_Rivers_Waterbodies { get; set; }
+        public bool Draw_Rivers_Waterways { get; set; }
+        public int Filter_RiverBody_Area { get; set; }
+        public int Filter_RiverLand_Area { get; set; }
+        public int Filter_Waterway_Line { get; set; }
 
         public bool LineMethod_Railways_System { get; set; }
 
@@ -145,6 +146,12 @@ namespace RailwaymapUI
             Filter_Border_Line = 3;
             Filter_Border_DrawLine = true;
 
+            Draw_Rivers_Waterbodies = false;
+            Draw_Rivers_Waterways = false;
+            Filter_RiverBody_Area = 2;
+            Filter_RiverLand_Area = 1;
+            Filter_Waterway_Line = 2;
+
             Filter_Railways_Line = 3;
             Filter_Railways_DrawLine = true;
 
@@ -175,11 +182,6 @@ namespace RailwaymapUI
 
             Draw_Landarea_Islands = true;
             Draw_Landarea_Islets = false;
-
-            Debug_Water_ID = false;
-            Debug_Water_BorderOnly = false;
-            Debug_Water_SingleItem = false;
-            Debug_Water_SingleItemNumber = 0;
 
             Scale_Position = ScalePosition.LeftBottom;
             Legend_Position = ScalePosition.LeftBottom;
@@ -323,6 +325,26 @@ namespace RailwaymapUI
                             Draw_Landarea_Islets = val_bool;
                             break;
 
+                        case "Draw_Rivers_Waterbodies":
+                            Draw_Rivers_Waterbodies = val_bool;
+                            break;
+
+                        case "Draw_Rivers_Waterways":
+                            Draw_Rivers_Waterways = val_bool;
+                            break;
+
+                        case "Filter_RiverBody_Area":
+                            Filter_RiverBody_Area = val_int;
+                            break;
+
+                        case "Filter_RiverLand_Area":
+                            Filter_RiverLand_Area = val_int;
+                            break;
+
+                        case "Filter_Waterway_Line":
+                            Filter_Waterway_Line = val_int;
+                            break;
+
                         case "Scale_Position":
                             Enum.TryParse(items[1], out scale_pos);
                             break;
@@ -464,6 +486,21 @@ namespace RailwaymapUI
             result.Add(str);
 
             str = CONFIG_PREFIX + "Draw_Landarea_Islets=" + Draw_Landarea_Islets.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Draw_Rivers_Waterbodies=" + Draw_Rivers_Waterbodies.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Draw_Rivers_Waterways=" + Draw_Rivers_Waterways.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Filter_RiverBody_Area=" + Filter_RiverBody_Area.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Filter_RiverLand_Area=" + Filter_RiverLand_Area.ToString();
+            result.Add(str);
+
+            str = CONFIG_PREFIX + "Filter_Waterway_Line=" + Filter_Waterway_Line.ToString();
             result.Add(str);
 
             str = CONFIG_PREFIX + "Scale_Position=" + Scale_Position.ToString();

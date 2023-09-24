@@ -38,6 +38,9 @@ namespace RailwaymapUI
         private const string DB_FILENAME_COASTLINE_CACHE = "coastline_cache.bin";
         private const string DB_FILENAME_LAKES = "lakes.db";
         private const string DB_FILENAME_LAKES_CACHE = "lakes_cache.bin";
+        private const string DB_FILENAME_RIVERS = "rivers.db";
+        private const string DB_FILENAME_RIVERS_CACHE = "rivers_cache.bin";
+
 
         public string Area { get; private set; }
         private string AreaPath;
@@ -60,6 +63,7 @@ namespace RailwaymapUI
         public MapImage_Background Image_Background { get; private set; }
         public MapImage_Landarea Image_Landarea { get; private set; }
         public MapImage_Lakes Image_Water { get; private set; }
+        public MapImage_Rivers Image_Rivers { get; private set; }
         public MapImage_Borders Image_Borders { get; private set; }
         public MapImage_Railways Image_Railways { get; private set; }
         public MapImage_Cities Image_Cities { get; private set; }
@@ -91,6 +95,7 @@ namespace RailwaymapUI
 
             public bool landarea;
             public bool water;
+            public bool rivers;
             public bool borders;
             public bool railways;
             public bool cities;
@@ -111,6 +116,7 @@ namespace RailwaymapUI
             Image_Background = new MapImage_Background();
             Image_Landarea = new MapImage_Landarea();
             Image_Water = new MapImage_Lakes();
+            Image_Rivers = new MapImage_Rivers();
             Image_Borders = new MapImage_Borders();
             Image_Railways = new MapImage_Railways();
             Image_Cities = new MapImage_Cities();
@@ -145,6 +151,7 @@ namespace RailwaymapUI
             Image_Background.Set_Size(OutputSizeWidth, OutputSizeHeight);
             Image_Landarea.Set_Size(OutputSizeWidth, OutputSizeHeight);
             Image_Water.Set_Size(OutputSizeWidth, OutputSizeHeight);
+            Image_Rivers.Set_Size(OutputSizeWidth, OutputSizeHeight);
             Image_Borders.Set_Size(OutputSizeWidth, OutputSizeHeight);
             Image_Railways.Set_Size(OutputSizeWidth, OutputSizeHeight);
             Image_Cities.Set_Size(OutputSizeWidth, OutputSizeHeight);
@@ -161,6 +168,7 @@ namespace RailwaymapUI
 
             draw_items.landarea = true;
             draw_items.water = true;
+            draw_items.rivers = true;
             draw_items.borders = true;
             draw_items.railways = true;
             draw_items.cities = true;
@@ -283,6 +291,11 @@ namespace RailwaymapUI
             if (Image_Water.Enabled)
             {
                 gr.DrawImage(Image_Water.GetBitmap(), 0, 0);
+            }
+
+            if (Image_Rivers.Enabled)
+            {
+                gr.DrawImage(Image_Rivers.GetBitmap(), 0, 0);
             }
 
             if (Image_Borders.Enabled)
@@ -573,6 +586,36 @@ namespace RailwaymapUI
 
                         OnPropertyChanged("Image_Water");
                     }
+
+                    if (draw_items.rivers)
+                    {
+                        db_file = Path.Combine(AreaPath, DB_FILENAME_RIVERS);
+
+                        string db_cache = Path.Combine(AreaPath, DB_FILENAME_RIVERS_CACHE);
+
+                        if (!Commons.Check_Cache_DB(db_file, db_cache))
+                        {
+                            RiverCache.Convert_Rivers(db_file, db_cache, Progress);
+                        }
+
+                        string img_cache = Commons.Cache_ImageName(AreaPath, "rivers");
+
+                        bool need_draw = true;
+
+                        if (draw_items.use_cache && Commons.Check_Cache_Image(db_file, img_cache))
+                        {
+                            need_draw = !Image_Water.DrawFromCache(img_cache);
+                        }
+
+                        if (need_draw)
+                        {
+                            Image_Rivers.Draw(db_cache, bxy, Progress, Set);
+                            Image_Rivers.Save_ImageCache(img_cache, db_file);
+                        }
+
+                        OnPropertyChanged("Image_Rivers");
+                    }
+
 
                     if (draw_items.countrycolors)
                     {

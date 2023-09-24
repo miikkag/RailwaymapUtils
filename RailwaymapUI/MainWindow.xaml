@@ -363,7 +363,7 @@
                         <Expander IsExpanded="{Binding ExpandItems.Landarea}" Background="#E0F0E0">
                             <Expander.Header>
                                 <Grid HorizontalAlignment="{Binding HorizontalAlignment, RelativeSource={RelativeSource AncestorType=ContentPresenter}, Mode=OneWayToSource}">
-                                    <TextBlock>Land Area</TextBlock>
+                                    <TextBlock FontSize="13">Land Area</TextBlock>
                                     <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" FontFamily="Segoe MDL2 Assets" FontSize="16" FontWeight="Normal" ToolTip="Refresh Image">
                                         <Hyperlink TextDecorations="None" Foreground="Black" Click="Refresh_ImageLandarea">&#xEDAB;</Hyperlink>
                                     </TextBlock>
@@ -455,20 +455,21 @@
                         <Expander IsExpanded="{Binding ExpandItems.Water}" Background="#DDECFF">
                             <Expander.Header>
                                 <Grid HorizontalAlignment="{Binding HorizontalAlignment, RelativeSource={RelativeSource AncestorType=ContentPresenter}, Mode=OneWayToSource}">
-                                    <TextBlock>Water</TextBlock>
+                                    <TextBlock FontSize="13">Water</TextBlock>
+                                </Grid>
+                            </Expander.Header>
+                            <StackPanel Orientation="Vertical" Margin="4">
+                                <Grid HorizontalAlignment="{Binding HorizontalAlignment, RelativeSource={RelativeSource AncestorType=ContentPresenter}, Mode=OneWayToSource}">
+                                    <TextBlock FontWeight="SemiBold">Lakes:</TextBlock>
                                     <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" FontFamily="Segoe MDL2 Assets" FontSize="16" FontWeight="Normal" ToolTip="Refresh Image">
                                         <Hyperlink TextDecorations="None" Foreground="Black" Click="Refresh_ImageWater">&#xEDAB;</Hyperlink>
                                     </TextBlock>
                                 </Grid>
-                            </Expander.Header>
-                            <StackPanel Orientation="Vertical" Margin="4">
+                                <Border Height="2"/>
                                 <CheckBox IsChecked="{Binding DB.Image_Water.Enabled}">Visible</CheckBox>
-                                <Separator Background="LightSteelBlue" Margin="0,3,0,3"/>
-
-                                <TextBlock FontWeight="SemiBold">Water:</TextBlock>
                                 <Border Height="3"/>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock VerticalAlignment="Center" Width="80">Area filter:</TextBlock>
+                                    <TextBlock VerticalAlignment="Center" Width="70">Area filter:</TextBlock>
                                     <TextBox Text="{Binding DB.Set.Filter_Water_Area}" Width="30"
                                              GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
                                     <Border Width="3"/>
@@ -477,10 +478,10 @@
 
                                 <Border Height="5"/>
 
-                                <CheckBox IsChecked="{Binding DB.Set.Draw_WaterLand}" VerticalContentAlignment="Center" FontWeight="SemiBold">Land:</CheckBox>
+                                <CheckBox IsChecked="{Binding DB.Set.Draw_WaterLand}" VerticalContentAlignment="Center">Draw Land:</CheckBox>
                                 <Border Height="3"/>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock VerticalAlignment="Center" Width="80">Area filter:</TextBlock>
+                                    <TextBlock VerticalAlignment="Center" Width="70">Area filter:</TextBlock>
                                     <TextBox Text="{Binding DB.Set.Filter_WaterLand_Area}" Width="30"
                                              GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
                                     <Border Width="3"/>
@@ -490,17 +491,46 @@
                                 <Border Height="5"/>
                                 <Separator Margin="0" Background="LightSteelBlue"/>
                                 <Border Height="5"/>
-                                <TextBlock Foreground="SteelBlue" FontWeight="SemiBold" FontSize="10">Debug:</TextBlock>
-                                <CheckBox IsChecked="{Binding DB.Set.Debug_Water_ID}" FontSize="11" Foreground="SteelBlue" VerticalContentAlignment="Center">Draw setnum</CheckBox>
-                                <CheckBox IsChecked="{Binding DB.Set.Debug_Water_BorderOnly}" FontSize="11" Foreground="SteelBlue" VerticalContentAlignment="Center">Border only</CheckBox>
-                                <CheckBox IsChecked="{Binding DB.Set.Debug_Water_SingleItem}" FontSize="11" Foreground="SteelBlue" VerticalContentAlignment="Center">
-                                    <StackPanel    Orientation="Horizontal">
-                                        <TextBlock>Draw single item:</TextBlock>
-                                        <Border Width="5"/>
-                                        <TextBox Width="30" Text="{Binding DB.Set.Debug_Water_SingleItemNumber}"
-                                                 GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
-                                    </StackPanel>
-                                </CheckBox>
+
+                                <Grid HorizontalAlignment="{Binding HorizontalAlignment, RelativeSource={RelativeSource AncestorType=ContentPresenter}, Mode=OneWayToSource}">
+                                    <TextBlock FontWeight="SemiBold">Rivers:</TextBlock>
+                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" FontFamily="Segoe MDL2 Assets" FontSize="16" FontWeight="Normal" ToolTip="Refresh Image">
+                                        <Hyperlink TextDecorations="None" Foreground="Black" Click="Refresh_ImageRivers">&#xEDAB;</Hyperlink>
+                                    </TextBlock>
+                                </Grid>
+                                <Border Height="2"/>
+                                <CheckBox IsChecked="{Binding DB.Image_Water.Enabled}">Visible</CheckBox>
+                                <Border Height="3"/>
+
+                                <CheckBox IsChecked="{Binding DB.Set.Draw_Rivers_Waterbodies}">Draw Waterbodies</CheckBox>
+                                <Border Height="2"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock VerticalAlignment="Center" Width="100">Water Area filter:</TextBlock>
+                                    <TextBox Text="{Binding DB.Set.Filter_RiverBody_Area}" Width="30"
+                                             GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
+                                    <Border Width="3"/>
+                                    <TextBlock>px</TextBlock>
+                                </StackPanel>
+                                <Border Height="2"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock VerticalAlignment="Center" Width="100">Land Area filter:</TextBlock>
+                                    <TextBox Text="{Binding DB.Set.Filter_RiverLand_Area}" Width="30"
+                                             GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
+                                    <Border Width="3"/>
+                                    <TextBlock>px</TextBlock>
+                                </StackPanel>
+
+                                <Border Height="5"/>
+
+                                <CheckBox IsChecked="{Binding DB.Set.Draw_Rivers_Waterways}">Draw Waterways</CheckBox>
+                                <Border Height="2"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock VerticalAlignment="Center" Width="100">Line filter:</TextBlock>
+                                    <TextBox Text="{Binding DB.Set.Filter_Waterway_Line}" Width="30"
+                                             GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
+                                    <Border Width="3"/>
+                                    <TextBlock>px</TextBlock>
+                                </StackPanel>
 
                                 <Border Height="8"/>
                             </StackPanel>
@@ -511,11 +541,7 @@
                         <Expander IsExpanded="{Binding ExpandItems.Borders}" Background="#E0E0E0">
                             <Expander.Header>
                                 <Grid HorizontalAlignment="{Binding HorizontalAlignment, RelativeSource={RelativeSource AncestorType=ContentPresenter}, Mode=OneWayToSource}">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="9*"/>
-                                        <RowDefinition Height="7*"/>
-                                    </Grid.RowDefinitions>
-                                    <TextBlock Grid.RowSpan="2">Borders</TextBlock>
+                                    <TextBlock Grid.RowSpan="2" FontSize="13">Borders</TextBlock>
                                     <TextBlock VerticalAlignment="Top" HorizontalAlignment="Right" FontFamily="Segoe MDL2 Assets" FontSize="16" FontWeight="Normal" ToolTip="Refresh Image" Grid.RowSpan="2">
                                         <Hyperlink TextDecorations="None" Foreground="Black" Click="Refresh_ImageBorder">&#xEDAB;</Hyperlink>
                                     </TextBlock>
@@ -619,7 +645,7 @@
                         <Expander IsExpanded="{Binding ExpandItems.Labels}" Background="#FFEAEA">
                             <Expander.Header>
                                 <Grid HorizontalAlignment="{Binding HorizontalAlignment, RelativeSource={RelativeSource AncestorType=ContentPresenter}, Mode=OneWayToSource}">
-                                    <TextBlock>Labels</TextBlock>
+                                    <TextBlock FontSize="13">Labels</TextBlock>
                                     <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" FontFamily="Segoe MDL2 Assets" FontSize="16" FontWeight="Normal" ToolTip="Refresh Image">
                                         <Hyperlink TextDecorations="None" Foreground="Black" Click="Refresh_ImageLabels">&#xEDAB;</Hyperlink>
                                     </TextBlock>
@@ -719,7 +745,7 @@
                         <Expander IsExpanded="{Binding ExpandItems.Railways}" Background="#FFFFFF">
                             <Expander.Header>
                                 <Grid HorizontalAlignment="{Binding HorizontalAlignment, RelativeSource={RelativeSource AncestorType=ContentPresenter}, Mode=OneWayToSource}">
-                                    <TextBlock>Railways</TextBlock>
+                                    <TextBlock FontSize="13">Railways</TextBlock>
                                     <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" FontFamily="Segoe MDL2 Assets" FontSize="16" FontWeight="Normal" ToolTip="Refresh Image">
                                         <Hyperlink TextDecorations="None" Foreground="Black" Click="Refresh_ImageRailways">&#xEDAB;</Hyperlink>
                                     </TextBlock>
@@ -772,7 +798,7 @@
                         <Expander IsExpanded="{Binding ExpandItems.Cities}" Background="#F0F0D0">
                             <Expander.Header>
                                 <Grid HorizontalAlignment="{Binding HorizontalAlignment, RelativeSource={RelativeSource AncestorType=ContentPresenter}, Mode=OneWayToSource}">
-                                    <TextBlock>Stations / Sites / Yards</TextBlock>
+                                    <TextBlock FontSize="13">Stations / Sites / Yards</TextBlock>
                                     <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" FontFamily="Segoe MDL2 Assets" FontSize="16" FontWeight="Normal" ToolTip="Refresh Image">
                                         <Hyperlink TextDecorations="None" Foreground="Black" Click="Refresh_ImageCities">&#xEDAB;</Hyperlink>
                                     </TextBlock>
@@ -964,6 +990,9 @@
                         <local:ImageNN Source="{Binding DB.Image_Water.ImageSrc}"
                                        Width="{Binding DB.Image_Water.Image_Width}" Height="{Binding DB.Image_Water.Image_Height}"
                                        Visibility="{Binding DB.Image_Water.Visible}"/>
+                        <local:ImageNN Source="{Binding DB.Image_Rivers.ImageSrc}"
+                                       Width="{Binding DB.Image_Rivers.Image_Width}" Height="{Binding DB.Image_Rivers.Image_Height}"
+                                       Visibility="{Binding DB.Image_Rivers.Visible}"/>
                         <local:ImageNN Source="{Binding DB.Image_CountryColors.ImageSrc}"
                                        Width="{Binding DB.Image_CountryColors.Image_Width}" Height="{Binding DB.Image_CountryColors.Image_Height}"
                                        Visibility="{Binding DB.Image_CountryColors.Visible}"/>

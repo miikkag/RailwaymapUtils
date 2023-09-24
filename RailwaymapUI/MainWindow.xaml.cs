@@ -82,6 +82,12 @@ namespace RailwaymapUI
             DB.Reset_Single(MapItems.Water);
         }
 
+        private void Refresh_ImageRivers(object sender, RoutedEventArgs e)
+        {
+            DB.Reset_Single(MapItems.Rivers);
+        }
+
+
         private void Refresh_ImageBorder(object sender, RoutedEventArgs e)
         {
             DB.Reset_Single(MapItems.Borders);

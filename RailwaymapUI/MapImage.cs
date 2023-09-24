@@ -123,6 +123,7 @@ namespace RailwaymapUI
             }
         }
 
+
         protected void Draw_Way_Coordinates(List<List<Coordinate>> ws, ProgressInfo progress, double filter_px, int thickness, System.Drawing.Color color, BoundsXY bounds, bool filter_drawline)
         {
             DateTime prev_update = DateTime.Now;

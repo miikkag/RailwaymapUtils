@@ -110,6 +110,7 @@
     <Compile Include="MapDB_Stations.cs" />
     <Compile Include="MapImage_CountryColors.cs" />
     <Compile Include="MapImage_Labels.cs" />
+    <Compile Include="MapImage_Rivers.cs" />
     <Compile Include="PatchLine.cs" />
     <Compile Include="PolygonNode.cs" />
     <Compile Include="MapImage.cs" />
@@ -124,12 +125,14 @@
     <Compile Include="ProgressInfo.cs" />
     <Compile Include="RailwayLegend.cs" />
     <Compile Include="RailwaySet.cs" />
+    <Compile Include="RiverCache.cs" />
     <Compile Include="StationItem.cs" />
     <Compile Include="StationUI.xaml.cs">
       <DependentUpon>StationUI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Lake.cs" />
+    <Compile Include="WaterBody.cs" />
     <Compile Include="StringExtensions.cs" />
+    <Compile Include="Waterway.cs" />
     <Compile Include="Way.cs" />
     <Compile Include="WayRail.cs" />
     <Compile Include="ZoomBorder.cs" />

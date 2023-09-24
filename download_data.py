@@ -57,6 +57,11 @@ targets['--lightrail'] = ( "lightrail",
 targets['--lakes'] = ( "lakes",
 	{ 'rel["natural"="water"]["water"="lake"]' } )
 
+targets['--rivers'] = ( "rivers",
+    { 'rel["natural"="water"]["water"="river"]',
+	  'way["natural"="water"]["water"="river"]',
+      'way["waterway"="river"]' } )
+
 
 #targets['--water'] = ( "water",
 #	{ 'way["natural"="water"]' } )

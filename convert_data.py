@@ -20,7 +20,7 @@ targets['--coastline'] = "coastline"
 targets['--railway'] = "railway"
 targets['--lightrail'] = "lightrail"
 targets['--lakes'] = "lakes"
-#targets['--water'] = "water"
+targets['--rivers'] = "rivers"
 
 
 use_targets = []
