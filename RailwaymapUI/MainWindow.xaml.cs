@@ -20,15 +20,19 @@ namespace RailwaymapUI
     {
         public MapDB DB;
         public ExpandList ExpandItems;
+        public FileHistory History;
+
+        private const string SETTINGS_FILENAME = "settings.conf";
 
         public MainWindow()
         {
             InitializeComponent();
 
-            DB = new MapDB();
+            History = new FileHistory(SETTINGS_FILENAME);
+            DB = new MapDB(History);
             ExpandItems = new ExpandList();
 
-            DataContext = new { DB, ExpandItems, zoomer };
+            DataContext = new { DB, ExpandItems, History, zoomer };
         }
 
         private void MainWindow_Drop(object sender, DragEventArgs e)
@@ -497,6 +501,30 @@ namespace RailwaymapUI
             DB.Save_Config();
         }
 
+        private void Click_OpenRecent(object sender, RoutedEventArgs e)
+        {
+            Button btn = sender as Button;
+            ContextMenu menu = btn.ContextMenu;
+
+            menu.PlacementTarget = btn;
+            menu.IsOpen = true;
+
+            System.Diagnostics.Debug.WriteLine(System.AppDomain.CurrentDomain.BaseDirectory);
+        }
+
+        private void FileHistoryItem_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                TextBlock tb = sender as TextBlock;
+
+                if (tb.Tag != null)
+                {
+                    DB.Load_Area(tb.Tag.ToString());
+                }
+            }
+        }
+
         private void AddCountryColor_Click(object sender, RoutedEventArgs e)
         {
             DB.CountryColors.NewItem();
@@ -653,5 +681,6 @@ namespace RailwaymapUI
                 DB.Reset_Single(MapItems.Cities);
             }
         }
+
     }
 }

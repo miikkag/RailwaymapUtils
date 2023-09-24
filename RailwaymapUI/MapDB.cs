@@ -89,6 +89,8 @@ namespace RailwaymapUI
 
         private RailwayLegend legend;
 
+        private FileHistory history;
+
         private struct DrawItems
         {
             public bool use_cache;
@@ -106,7 +108,7 @@ namespace RailwaymapUI
 
         private DrawItems draw_items;
 
-        public MapDB()
+        public MapDB(FileHistory file_history)
         {
             OutputSizeWidth = 1000;
             OutputSizeHeight = 1000;
@@ -144,6 +146,8 @@ namespace RailwaymapUI
             railways_timestamp = DateTime.MinValue;
 
             drawlock = new object();
+
+            history = file_history;
         }
 
         public void Reset_Size()
@@ -273,6 +277,8 @@ namespace RailwaymapUI
 
                 OnPropertyChanged("Area");
                 OnPropertyChanged("OutputFileName");
+
+                history.Add_Item(area_path);
             }
         }
 

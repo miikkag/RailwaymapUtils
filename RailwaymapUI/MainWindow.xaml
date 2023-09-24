@@ -107,7 +107,21 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <Button Width="40" HorizontalAlignment="Left" Click="Click_SaveConfig">Save</Button>
+                    <Button Width="60" Click="Click_SaveConfig">Save</Button>
+                    <Border Width="10"/>
+
+                    <Button Width="60" Click="Click_OpenRecent" Content="Recent...">
+                        <Button.ContextMenu>
+                            <ContextMenu ItemsSource="{Binding History.Items}">
+                                <ContextMenu.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name}" Tag="{Binding FullPath}" MouseUp="FileHistoryItem_MouseUp"/>
+                                    </DataTemplate>
+                                </ContextMenu.ItemTemplate>
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                    </Button>
+
                     <Border Width="10"/>
 
                     <TextBlock FontWeight="SemiBold" VerticalAlignment="Center">Area:</TextBlock>

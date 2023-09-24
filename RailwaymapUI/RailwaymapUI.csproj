@@ -97,6 +97,7 @@
     <Compile Include="Commons.cs" />
     <Compile Include="Coordinate.cs" />
     <Compile Include="ExpandList.cs" />
+    <Compile Include="FileHistory.cs" />
     <Compile Include="ImageNN.cs" />
     <Compile Include="LabelCoordinate.cs" />
     <Compile Include="LakeCache.cs" />
