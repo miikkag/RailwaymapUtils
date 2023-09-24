@@ -60,6 +60,8 @@ namespace RailwaymapUI
         public int CursorX { get; private set; }
         public int CursorY { get; private set; }
 
+        public bool MissingDB_Rivers { get; private set; }
+
         public MapImage_Background Image_Background { get; private set; }
         public MapImage_Landarea Image_Landarea { get; private set; }
         public MapImage_Lakes Image_Water { get; private set; }
@@ -145,6 +147,8 @@ namespace RailwaymapUI
 
             railways_timestamp = DateTime.MinValue;
 
+            MissingDB_Rivers = false;
+
             drawlock = new object();
 
             history = file_history;
@@ -192,6 +196,7 @@ namespace RailwaymapUI
             draw_items.landarea = (item == MapItems.Landarea);
             draw_items.borders = (item == MapItems.Borders);
             draw_items.water = (item == MapItems.Water);
+            draw_items.rivers = (item == MapItems.Rivers);
             draw_items.railways = (item == MapItems.Railways);
             draw_items.cities = (item == MapItems.Cities);
             draw_items.scale = (item == MapItems.Scale);
@@ -597,26 +602,37 @@ namespace RailwaymapUI
                     {
                         db_file = Path.Combine(AreaPath, DB_FILENAME_RIVERS);
 
-                        string db_cache = Path.Combine(AreaPath, DB_FILENAME_RIVERS_CACHE);
-
-                        if (!Commons.Check_Cache_DB(db_file, db_cache))
+                        if (File.Exists(db_file))
                         {
-                            RiverCache.Convert_Rivers(db_file, db_cache, Progress);
+                            string db_cache = Path.Combine(AreaPath, DB_FILENAME_RIVERS_CACHE);
+
+                            if (!Commons.Check_Cache_DB(db_file, db_cache))
+                            {
+                                RiverCache.Convert_Rivers(db_file, db_cache, Progress);
+                            }
+
+                            string img_cache = Commons.Cache_ImageName(AreaPath, "rivers");
+
+                            bool need_draw = true;
+
+                            if (draw_items.use_cache && Commons.Check_Cache_Image(db_file, img_cache))
+                            {
+                                need_draw = !Image_Rivers.DrawFromCache(img_cache);
+                            }
+
+                            if (need_draw)
+                            {
+                                Image_Rivers.Draw(db_cache, bxy, Progress, Set);
+                                Image_Rivers.Save_ImageCache(img_cache, db_file);
+                            }
+
+                            MissingDB_Rivers = false;
+                            OnPropertyChanged(nameof(MissingDB_Rivers));
                         }
-
-                        string img_cache = Commons.Cache_ImageName(AreaPath, "rivers");
-
-                        bool need_draw = true;
-
-                        if (draw_items.use_cache && Commons.Check_Cache_Image(db_file, img_cache))
+                        else
                         {
-                            need_draw = !Image_Water.DrawFromCache(img_cache);
-                        }
-
-                        if (need_draw)
-                        {
-                            Image_Rivers.Draw(db_cache, bxy, Progress, Set);
-                            Image_Rivers.Save_ImageCache(img_cache, db_file);
+                            MissingDB_Rivers = true;
+                            OnPropertyChanged(nameof(MissingDB_Rivers));
                         }
 
                         OnPropertyChanged("Image_Rivers");

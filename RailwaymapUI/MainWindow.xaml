@@ -84,6 +84,15 @@
             </Style.Triggers>
         </Style>
 
+        <Style x:Key="StyleShowTextBlock" TargetType="TextBlock">
+            <Setter Property="Visibility" Value="Hidden"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding}" Value="True">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
         <ContextMenu x:Key="HideStationsMenu">
             <MenuItem Header="Hide items of type:" IsHitTestVisible="False" Focusable="False" FontWeight="SemiBold"/>
             <MenuItem Header="Stations" Tag="station" Click="HideStationsMenu_Click"/>
@@ -508,12 +517,19 @@
 
                                 <Grid HorizontalAlignment="{Binding HorizontalAlignment, RelativeSource={RelativeSource AncestorType=ContentPresenter}, Mode=OneWayToSource}">
                                     <TextBlock FontWeight="SemiBold">Rivers:</TextBlock>
-                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" FontFamily="Segoe MDL2 Assets" FontSize="16" FontWeight="Normal" ToolTip="Refresh Image">
-                                        <Hyperlink TextDecorations="None" Foreground="Black" Click="Refresh_ImageRivers">&#xEDAB;</Hyperlink>
-                                    </TextBlock>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <TextBlock HorizontalAlignment="Right" Foreground="CornflowerBlue"
+                                                   DataContext="{Binding DB.MissingDB_Rivers}" Style="{StaticResource StyleShowTextBlock}">
+                                            &#x2012; No Database &#x2012;
+                                        </TextBlock>
+                                        <Border Width="5"/>
+                                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" FontFamily="Segoe MDL2 Assets" FontSize="16" FontWeight="Normal" ToolTip="Refresh Image">
+                                            <Hyperlink TextDecorations="None" Foreground="Black" Click="Refresh_ImageRivers">&#xEDAB;</Hyperlink>
+                                        </TextBlock>
+                                    </StackPanel>
                                 </Grid>
                                 <Border Height="2"/>
-                                <CheckBox IsChecked="{Binding DB.Image_Water.Enabled}">Visible</CheckBox>
+                                <CheckBox IsChecked="{Binding DB.Image_Rivers.Enabled}">Visible</CheckBox>
                                 <Border Height="3"/>
 
                                 <CheckBox IsChecked="{Binding DB.Set.Draw_Rivers_Waterbodies}">Draw Waterbodies</CheckBox>
