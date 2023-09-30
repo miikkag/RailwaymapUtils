@@ -825,7 +825,7 @@
 
                         <Separator Background="Silver" Margin="0,8,0,8"/>
 
-                        <Expander IsExpanded="{Binding ExpandItems.Cities}" Background="#F0F0D0">
+                        <Expander IsExpanded="{Binding ExpandItems.Cities}" Background="#F7F7DC">
                             <Expander.Header>
                                 <Grid HorizontalAlignment="{Binding HorizontalAlignment, RelativeSource={RelativeSource AncestorType=ContentPresenter}, Mode=OneWayToSource}">
                                     <TextBlock FontSize="13">Stations / Sites / Yards</TextBlock>
@@ -928,6 +928,7 @@
                                                              Click_Bold="Station_Bold_Click"
                                                              Click_Outline="Station_Outline_Click"
                                                              Click_EN="Station_EN_Click"
+                                                             Click_HideName="Station_HideName_Click"
                                                              Click_Rotation="Station_Rotation_Click"
                                                              Click_OffsetX_Minus="Station_OffsetXMinus_Click"
                                                              Click_OffsetX_Plus="Station_OffsetXPlus_Click"
@@ -983,6 +984,7 @@
                                                              Click_Bold="Station_Bold_Click"
                                                              Click_Outline="Station_Outline_Click"
                                                              Click_EN="Station_EN_Click"
+                                                             Click_HideName="Station_HideName_Click"
                                                              Click_Rotation="Station_Rotation_Click"
                                                              Click_OffsetX_Minus="Station_OffsetXMinus_Click"
                                                              Click_OffsetX_Plus="Station_OffsetXPlus_Click"

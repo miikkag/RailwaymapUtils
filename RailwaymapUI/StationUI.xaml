@@ -12,6 +12,7 @@
         <Brush x:Key="Rotation1Selected">#4FC1FF</Brush>
         <Brush x:Key="Rotation2Selected">#BF91FF</Brush>
         <Brush x:Key="ENbuttonSelected">#FF975B</Brush>
+        <Brush x:Key="HidenamebuttonSelected">#FF975B</Brush>
 
         <Style x:Key="StyleMainBackground" TargetType="Border">
             <Setter Property="Background" Value="#F0F0E0"/>
@@ -189,6 +190,15 @@
             </Style.Triggers>
         </Style>
 
+        <Style x:Key="StyleButtonHideName" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AlignButtonIdle}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding hidename}" Value="True">
+                    <Setter Property="Background" Value="{StaticResource HidenamebuttonSelected}"/>
+                    <Setter Property="Foreground" Value="#FFFFFF"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
 
 
         <Style x:Key="StyleButtonEN" TargetType="Button">
@@ -231,7 +241,7 @@
 
 
     </UserControl.Resources>
-    <Border HorizontalAlignment="Left" Padding="2" Margin="2,2,2,2" BorderThickness="1"
+    <Border HorizontalAlignment="Left" Padding="3" Margin="2,2,2,3"
             x:Name="LayoutRoot" DataContext="{Binding}" SnapsToDevicePixels="True" UseLayoutRounding="True"
             Style="{StaticResource StyleMainBackground}" >
         <StackPanel Orientation="Vertical">
@@ -265,56 +275,56 @@
             </Grid>
             <Border Height="2"/>
             <StackPanel Orientation="Horizontal">
-                <Button Padding="2" Tag="{Binding id}" Width="18" Height="18" Click="Station_valign_top"
+                <Button Padding="2" Tag="{Binding id}" Width="20" Height="20" Click="Station_valign_top"
                         FontFamily="Segoe MDL2 Assets" FontSize="9" TextOptions.TextFormattingMode="Display"
                         Style="{StaticResource StyleValign_Top}">&#xF0AD;</Button>
                 <Border Width="2"/>
-                <Button Padding="2" Tag="{Binding id}" Width="18" Height="18" Click="Station_valign_center"
+                <Button Padding="2" Tag="{Binding id}" Width="20" Height="20" Click="Station_valign_center"
                         FontFamily="Segoe MDL2 Assets" FontSize="10" TextOptions.TextFormattingMode="Display"
                         Style="{StaticResource StyleValign_Center}">&#xF141;</Button>
                 <Border Width="2"/>
-                <Button Padding="2" Tag="{Binding id}" Width="18" Height="18" Click="Station_valign_bottom"
+                <Button Padding="2" Tag="{Binding id}" Width="20" Height="20" Click="Station_valign_bottom"
                         FontFamily="Segoe MDL2 Assets" FontSize="9" TextOptions.TextFormattingMode="Display"
                         Style="{StaticResource StyleValign_Bottom}">&#xF0AE;</Button>
 
                 <Border Width="6"/>
 
-                <Button Padding="2" Tag="{Binding id}" Width="18" Height="18" Click="Station_halign_left"
+                <Button Padding="2" Tag="{Binding id}" Width="20" Height="20" Click="Station_halign_left"
                         FontFamily="Segoe MDL2 Assets" FontSize="9" TextOptions.TextFormattingMode="Display"
                         Style="{StaticResource StyleHalign_Left}">&#xF0B0;</Button>
                 <Border Width="2"/>
-                <Button Padding="2" Tag="{Binding id}" Width="18" Height="18" Click="Station_halign_center"
+                <Button Padding="2" Tag="{Binding id}" Width="20" Height="20" Click="Station_halign_center"
                         FontSize="10" TextOptions.TextFormattingMode="Display"
                         Style="{StaticResource StyleHalign_Center}">|</Button>
                 <Border Width="2"/>
-                <Button Padding="2" Tag="{Binding id}" Width="18" Height="18" Click="Station_halign_right"
+                <Button Padding="2" Tag="{Binding id}" Width="20" Height="20" Click="Station_halign_right"
                         FontFamily="Segoe MDL2 Assets" FontSize="9" TextOptions.TextFormattingMode="Display"
                         Style="{StaticResource StyleHalign_Right}">&#xF0AF;</Button>
 
                 <Border Width="5"/>
-                <TextBox Text="{Binding display_name}" Width="96"
+                <TextBox Text="{Binding display_name}" Width="126"
                          GotKeyboardFocus="SelectField" PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"/>
             </StackPanel>
             <Border Height="2"/>
             
             <StackPanel Orientation="Horizontal">
-                <Button Padding="-3" Tag="{Binding id}" Width="18" Height="14" Click="Station_offsety_minus"
-                        FontFamily="Segoe MDL2 Assets" FontSize="8" TextOptions.TextFormattingMode="Display">&#xE70E;</Button>
+                <Button Padding="-3" Tag="{Binding id}" Width="20" Height="16" Click="Station_offsety_minus"
+                        FontFamily="Segoe MDL2 Assets" FontSize="9" TextOptions.TextFormattingMode="Display">&#xE70E;</Button>
                 <Border Width="2"/>
-                <Button Padding="-3" Tag="{Binding id}" Width="18" Height="14" Click="Station_offsety_plus"
-                        FontFamily="Segoe MDL2 Assets" FontSize="8" TextOptions.TextFormattingMode="Display">&#xE70D;</Button>
+                <Button Padding="-3" Tag="{Binding id}" Width="20" Height="16" Click="Station_offsety_plus"
+                        FontFamily="Segoe MDL2 Assets" FontSize="9" TextOptions.TextFormattingMode="Display">&#xE70D;</Button>
                 <Border Width="2"/>
                 <Border Width="18" Height="13">
                     <TextBlock FontSize="10" VerticalAlignment="Center" HorizontalAlignment="Center"
                                Text="{Binding offsety}" Foreground="Gray"/>
                 </Border>
 
-                <Border Width="6"/>
+                <Border Width="8"/>
 
-                <Button Padding="-3" Tag="{Binding id}" Width="18" Height="14" Click="Station_offsetx_minus"
+                <Button Padding="-3" Tag="{Binding id}" Width="20" Height="16" Click="Station_offsetx_minus"
                         FontFamily="Segoe MDL2 Assets" FontSize="8" TextOptions.TextFormattingMode="Display">&#xE76B;</Button>
                 <Border Width="2"/>
-                <Button Padding="-3" Tag="{Binding id}" Width="18" Height="14" Click="Station_offsetx_plus"
+                <Button Padding="-3" Tag="{Binding id}" Width="20" Height="16" Click="Station_offsetx_plus"
                         FontFamily="Segoe MDL2 Assets" FontSize="8" TextOptions.TextFormattingMode="Display">&#xE76C;</Button>
                 <Border Width="2"/>
                 <Border Width="18" Height="14">
@@ -322,39 +332,46 @@
                                Text="{Binding offsetx}" Foreground="Gray"/>
                 </Border>
 
-                <Border Width="5"/>
-                <Button Padding="-3" Tag="{Binding id}" Width="18" Height="14" Click="Station_Bold_Click"
+                <Border Width="8"/>
+                <Button Padding="-3" Tag="{Binding id}" Width="20" Height="16" Click="Station_Bold_Click"
                         FontSize="10" FontWeight="Bold" TextOptions.TextFormattingMode="Display"
                         Style="{StaticResource StyleButtonBold}">B</Button>
                 
                 <Border Width="1"/>
-                <Button Padding="-3" Tag="{Binding id}" Width="14" Height="14" Click="Station_Outline_Click"
+                <Button Padding="-3" Tag="{Binding id}" Width="16" Height="16" Click="Station_Outline_Click"
                         FontSize="10" FontWeight="Normal" TextOptions.TextFormattingMode="Display"
                         Style="{StaticResource StyleButtonOutline}">
                     <Rectangle Width="8" Height="8" Stroke="white" StrokeThickness="2.5"/>
                 </Button>
                 <Border Width="1"/>
-                <Button Padding="-3" Tag="{Binding id}" Width="14" Height="14" Click="Station_Rotation_Click"
+                <Button Padding="-3" Tag="{Binding id}" Width="16" Height="16" Click="Station_Rotation_Click"
                         FontSize="10" FontWeight="Normal" TextOptions.TextFormattingMode="Display"
                         FontFamily="Segoe MDL2 Assets"
                         Style="{StaticResource StyleButtonRotation}">
                     &#xE7AD;
                 </Button>
+                <Border Width="1"/>
+                <Button Padding="-3" Tag="{Binding id}" Width="16" Height="16" Click="Station_HideName_Click"
+                        FontSize="10" FontWeight="Normal" TextOptions.TextFormattingMode="Display"
+                        FontFamily="Segoe MDL2 Assets"
+                        Style="{StaticResource StyleButtonHideName}">
+                    &#xF78A;
+                </Button>
                 <Border Width="4"/>
 
-                <Button Padding="-3" Tag="{Binding id}" Width="14" Height="14" Click="Station_Dot2"
+                <Button Padding="-3" Tag="{Binding id}" Width="16" Height="16" Click="Station_Dot2"
                         FontSize="12" TextOptions.TextFormattingMode="Display"
                         Style="{StaticResource DotButtonStyle2}">
                     <Rectangle Width="3" Height="3" Fill="Black"/>
                 </Button>
                 <Border Width="1"/>
-                <Button Padding="-3" Tag="{Binding id}" Width="14" Height="14" Click="Station_Dot3"
+                <Button Padding="-3" Tag="{Binding id}" Width="16" Height="16" Click="Station_Dot3"
                         FontSize="6" TextOptions.TextFormattingMode="Display"
                         Style="{StaticResource DotButtonStyle3}">
                     <Rectangle Width="4" Height="4" Fill="Black"/>
                 </Button>
                 <Border Width="1"/>
-                <Button Padding="-3" Tag="{Binding id}" Width="14" Height="14" Click="Station_Dot4"
+                <Button Padding="-3" Tag="{Binding id}" Width="16" Height="16" Click="Station_Dot4"
                         FontSize="7" TextOptions.TextFormattingMode="Display"
                         Style="{StaticResource DotButtonStyle4}">
                     <Rectangle Width="6" Height="6" Fill="Black"/>

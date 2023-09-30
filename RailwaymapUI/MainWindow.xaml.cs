@@ -363,6 +363,17 @@ namespace RailwaymapUI
             }
         }
 
+        private void Station_HideName_Click(object sender, RoutedEventArgs e)
+        {
+            Int64.TryParse((sender as Button).Tag.ToString(), out Int64 id);
+
+            DB.Stations.Flip_Station_HideName(id);
+
+            if (DB.Set.AutoRedraw_Cities)
+            {
+                DB.Reset_Single(MapItems.Cities);
+            }
+        }
 
         private void Station_OffsetXPlus_Click(object sender, RoutedEventArgs e)
         {

@@ -54,6 +54,8 @@ namespace RailwaymapUI
         public bool Halign_Center { get { return (halign == Halign.Center); } }
         public bool Halign_Right { get { return (halign == Halign.Right); } }
 
+        public bool hidename { get; set; }
+
         public Int64 id { get; set; }
 
         public string use_name { get { if (english) return name_en; else return name; } }

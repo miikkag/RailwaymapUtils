@@ -115,6 +115,7 @@ namespace RailwaymapUI
                 str.Append("offsety"      + Commons.DELIM_EQ + st.offsety.ToString() + Commons.DELIM_CONFITEMS);
                 str.Append("dotsize"      + Commons.DELIM_EQ + st.dotsize.ToString() + Commons.DELIM_CONFITEMS);
                 str.Append("english"      + Commons.DELIM_EQ + st.english.ToString() + Commons.DELIM_CONFITEMS);
+                str.Append("hidename"     + Commons.DELIM_EQ + st.hidename.ToString() + Commons.DELIM_CONFITEMS);
                 str.Append("rotation"     + Commons.DELIM_EQ + st.rotation.ToString());
 
                 result.Add(str.ToString());
@@ -141,6 +142,7 @@ namespace RailwaymapUI
                 int offsety = 0;
                 int dotsize = DrawSettings.Dotsize_Station_Default;
                 int rotation = 0;
+                bool hidename = false;
 
                 foreach (string pair in items)
                 {
@@ -198,6 +200,10 @@ namespace RailwaymapUI
                                 int.TryParse(parts[1], out rotation);
                                 break;
 
+                            case "hidename":
+                                bool.TryParse(parts[1], out hidename);
+                                break;
+
                             default:
                                 break;
                         }
@@ -221,6 +227,7 @@ namespace RailwaymapUI
                             st.english = english;
                             st.rotation = rotation;
                             st.display_name = display_name; // setting english flag resets display name
+                            st.hidename = hidename;
 
                             st.Force_Refresh();
 
@@ -667,6 +674,20 @@ namespace RailwaymapUI
                         st.rotation = 0;
                     }
 
+                    st.Force_Refresh();
+
+                    break;
+                }
+            }
+        }
+
+        public void Flip_Station_HideName(Int64 id)
+        {
+            foreach (StationItem st in Items)
+            {
+                if (st.id == id)
+                {
+                    st.hidename = !st.hidename;
                     st.Force_Refresh();
 
                     break;
